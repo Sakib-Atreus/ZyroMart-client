@@ -2,8 +2,6 @@ const Footer = () => {
   return (
     <div>
       <footer className="footer bg-base-200 text-base-content p-10 text-md font-semibold lg:py-24 md:py-24">
-
-        
         <aside className="">
           <svg
             width="50"
@@ -18,7 +16,8 @@ const Footer = () => {
           </svg>
           <p>
             <br />
-            Making the world a better place through constructing elegant hierarchies. <br />
+            Making the world a better place through constructing elegant
+            hierarchies. <br />
             Providing reliable tech since 1992
           </p>
           <br />
@@ -59,7 +58,6 @@ const Footer = () => {
           </nav>
         </aside>
 
-
         <nav>
           <h6 className="footer-title">Services</h6>
           <a className="link link-hover">Branding</a>
@@ -90,8 +88,9 @@ const Footer = () => {
         </nav>
       </footer>
 
-
-      <hr className="mx-8 opacity-15"/>
+      <div className="bg-base-200">
+        <hr className="mx-8 opacity-15" />
+      </div>
       <footer className="footer footer-left bg-base-200 text-base-content p-10">
         <aside>
           <p>
