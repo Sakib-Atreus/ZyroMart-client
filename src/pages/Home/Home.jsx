@@ -1,9 +1,16 @@
 import React from 'react';
+import Carousel from './Carousel/Carousel';
+import FeaturedCategories from './FeaturedCategories/FeaturedCategories';
+import ExclusiveProducts from './ExclusiveProducts/ExclusiveProducts';
+import NewArrival from './NewArrival/NewArrival';
 
 const Home = () => {
     return (
-        <div className='my-64'>
-            <h2>This is home page!</h2>
+        <div className='max-w-7xl mx-auto'>
+            <Carousel/>
+            <FeaturedCategories/>
+            <ExclusiveProducts/>
+            <NewArrival/>
         </div>
     );
 };

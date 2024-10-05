@@ -1,0 +1,40 @@
+.custom-search .ant-input {
+  background-color: orangered;
+  color: white;
+}
+
+.custom-search .ant-btn {
+  background-color: orangered;
+  color: white;
+}
+
+.custom-search:hover .ant-btn:hover {
+  background-color: orangered;
+  color: white;
+}
+
+.custom-badge .ant-badge-count {
+  background-color: orangered; /* Change background color of the badge */
+  color: white; /* Change text color */
+  border-radius: 50%; /* Make it circular */
+  font-size: 14px; /* Change font size */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+}
+
+.custom-badge .ant-badge-count-square {
+  background-color: green; /* Change background color of the square badge */
+  color: white;
+}
+
+.custom-badge .ant-badge-count::after {
+  content: ""; /* Optional: add content after the badge */
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 50%;
+}
+
+.custom-icon {
+  font-size: 24px; /* Change icon size */
+  color: white; /* Change icon color */
+}
