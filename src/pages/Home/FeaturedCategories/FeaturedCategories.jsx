@@ -39,7 +39,7 @@ const FeaturedCategories = () => {
                 </div>
                 <div className='grid grid-cols-1 gap-4'>
                     <img src={fc5} alt="" className='w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg' />
-                    <p className='text-[#454457] text-center'>Cases & Screen <br /> Protector</p>
+                    <p className='text-[#454457] text-center'>Cases & Protector</p>
                 </div>
                 <div className='grid grid-cols-1 gap-4'>
                     <img src={fc6} alt="" className='w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg' />
