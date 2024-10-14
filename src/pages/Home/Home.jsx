@@ -3,6 +3,7 @@ import Carousel from './Carousel/Carousel';
 import FeaturedCategories from './FeaturedCategories/FeaturedCategories';
 import ExclusiveProducts from './ExclusiveProducts/ExclusiveProducts';
 import NewArrival from './NewArrival/NewArrival';
+import ImageHover from './ImageHover/ImageHover';
 
 const Home = () => {
     return (
@@ -11,6 +12,7 @@ const Home = () => {
             <FeaturedCategories/>
             <ExclusiveProducts/>
             <NewArrival/>
+            <ImageHover/>
         </div>
     );
 };
