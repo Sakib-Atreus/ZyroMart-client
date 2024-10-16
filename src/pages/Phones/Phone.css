@@ -1,0 +1,40 @@
+.custom-dropdown .ant-select-item-option:hover {
+    background-color: #fb923c; 
+    color: white;
+    border: none;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #a0aec0; /* Tailwind's Gray-400 (#a0aec0) */
+  }
+
+  .custom-select {
+    background-color: white; /* Default background color */
+  }
+  
+  /* Remove hover effect */
+  .custom-select:hover {
+    background-color: white; /* Keep background white on hover */
+  }
+  
+  /* Remove the focus effect */
+  .custom-select:focus {
+    background-color: white; /* Keep background white on focus */
+    box-shadow: none; /* Remove box shadow */
+  }
+  
+  /* Optional: Style for the dropdown options */
+  .custom-dropdown .ant-select-item-option:hover {
+    background-color: #fb923c; /* Set hover color to orange for options */
+    color: white; /* Change text color to white on hover */
+  }
+  
+  .ant-select-selection-item {
+    color: gray; /* Adjust color of the selected item if needed */
+  }
+  
+
+  /* Range Button  */
+
+
+  

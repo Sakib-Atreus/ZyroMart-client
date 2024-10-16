@@ -24,7 +24,7 @@ const items = [
   {
     key: "sub1",
     label: (
-      <p className="lg:text-white md:text-white text-black">Phones</p>
+      <p className="lg:text-white md:text-white text-black"><Link to="/phones">Phones</Link></p>
     ),
     children: [
       {
