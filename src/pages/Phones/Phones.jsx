@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import "rc-slider/assets/index.css";
 import Slider from "rc-slider";
 import { Cascader, Input, Select, Space } from "antd";
-import "./Phone.css";
+import "./Phones.css";
 
 const { Option } = Select;
 

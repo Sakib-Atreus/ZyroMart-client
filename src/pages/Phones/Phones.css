@@ -1,0 +1,64 @@
+.custom-dropdown .ant-select-item-option:hover {
+    background-color: #fb923c; 
+    color: white;
+    border: none;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #a0aec0; 
+  }
+
+  .custom-select {
+    background-color: white; 
+  }
+  
+  /* Remove hover effect */
+  .custom-select:hover {
+    background-color: white; 
+  }
+  
+  /* Remove the focus effect */
+  .custom-select:focus {
+    background-color: white;
+    box-shadow: none; 
+  }
+  
+  /* Optional: Style for the dropdown options */
+  .custom-dropdown .ant-select-item-option:hover {
+    background-color: #fb923c; 
+    color: white; 
+  }
+  
+  .ant-select-selection-item {
+    color: gray; 
+  }
+  
+
+  /* Range Button  */
+
+/* Change the track color */
+.custom-slider .rc-slider-track {
+  background-color: #fb923c; 
+}
+
+/* Change the handle color */
+.custom-slider .rc-slider-handle {
+  border-color: #fb923c; 
+  background-color: white; 
+}
+
+/* Change the handle color on hover */
+.custom-slider .rc-slider-handle:hover {
+  border-color: #fb923c; 
+}
+
+/* Change the handle color when focused */
+.custom-slider .rc-slider-handle:focus {
+  border-color: #fb923c;
+  box-shadow: none; 
+}
+
+/* Change the color of the handle while dragging */
+.custom-slider .rc-slider-handle:active {
+  border-color: #fb923c; 
+}

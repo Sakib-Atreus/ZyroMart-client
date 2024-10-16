@@ -24,7 +24,7 @@ const items = [
   {
     key: "sub1",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link to="/phones">Phones</Link></p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/phones">Phones</Link></p>
     ),
     children: [
       {
@@ -55,7 +55,7 @@ const items = [
   {
     key: "sub2",
     label: (
-      <p className="lg:text-white md:text-white text-black">iPad & Tab</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">iPad & Tab</Link></p>
     ),
     children: [
       {
@@ -85,7 +85,7 @@ const items = [
   {
     key: "sub4",
     label: (
-      <p className="lg:text-white md:text-white text-black">Mac</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Mac</Link></p>
     ),
     children: [
       {
@@ -109,7 +109,7 @@ const items = [
   {
     key: "sub5",
     label: (
-      <p className="lg:text-white md:text-white text-black">Wearable</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Wearable</Link></p>
     ),
     children: [
       {
@@ -133,7 +133,7 @@ const items = [
   {
     key: "sub6",
     label: (
-      <p className="lg:text-white md:text-white text-black">Headphone & Speaker</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Headphone & Speaker</Link></p>
     ),
     children: [
       {
@@ -157,7 +157,7 @@ const items = [
   {
     key: "sub7",
     label: (
-      <p className="lg:text-white md:text-white text-black">Accessories</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Accessories</Link></p>
     ),
     children: [
       {
@@ -181,7 +181,7 @@ const items = [
   {
     key: "sub8",
     label: (
-      <p className="lg:text-white md:text-white text-black">Camera</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Camera</Link></p>
     ),
     children: [
       {
@@ -205,7 +205,7 @@ const items = [
   {
     key: "sub9",
     label: (
-      <p className="lg:text-white md:text-white text-black">Video Games</p>
+      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Video Games</Link></p>
     ),
     children: [
       {
@@ -376,7 +376,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto hidden lg:flex justify-start px-4 bg-black text-white">
           <MenuOutlined /> <hr className="border-r-2 h-8 ms-4 my-auto" />
           <Menu
-            className="bg-black text-white"
+            className="bg-black text-white custom-menu"
             onClick={onClick}
             style={{
               width: 1080,
