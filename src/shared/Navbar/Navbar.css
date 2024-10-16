@@ -41,14 +41,3 @@
 
 
 /* hover */
-
-.custom-menu .ant-menu-item:hover {
-  border-bottom-color: orange !important; /* Change hover underline color to blue */
-}
-
-.custom-menu .ant-menu-item-active,
-.custom-menu .ant-menu-item-selected {
-  border-bottom-color: orange !important; /* Keep the active underline color blue */
-}
-
-

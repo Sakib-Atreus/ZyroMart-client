@@ -26,6 +26,7 @@ const items = [
     label: (
       <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/phones">Phones</Link></p>
     ),
+    danger: true,
     children: [
       {
         key: "1-1",
@@ -380,8 +381,20 @@ const Navbar = () => {
             onClick={onClick}
             style={{
               width: 1080,
+              border: "2px solid black"
             }}
             mode="horizontal"
+            horizontalItemHoverColor="#ff4d4f"
+            horizontalItemSelectedColor="#ff4d4f"
+            itemSelectedColor="#ff4d4f"
+            darkItemSelectedBg="#ff4d4f"
+            colorPrimaryBorder="#ff4d4f"
+            horizontalItemHoverBg="#ff4d4f"
+            horizontalItemSelectedBg="#ff4d4f"
+            horizontalLineHeight="12px"
+            itemMarginInline="0"
+            activeBarBorderWidth="0"
+            
             items={items}
           />
           <div className="flex justify-center items-center gap-4 text-sm font-semibold hover:text-primary">

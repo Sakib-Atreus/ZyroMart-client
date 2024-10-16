@@ -189,39 +189,60 @@ const Phones = () => {
           {/* Product Grid */}
           <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 text-center">
             {/* Product Card */}
-            <div className="border p-4 rounded shadow-xl bg-white">
+            <Link to="/phones/new">
+            <div className="shadow-xl bg-white pb-2">
               <img
                 src="https://dvf83rt16ac4w.cloudfront.net/upload/product/20220405_1649146951_699542.png"
                 alt="Product Image"
               />
-              <h3 className="text-lg font-semibold">Redmi Note 11S</h3>
+              <img
+                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191204_1575461019_541440.png"
+                alt="brand icon"
+                className="w-14 h-8 mx-auto"
+              />
+              <h3 className="text-md font-semibold">Redmi Note 11S</h3>
               <p className="text-orange-600 font-bold my-2">Tk. 27,999</p>
               <p className="text-sm text-gray-500">No Review Yet</p>
-            </div>
-            <div className="border p-4 rounded shadow-xl bg-white">
+            </div></Link>
+            <div className="shadow-xl bg-white pb-2">
               <img
                 src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1719983159812679.jpeg"
                 alt="Product Image"
               />
-              <h3 className="text-lg font-semibold">Vivo Y28</h3>
+              <img
+                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191202_1575290973_740323.jpeg"
+                alt="brand icon"
+                className="w-14 h-8 mx-auto"
+              />
+              <h3 className="text-md font-semibold">Vivo Y28</h3>
               <p className="text-orange-600 font-bold my-2">Tk. 20,999</p>
               <p className="text-sm text-gray-500">No Review Yet</p>
             </div>
-            <div className="border p-4 rounded shadow-xl bg-white">
+            <div className="shadow-xl bg-white pb-2">
               <img
                 src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1717237546618684.jpeg"
                 alt="Product Image"
               />
-              <h3 className="text-lg font-semibold">Vivo Y18</h3>
+              <img
+                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191202_1575290973_740323.jpeg"
+                alt="brand icon"
+                className="w-14 h-8 mx-auto"
+              />
+              <h3 className="text-md font-semibold">Vivo Y18</h3>
               <p className="text-orange-600 font-bold my-2">Tk. 14,999</p>
               <p className="text-sm text-gray-500">No Review Yet</p>
             </div>
-            <div className="border p-4 rounded shadow-xl bg-white">
+            <div className="shadow-xl bg-white pb-2">
               <img
                 src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1717660403496377.jpeg"
                 alt="Product Image"
               />
-              <h3 className="text-lg font-semibold">Galaxy M14 4G</h3>
+              <img
+                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20180405_1522919778_830681.png"
+                alt="brand icon"
+                className="w-14 h-8 mx-auto"
+              />
+              <h3 className="text-md font-semibold">Galaxy M14 4G</h3>
               <p className="text-orange-600 font-bold my-2">Tk. 17,999</p>
               <p className="text-sm text-gray-500">No Review Yet</p>
             </div>
