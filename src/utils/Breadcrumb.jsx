@@ -21,7 +21,6 @@ const DynamicBreadcrumb = () => {
         const url = '/' + pathArray.slice(0, index + 1).join('/');
 
         const formattedPath = path.charAt(0).toUpperCase() + path.slice(1);
-
         const isActive = url === pathname;
 
         return (
