@@ -164,7 +164,7 @@ const Phones = () => {
         </div>
 
         {/* Main Content */}
-        <div className="w-3/4 p-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
+        <div className="w-4/5 p-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
           <div className="flex justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold">Phones</h2>
