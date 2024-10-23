@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
+import { TiArrowForwardOutline } from "react-icons/ti";
+import SocialShare from "../../utils/SocialShare";
+import { BsShare } from "react-icons/bs";
 
 const PhoneDetails = () => {
   const [mainImage, setMainImage] = useState(
@@ -25,7 +28,10 @@ const PhoneDetails = () => {
   const handleArrowClick = (direction) => {
     if (direction === "up" && visibleThumbnails > 0) {
       setVisibleThumbnails(visibleThumbnails - 1);
-    } else if (direction === "down" && visibleThumbnails < thumbnails.length - 3) {
+    } else if (
+      direction === "down" &&
+      visibleThumbnails < thumbnails.length - 3
+    ) {
       setVisibleThumbnails(visibleThumbnails + 1);
     }
   };
@@ -113,15 +119,17 @@ const PhoneDetails = () => {
               </button>
 
               {/* Visible thumbnails */}
-              {thumbnails.slice(visibleThumbnails, visibleThumbnails + 3).map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  className="w-3/4 h-1/6 object-cover border cursor-pointer mb-2"
-                  alt={`thumbnail-${index}`}
-                  onClick={() => setMainImage(img)} // Change the main image on click
-                />
-              ))}
+              {thumbnails
+                .slice(visibleThumbnails, visibleThumbnails + 3)
+                .map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    className="w-3/4 h-1/6 object-cover border cursor-pointer mb-2"
+                    alt={`thumbnail-${index}`}
+                    onClick={() => setMainImage(img)} // Change the main image on click
+                  />
+                ))}
 
               {/* Down arrow */}
               <button
@@ -166,17 +174,32 @@ const PhoneDetails = () => {
         <div className="space-y-8">
           {/* Product Info */}
           <div>
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">HONOR X6b</h1>
-            {/* Share Button */}
-            <button
-              onClick={handleShare}
-              className="text-gray-600 flex items-center space-x-1 hover:text-black transition duration-300"
-            >
-              <FiShare2 size={20} />
-              <span className="underline">Share</span>
-            </button>
-          </div>
+            <div className="flex items-center ">
+              <h1 className="text-2xl font-bold">HONOR X6b</h1>
+              <button
+                className="text-gray-600 flex items-center space-x-1 hover:text-black transition duration-300 ms-4"
+                onClick={() =>
+                  document.getElementById("my_modal_2").showModal()
+                }
+              >
+                <TiArrowForwardOutline size={16} />
+
+                <span className="underline text-xs">Share</span>
+              </button>
+              <dialog id="my_modal_2" className="modal">
+                <div className="modal-box bg-white">
+                  <h3 className="font-semibold text-sm  italic">
+                    Share this link via
+                  </h3>
+                  <p className="mt-3 ">
+                    <SocialShare></SocialShare>
+                  </p>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                  <button>close</button>
+                </form>
+              </dialog>
+            </div>
             <p className="text-gray-500 mb-2">No Review Yet</p>
             <p className="text-2xl font-semibold text-orange-500">Tk. 14,999</p>
 
@@ -198,29 +221,71 @@ const PhoneDetails = () => {
                 <span className="text-gray-500">6GB</span>
               </div>
             </div>
+
+            <div className="flex mt-4">
+              <span className="text-sm">Warranty:</span>
+              <span className="text-primary text-xs font-semibold ms-2">
+                12 Months (Please preserve your box to claim warranty)
+              </span>
+            </div>
           </div>
 
           {/* Pricing & Purchase Options */}
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-lg text-orange-500 font-bold">
-                Tk. 14,999
-              </span>
-              <span className="text-sm text-gray-600">Cash Discount Price</span>
+            <div className="flex items-center space-x-4">
+              {/* EMI Checkbox */}
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" name="emi" />
+                <span className="text-sm">EMI</span>
+              </label>
+
+              {/* Z&M Gift Checkbox */}
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" name="ggGift" />
+                <span className="text-sm">Z&M Gift</span>
+              </label>
             </div>
 
-            <div className="flex items-center mt-2 space-x-4">
-              <div>
-                <label className="text-gray-600">EMI:</label>
-                <p className="text-sm">From 5,000/month</p>
+            <div className="flex space-x-4 mt-4">
+              {/* Cash Discount Price Box */}
+              <div className="border border-orange-500 p-4 rounded-lg flex flex-col items-start space-y-1">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cash"
+                  checked
+                  className="mb-2"
+                />
+                <span className="text-orange-500 font-bold text-md">
+                  Tk. 14,999
+                </span>
+                <span className="text-gray-500 text-sm">
+                  Cash Discount Price
+                </span>
+                <span className="text-gray-400 text-xs">
+                  Online / Cash Payment
+                </span>
               </div>
-              <div>
-                <label className="text-gray-600">0% EMI Price:</label>
-                <p className="text-sm">Tk. 14,999</p>
+
+              {/* EMI Box */}
+              <div className="border border-gray-300 p-4 rounded-lg flex flex-col items-start space-y-1">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="emi"
+                  className="mb-2"
+                />
+                <span className="text-orange-500 font-bold text-sm">
+                  Start From 5,000/month
+                </span>
+                <span className="text-gray-500 text-sm">
+                  0% EMI Price: Tk. 14,999
+                </span>
+                <span className="text-gray-400 text-xs">Up to 3 Months</span>
               </div>
             </div>
 
-            <div className="flex space-x-4 mt-6">
+            <div className="grid grid-cols-2 space-x-4 mt-6">
               <button className="bg-gray-200 py-2 px-4 rounded-lg">
                 Add To Cart
               </button>
@@ -248,14 +313,17 @@ const PhoneDetails = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white rounded-lg p-6 w-96">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold">Share this link via</h2>
-              <button onClick={() => setShowShareModal(false)} className="text-gray-500">
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="text-gray-500"
+              >
                 ✕
               </button>
             </div>
@@ -310,8 +378,8 @@ const PhoneDetails = () => {
                 </button>
               </div>
             </div>
-            </div>
-            </div>
+          </div>
+        </div>
       )}
     </div>
   );
