@@ -5,6 +5,9 @@ import { FiShare2 } from "react-icons/fi";
 import { TiArrowForwardOutline } from "react-icons/ti";
 import SocialShare from "../../utils/SocialShare";
 import { BsShare } from "react-icons/bs";
+import { FiThumbsUp } from "react-icons/fi";
+import { FaRegStar } from "react-icons/fa";
+import { CiCircleQuestion } from "react-icons/ci";
 
 const PhoneDetails = () => {
   const [mainImage, setMainImage] = useState(
@@ -14,6 +17,11 @@ const PhoneDetails = () => {
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 }); // State to store mouse position for zoom
   const [visibleThumbnails, setVisibleThumbnails] = useState(0); // Track which set of thumbnails is visible
   const [showShareModal, setShowShareModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("specification");
+
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
+  };
 
   const thumbnails = [
     "https://assets.gadgetandgear.com/upload/media/172432272608179.jpeg",
@@ -302,12 +310,22 @@ const PhoneDetails = () => {
           <div>
             <label className="flex items-center space-x-2">
               <input type="radio" name="gift" />
+              <img
+                className="w-12 rounded-3xl"
+                src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
+                alt=""
+              />
               <span>Meko C35 PWS x 1</span>
             </label>
           </div>
           <div>
             <label className="flex items-center space-x-2">
               <input type="radio" name="gift" />
+              <img
+                className="w-12 rounded-3xl"
+                src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
+                alt=""
+              />
               <span>MEKO N3 Sports Wireless Neckband x 1</span>
             </label>
           </div>
@@ -381,6 +399,468 @@ const PhoneDetails = () => {
           </div>
         </div>
       )}
+
+      <hr className="my-8 mb-16" />
+
+      <div className="grid grid-cols-8">
+        <div className="col-span-6">
+          <div className="tabs-container">
+            <ul className="flex">
+              <li
+                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                  activeTab === "specification"
+                    ? "text-orange-500 border-b-2 border-orange-500"
+                    : "text-black hover:text-orange-500"
+                }`}
+                onClick={() => handleTabClick("specification")}
+              >
+                Specification
+              </li>
+              <li
+                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                  activeTab === "description"
+                    ? "text-orange-500 border-b-2 border-orange-500"
+                    : "text-black hover:text-orange-500"
+                }`}
+                onClick={() => handleTabClick("description")}
+              >
+                Description
+              </li>
+              <li
+                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                  activeTab === "reviews"
+                    ? "text-orange-500 border-b-2 border-orange-500"
+                    : "text-black hover:text-orange-500"
+                }`}
+                onClick={() => handleTabClick("reviews")}
+              >
+                Reviews (0)
+              </li>
+              <li
+                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                  activeTab === "questions"
+                    ? "text-orange-500 border-b-2 border-orange-500"
+                    : "text-black hover:text-orange-500"
+                }`}
+                onClick={() => handleTabClick("questions")}
+              >
+                Questions (0)
+              </li>
+            </ul>
+          </div>
+
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-orange-500">
+              Specification
+            </h2>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">Battery</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">
+                  Connectivity and Location
+                </p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">
+                  Cellular Network
+                </p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">Rear Camera</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">Memory</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">System</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">Processor</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+            <div>
+              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
+                <p className="text-md font-semibold py-2 px-4">Display</p>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Sensors</h4>
+                <h3 className="col-span-4">
+                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
+                  Proximity Sensor
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Bluetooth</h4>
+                <h3 className="col-span-4">
+                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
+                </h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
+                <h3 className="col-span-4">Supported</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Frequency</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
+                <h4 className="col-span-2">Wi-Fi Protocols</h4>
+                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-orange-500">
+              Description
+            </h2>
+            <hr className="mt-2 text-gray-900 border" />
+            <div>
+              <h2 className="my-2 text-2xl font-bold">HONOR X6B</h2>
+              <p>
+                The HONOR X6B is a feature-packed smartphone designed for users
+                who demand style, performance, and reliability. This unlocked
+                Android device combines a sleek design with powerful
+                specifications, ensuring a seamless and enjoyable mobile
+                experience.
+              </p>
+              <h2 className="my-2 text-2xl font-bold">
+                Key Features of HONOR X6B
+              </h2>
+              <p>
+                The Honor X6B comes with features that make the Smartphone more
+                attractive to the customers. Here’s the details feature of HONOR
+                X6B:
+              </p>
+              <h2 className="my-2 text-xl font-bold">
+                6.56-Inch 90Hz Display:
+              </h2>
+              <p>
+                Dive into a smoother and more immersive viewing experience with
+                the 6.56-inch FullView display. The 90Hz refresh rate ensures
+                that everything from scrolling to gaming is incredibly fluid,
+                while the vibrant colors and sharp resolution make videos and
+                photos come to life.
+              </p>
+              <h2 className="my-2 text-xl font-bold">Storage:</h2>
+              <p>
+                With 6GB of RAM, the HONOR X6B handles multitasking with ease,
+                letting you switch between apps without lag. The 128GB of
+                internal storage offers ample space to store your favorite apps,
+                high-resolution photos, and videos. Expandable storage options
+                give you the flexibility to add more as needed.
+              </p>
+              <h2 className="my-2 text-xl font-bold">Long-Lasting Battery:</h2>
+              <p>
+                Power through your day without worrying about frequent charging.
+                The 5200mAh battery provides all-day power, perfect for heavy
+                users who rely on their phone for work, entertainment, and
+                staying connected. With intelligent power management, the
+                battery optimizes usage to ensure you get the most out of every
+                charge.
+              </p>
+              <h2 className="my-2 text-xl font-bold">Triple Camera System:</h2>
+              <p>
+                Capture every moment in stunning detail with the 50MP triple
+                camera system. The main camera delivers sharp, high-quality
+                images, while the additional lenses offer versatility with
+                wide-angle and macro capabilities. Whether you’re shooting
+                landscapes, portraits, or close-ups, the HONOR X6B ensures every
+                shot is picture-perfect.
+              </p>
+              <h2 className="my-2 text-xl font-bold">
+                Android Operating System:
+              </h2>
+              <p>
+                Enjoy the latest Android experience with a user-friendly
+                interface, access to millions of apps on the Google Play Store,
+                and regular updates to keep your device secure and running
+                smoothly.
+              </p>
+              <h2 className="my-2 text-xl font-bold">1-Years Warranty:</h2>
+              <p>
+                This device is protected with a 1-years warranty, providing
+                coverage for manufacturing defects and ensuring your investment
+                is safeguarded.
+              </p>
+              <h2 className="my-2 text-2xl font-bold">
+                Reasons to Buy the HONOR X6B
+              </h2>
+              <p>
+                The HONOR X6B is the ideal choice for users seeking a versatile,
+                high-performance smartphone that delivers exceptional value.
+                Whether you’re a tech enthusiast, a photography lover, or
+                someone who needs a reliable phone for everyday use, the HONOR
+                X6B has you covered.
+              </p>
+              <h2 className="my-2 text-2xl font-bold">
+                Get your Honor X6B Smartphone from Gadget & Gear
+              </h2>
+              <p>
+                You can find this feature-packed smartphone available at Gadget
+                and Gear, your trusted retailer for the latest tech devices.
+                Known for offering authentic products with reliable service,
+                Gadget and Gear ensures a seamless buying experience, whether
+                you’re shopping online or in-store. Get your HONOR X6B today
+              </p>
+              <h2 className="my-2 text-xl font-semibold text-orange-500">
+                What is the price of HONOR X6b in Bangladesh?
+              </h2>
+              <hr className="my-2 text-gray-900 border" />
+              <p>
+                The latest price of HONOR X6b in Bangladesh is BDT 14999. You
+                can buy the HONOR X6b at best price from our website or visit
+                any of our store .
+              </p>
+            </div>
+          </div>
+          <div className="mt-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-orange-500">Reviews</h2>
+              <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
+                Write a Review
+              </button>
+            </div>
+            <hr className="mt-2 text-gray-900 border" />
+            <div className="flex flex-col items-center justify-center my-16">
+              {/* Thumbs Up Icon with Stars */}
+              <FiThumbsUp className="text-5xl text-black mb-2" />
+              <div className="flex space-x-1 mb-4">
+                <span className="text-xl text-gray-700">
+                  <FaRegStar />
+                </span>
+                <span className="text-xl text-gray-700">
+                  <FaRegStar />
+                </span>
+                <span className="text-xl text-gray-700">
+                  <FaRegStar />
+                </span>
+              </div>
+
+              {/* No Review Text */}
+              <p className="text-xl  text-black mb-2">No Review Found</p>
+
+              {/* Write a Review Button */}
+              <button className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md hover:bg-orange-200 transition duration-300">
+                Write a Review
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-orange-500">Questions</h2>
+              <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
+                Ask a Question
+              </button>
+            </div>
+            <hr className="mt-2 text-gray-900 border" />
+            <div className="flex flex-col items-center justify-center my-16">
+              {/* Thumbs Up Icon with Stars */}
+              <CiCircleQuestion className="text-5xl text-black mb-2" />
+
+              {/* No Review Text */}
+              <p className="text-xl  text-black mb-2">No Question Found</p>
+
+              {/* Write a Review Button */}
+              <button className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md hover:bg-orange-200 transition duration-300">
+                Ask a Question
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="col-span-2">
+          <h2>Divider</h2>
+        </div>
+      </div>
     </div>
   );
 };
