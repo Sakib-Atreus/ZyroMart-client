@@ -366,7 +366,7 @@ const PhoneDetails = () => {
             name="emi"
             checked={isEmiChecked}
             onChange={handleEmiToggle}
-            className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+            className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
           />
           <span className="text-sm">EMI</span>
           
@@ -383,7 +383,7 @@ const PhoneDetails = () => {
             name="ggGift"
             checked={isGiftChecked}
             onChange={handleGiftToggle}
-            className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+            className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
           />
           <span className="text-sm">Z&M Gift</span>
           
@@ -408,7 +408,7 @@ const PhoneDetails = () => {
               value="cash"
               checked={paymentMethod === 'cash'}
               onChange={() => handlePaymentMethodChange('cash')}
-              className="peer w-4 h-4 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+              className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
             />
             <span className="text-md text-orange-500 font-bold">Tk. 14,999</span>
 
@@ -434,7 +434,7 @@ const PhoneDetails = () => {
               value="emi"
               checked={paymentMethod === 'emi'}
               onChange={() => handlePaymentMethodChange('emi')}
-              className="peer w-4 h-4 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+              className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
             />
             <span className="text-sm text-orange-500 font-bold">
               Start From 5,000/month
