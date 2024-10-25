@@ -8,6 +8,8 @@ import { BsShare } from "react-icons/bs";
 import { FiThumbsUp } from "react-icons/fi";
 import { FaRegStar } from "react-icons/fa";
 import { CiCircleQuestion } from "react-icons/ci";
+import { FaStar } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 
 const PhoneDetails = () => {
   const [mainImage, setMainImage] = useState(
@@ -18,6 +20,38 @@ const PhoneDetails = () => {
   const [visibleThumbnails, setVisibleThumbnails] = useState(0); // Track which set of thumbnails is visible
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState("specification");
+
+  // State to manage EMI checkbox and payment method
+  const [isEmiChecked, setIsEmiChecked] = useState(false);
+  const [isGiftChecked, setIsGiftChecked] = useState(false);
+  const [showGiftModal, setShowGiftModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+
+  const handleEmiToggle = () => {
+    setIsEmiChecked(!isEmiChecked);
+    if (!isEmiChecked) {
+      setPaymentMethod('emi');
+    } else {
+      setPaymentMethod('cash');
+    }
+  };
+
+  const handleGiftToggle = () => {
+    setIsGiftChecked(!isGiftChecked);
+    setShowGiftModal(!isGiftChecked);
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
+    setIsEmiChecked(method === 'emi');
+  };
+
+  const closeModal = () => {
+    setShowGiftModal(false);
+  };
+
+
+  
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -150,7 +184,7 @@ const PhoneDetails = () => {
             </div>
 
             {/* Main Image */}
-            <div className="w-4/5 relative">
+            <div className="w-[75%] relative">
               <img
                 src={mainImage}
                 className="w-full h-full object-cover"
@@ -179,9 +213,10 @@ const PhoneDetails = () => {
         </div>
 
         {/* Product Info & Options */}
-        <div className="space-y-8">
+        <div className="lg:-mx-8 space-y-8">
           {/* Product Info */}
-          <div>
+          <div className="">
+            <h1 className="text-md font-medium mt-2 mb-6 ps-1">HONOR</h1>
             <div className="flex items-center ">
               <h1 className="text-2xl font-bold">HONOR X6b</h1>
               <button
@@ -239,34 +274,49 @@ const PhoneDetails = () => {
           </div>
 
           {/* Pricing & Purchase Options */}
-          <div>
+           {/* <div>
             <div className="flex items-center space-x-4">
-              {/* EMI Checkbox */}
+
               <label className="flex items-center space-x-2">
-                <input type="checkbox" name="emi" />
+                <input type="checkbox" name="emi" 
+                className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+                />
                 <span className="text-sm">EMI</span>
+
+                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none ">
+                <FaCheck />
+                </span>
               </label>
 
-              {/* Z&M Gift Checkbox */}
               <label className="flex items-center space-x-2">
-                <input type="checkbox" name="ggGift" />
+                <input type="checkbox" name="ggGift"
+                className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none" 
+                />
                 <span className="text-sm">Z&M Gift</span>
+
+                <span className="absolute hidden peer-checked:block text-white font-bold text-xm pointer-events-none">
+                <FaCheck />
+                </span>
               </label>
             </div>
 
             <div className="flex space-x-4 mt-4">
-              {/* Cash Discount Price Box */}
               <div className="border border-orange-500 p-4 rounded-lg flex flex-col items-start space-y-1">
                 <input
                   type="radio"
                   name="paymentMethod"
                   value="cash"
                   checked
-                  className="mb-2"
+                  className="mb-2 peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
                 />
                 <span className="text-orange-500 font-bold text-md">
                   Tk. 14,999
                 </span>
+
+                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none">
+                <FaCheck />
+                </span>
+
                 <span className="text-gray-500 text-sm">
                   Cash Discount Price
                 </span>
@@ -275,17 +325,21 @@ const PhoneDetails = () => {
                 </span>
               </div>
 
-              {/* EMI Box */}
               <div className="border border-gray-300 p-4 rounded-lg flex flex-col items-start space-y-1">
                 <input
                   type="radio"
                   name="paymentMethod"
                   value="emi"
-                  className="mb-2"
+                  className="mb-2 peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
                 />
                 <span className="text-orange-500 font-bold text-sm">
                   Start From 5,000/month
                 </span>
+
+                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none ">
+                <FaCheck />
+                </span>
+
                 <span className="text-gray-500 text-sm">
                   0% EMI Price: Tk. 14,999
                 </span>
@@ -301,12 +355,156 @@ const PhoneDetails = () => {
                 Buy Now
               </button>
             </div>
+          </div>  */}
+
+          <div>
+      <div className="flex items-center space-x-4">
+        {/* EMI Checkbox */}
+        <label className="flex items-center space-x-2 relative">
+          <input
+            type="checkbox"
+            name="emi"
+            checked={isEmiChecked}
+            onChange={handleEmiToggle}
+            className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+          />
+          <span className="text-sm">EMI</span>
+          
+          {/* Tick sign (✓) - Custom checkmark */}
+          <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+            ✓
+          </span>
+        </label>
+
+        {/* Z&M Gift Checkbox */}
+        <label className="flex items-center space-x-2 relative">
+          <input
+            type="checkbox"
+            name="ggGift"
+            checked={isGiftChecked}
+            onChange={handleGiftToggle}
+            className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+          />
+          <span className="text-sm">Z&M Gift</span>
+          
+          {/* Tick sign for Z&M Gift */}
+          <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+            ✓
+          </span>
+        </label>
+      </div>
+
+      <div className="flex space-x-4 mt-4">
+        {/* Cash Discount Price Box */}
+        <div
+          className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
+            paymentMethod === 'cash' ? 'border-orange-500' : 'border-gray-300'
+          }`}
+        >
+          <label className="relative flex items-center space-x-2">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="cash"
+              checked={paymentMethod === 'cash'}
+              onChange={() => handlePaymentMethodChange('cash')}
+              className="peer w-4 h-4 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+            />
+            <span className="text-md text-orange-500 font-bold">Tk. 14,999</span>
+
+            {/* Tick sign for radio */}
+            <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+              ✓
+            </span>
+          </label>
+          <span className="text-gray-500 text-sm">Cash Discount Price</span>
+          <span className="text-gray-400 text-xs">Online / Cash Payment</span>
+        </div>
+
+        {/* EMI Box */}
+        <div
+          className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
+            paymentMethod === 'emi' ? 'border-orange-500' : 'border-gray-300'
+          }`}
+        >
+          <label className="relative flex items-center space-x-2">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="emi"
+              checked={paymentMethod === 'emi'}
+              onChange={() => handlePaymentMethodChange('emi')}
+              className="peer w-4 h-4 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+            />
+            <span className="text-sm text-orange-500 font-bold">
+              Start From 5,000/month
+            </span>
+
+            {/* Tick sign for radio */}
+            <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+              ✓
+            </span>
+          </label>
+          <span className="text-gray-500 text-sm">0% EMI Price: Tk. 14,999</span>
+          <span className="text-gray-400 text-xs">Up to 3 Months</span>
+        </div>
+      </div>
+
+      {/* Gift Modal */}
+      {showGiftModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg space-y-4">
+            <h2 className="text-lg font-bold">Gift From Z&M</h2>
+            <div>
+              <label className="flex items-center space-x-2">
+                <input type="radio" name="gift" />
+                <img
+                  className="w-12 rounded-3xl"
+                  src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
+                  alt="Meko C35 PWS"
+                />
+                <span>Meko C35 PWS x 1</span>
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center space-x-2">
+                <input type="radio" name="gift" />
+                <img
+                  className="w-12 rounded-3xl"
+                  src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
+                  alt="MEKO N3 Sports Wireless Neckband"
+                />
+                <span>MEKO N3 Sports Wireless Neckband x 1</span>
+              </label>
+            </div>
+
+            {/* Close Button */}
+            <button
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg"
+              onClick={closeModal}
+            >
+              Close
+            </button>
           </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 space-x-4 mt-6">
+        {!isEmiChecked && (
+          <button className="bg-gray-200 py-2 px-4 rounded-lg">
+            Add To Cart
+          </button>
+        )}
+        <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">
+          Buy Now
+        </button>
+      </div>
+    </div>
         </div>
 
         {/* Gift Options */}
         <div className="border p-4 rounded-lg space-y-4">
-          <h2 className="text-lg font-bold">Gift From G&G</h2>
+          <h2 className="text-lg font-bold">Gift From Z&M</h2>
           <div>
             <label className="flex items-center space-x-2">
               <input type="radio" name="gift" />
@@ -402,7 +600,7 @@ const PhoneDetails = () => {
 
       <hr className="my-8 mb-16" />
 
-      <div className="grid grid-cols-8">
+      <div className="grid grid-cols-8 gap-5">
         <div className="col-span-6">
           <div className="tabs-container">
             <ul className="flex">
@@ -837,7 +1035,9 @@ const PhoneDetails = () => {
 
           <div className="mt-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-orange-500">Questions</h2>
+              <h2 className="text-xl font-semibold text-orange-500">
+                Questions
+              </h2>
               <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
                 Ask a Question
               </button>
@@ -845,10 +1045,10 @@ const PhoneDetails = () => {
             <hr className="mt-2 text-gray-900 border" />
             <div className="flex flex-col items-center justify-center my-16">
               {/* Thumbs Up Icon with Stars */}
-              <CiCircleQuestion className="text-5xl text-black mb-2" />
+              <CiCircleQuestion className="text-6xl text-black mb-2" />
 
               {/* No Review Text */}
-              <p className="text-xl  text-black mb-2">No Question Found</p>
+              <p className="text-xl text-black mb-2">No Question Found</p>
 
               {/* Write a Review Button */}
               <button className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md hover:bg-orange-200 transition duration-300">
@@ -858,7 +1058,131 @@ const PhoneDetails = () => {
           </div>
         </div>
         <div className="col-span-2">
-          <h2>Divider</h2>
+          <div>
+            <h2 className="text-2xl font-semibold">Related Products</h2>
+            <div className="mt-6">
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold">Similar Products</h2>
+            <div className="mt-6">
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/media/1719983159812679.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">vivo Y28</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 19,999</h4>
+                  <p className="text-sm">
+                    <div className="flex space-x-2 mb-4 items-center">
+                      <span className="text-md text-yellow-400">
+                        <FaStar />
+                      </span>
+                      <span className="text-md text-yellow-400">
+                        <FaStar />
+                      </span>
+                      <span className="text-md text-yellow-400">
+                        <FaStar />
+                      </span>
+                      <span className="text-md text-yellow-400">
+                        <FaStar />
+                      </span>
+                      <span className="text-md text-yellow-400">
+                        <FaStar />
+                      </span>
+                      <span className="font-medium">(5.0)</span>
+                    </div>
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center p-2 border">
+                <img
+                  className="w-24 h-24"
+                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
+                  alt=""
+                />
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium">HONOR X5 Plus</h3>
+                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
+                  <p className="text-sm">No Review Yet</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
