@@ -25,14 +25,14 @@ const PhoneDetails = () => {
   const [isEmiChecked, setIsEmiChecked] = useState(false);
   const [isGiftChecked, setIsGiftChecked] = useState(false);
   const [showGiftModal, setShowGiftModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState("cash");
 
   const handleEmiToggle = () => {
     setIsEmiChecked(!isEmiChecked);
     if (!isEmiChecked) {
-      setPaymentMethod('emi');
+      setPaymentMethod("emi");
     } else {
-      setPaymentMethod('cash');
+      setPaymentMethod("cash");
     }
   };
 
@@ -43,15 +43,12 @@ const PhoneDetails = () => {
 
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
-    setIsEmiChecked(method === 'emi');
+    setIsEmiChecked(method === "emi");
   };
 
   const closeModal = () => {
     setShowGiftModal(false);
   };
-
-
-  
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -274,7 +271,7 @@ const PhoneDetails = () => {
           </div>
 
           {/* Pricing & Purchase Options */}
-           {/* <div>
+          {/* <div>
             <div className="flex items-center space-x-4">
 
               <label className="flex items-center space-x-2">
@@ -358,148 +355,149 @@ const PhoneDetails = () => {
           </div>  */}
 
           <div>
-      <div className="flex items-center space-x-4">
-        {/* EMI Checkbox */}
-        <label className="flex items-center space-x-2 relative">
-          <input
-            type="checkbox"
-            name="emi"
-            checked={isEmiChecked}
-            onChange={handleEmiToggle}
-            className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-          />
-          <span className="text-sm">EMI</span>
-          
-          {/* Tick sign (✓) - Custom checkmark */}
-          <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-            ✓
-          </span>
-        </label>
-
-        {/* Z&M Gift Checkbox */}
-        <label className="flex items-center space-x-2 relative">
-          <input
-            type="checkbox"
-            name="ggGift"
-            checked={isGiftChecked}
-            onChange={handleGiftToggle}
-            className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-          />
-          <span className="text-sm">Z&M Gift</span>
-          
-          {/* Tick sign for Z&M Gift */}
-          <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-            ✓
-          </span>
-        </label>
-      </div>
-
-      <div className="flex space-x-4 mt-4">
-        {/* Cash Discount Price Box */}
-        <div
-          className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
-            paymentMethod === 'cash' ? 'border-orange-500' : 'border-gray-300'
-          }`}
-        >
-          <label className="relative flex items-center space-x-2">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="cash"
-              checked={paymentMethod === 'cash'}
-              onChange={() => handlePaymentMethodChange('cash')}
-              className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-            />
-            <span className="text-md text-orange-500 font-bold">Tk. 14,999</span>
-
-            {/* Tick sign for radio */}
-            <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-              ✓
-            </span>
-          </label>
-          <span className="text-gray-500 text-sm">Cash Discount Price</span>
-          <span className="text-gray-400 text-xs">Online / Cash Payment</span>
-        </div>
-
-        {/* EMI Box */}
-        <div
-          className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
-            paymentMethod === 'emi' ? 'border-orange-500' : 'border-gray-300'
-          }`}
-        >
-          <label className="relative flex items-center space-x-2">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="emi"
-              checked={paymentMethod === 'emi'}
-              onChange={() => handlePaymentMethodChange('emi')}
-              className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-            />
-            <span className="text-sm text-orange-500 font-bold">
-              Start From 5,000/month
-            </span>
-
-            {/* Tick sign for radio */}
-            <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-              ✓
-            </span>
-          </label>
-          <span className="text-gray-500 text-sm">0% EMI Price: Tk. 14,999</span>
-          <span className="text-gray-400 text-xs">Up to 3 Months</span>
-        </div>
-      </div>
-
-      {/* Gift Modal */}
-      {showGiftModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg space-y-4">
-            <h2 className="text-lg font-bold">Gift From Z&M</h2>
-            <div>
-              <label className="flex items-center space-x-2">
-                <input type="radio" name="gift" />
-                <img
-                  className="w-12 rounded-3xl"
-                  src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
-                  alt="Meko C35 PWS"
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center space-x-2 relative">
+                <input
+                  type="checkbox"
+                  name="emi"
+                  checked={isEmiChecked}
+                  onChange={handleEmiToggle}
+                  className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
                 />
-                <span>Meko C35 PWS x 1</span>
+                <span className="text-sm">EMI</span>
+
+                <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+                  ✓
+                </span>
               </label>
-            </div>
-            <div>
-              <label className="flex items-center space-x-2">
-                <input type="radio" name="gift" />
-                <img
-                  className="w-12 rounded-3xl"
-                  src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
-                  alt="MEKO N3 Sports Wireless Neckband"
+
+              <label className="flex items-center space-x-2 relative">
+                <input
+                  type="checkbox"
+                  name="ggGift"
+                  checked={isGiftChecked}
+                  onChange={handleGiftToggle}
+                  className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
                 />
-                <span>MEKO N3 Sports Wireless Neckband x 1</span>
+                <span className="text-sm">Z&M Gift</span>
+                <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+                  ✓
+                </span>
               </label>
             </div>
 
-            {/* Close Button */}
-            <button
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg"
-              onClick={closeModal}
-            >
-              Close
-            </button>
+            <div className="flex space-x-4 mt-4">
+              <div
+                className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
+                  paymentMethod === "cash"
+                    ? "border-orange-500"
+                    : "border-gray-300"
+                }`}
+              >
+                <label className="relative flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cash"
+                    checked={paymentMethod === "cash"}
+                    onChange={() => handlePaymentMethodChange("cash")}
+                    className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+                  />
+                  <span className="text-md text-orange-500 font-bold">
+                    Tk. 14,999
+                  </span>
+
+                  <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+                    ✓
+                  </span>
+                </label>
+                <span className="text-gray-500 text-sm">
+                  Cash Discount Price
+                </span>
+                <span className="text-gray-400 text-xs">
+                  Online / Cash Payment
+                </span>
+              </div>
+
+              <div
+                className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
+                  paymentMethod === "emi"
+                    ? "border-orange-500"
+                    : "border-gray-300"
+                }`}
+              >
+                <label className="relative flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="emi"
+                    checked={paymentMethod === "emi"}
+                    onChange={() => handlePaymentMethodChange("emi")}
+                    className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
+                  />
+                  <span className="text-sm text-orange-500 font-bold">
+                    Start From 5,000/month
+                  </span>
+
+                  <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
+                    ✓
+                  </span>
+                </label>
+                <span className="text-gray-500 text-sm">
+                  0% EMI Price: Tk. 14,999
+                </span>
+                <span className="text-gray-400 text-xs">Up to 3 Months</span>
+              </div>
+            </div>
+
+            {showGiftModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg space-y-4">
+                  <h2 className="text-lg font-bold">Gift From Z&M</h2>
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input type="radio" name="gift" />
+                      <img
+                        className="w-12 rounded-3xl"
+                        src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
+                        alt="Meko C35 PWS"
+                      />
+                      <span>Meko C35 PWS x 1</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input type="radio" name="gift" />
+                      <img
+                        className="w-12 rounded-3xl"
+                        src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
+                        alt="MEKO N3 Sports Wireless Neckband"
+                      />
+                      <span>MEKO N3 Sports Wireless Neckband x 1</span>
+                    </label>
+                  </div>
+
+                  <button
+                    className="bg-orange-500 text-white px-4 py-2 rounded-lg"
+                    onClick={closeModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 space-x-4 mt-6">
+              {!isEmiChecked && (
+                <button className="bg-gray-200 py-2 px-4 rounded-lg">
+                  Add To Cart
+                </button>
+              )}
+              <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">
+                Buy Now
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 space-x-4 mt-6">
-        {!isEmiChecked && (
-          <button className="bg-gray-200 py-2 px-4 rounded-lg">
-            Add To Cart
-          </button>
-        )}
-        <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">
-          Buy Now
-        </button>
-      </div>
-    </div>
         </div>
 
         {/* Gift Options */}
