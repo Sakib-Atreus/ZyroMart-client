@@ -444,7 +444,7 @@ const PhoneDetails = () => {
                   </span>
                 </label>
                 <span className="text-gray-500 text-sm">
-                  0% EMI Price: Tk. 15,999
+                  0% EMI Price: Tk. 14,999
                 </span>
                 <span className="text-gray-400 text-xs">Up to 3 Months</span>
               </div>
