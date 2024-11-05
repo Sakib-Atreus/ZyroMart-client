@@ -620,7 +620,7 @@ const PhoneDetails = () => {
                 }`}
                 onClick={() => handleTabClick("description")}
               >
-                Description
+                <a href="#desc">Description</a>
               </li>
               <li
                 className={`text-md font-semibold px-4 py-2 cursor-pointer ${
@@ -630,7 +630,7 @@ const PhoneDetails = () => {
                 }`}
                 onClick={() => handleTabClick("reviews")}
               >
-                Reviews (0)
+                <a href="#rev">Reviews (0)</a>
               </li>
               <li
                 className={`text-md font-semibold px-4 py-2 cursor-pointer ${
@@ -640,7 +640,7 @@ const PhoneDetails = () => {
                 }`}
                 onClick={() => handleTabClick("questions")}
               >
-                Questions (0)
+                <a href="#ques">Questions (0)</a>
               </li>
             </ul>
           </div>
@@ -894,7 +894,7 @@ const PhoneDetails = () => {
               </div>
             </div>
           </div>
-          <div className="mt-6">
+          <div className="mt-6" id="desc">
             <h2 className="text-xl font-semibold text-orange-500">
               Description
             </h2>
@@ -998,7 +998,7 @@ const PhoneDetails = () => {
               </p>
             </div>
           </div>
-          <div className="mt-6">
+          <div className="mt-6" id="rev">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-orange-500">Reviews</h2>
               <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
@@ -1031,7 +1031,7 @@ const PhoneDetails = () => {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6" id="ques">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-orange-500">
                 Questions
