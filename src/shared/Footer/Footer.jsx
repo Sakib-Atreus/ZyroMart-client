@@ -101,8 +101,8 @@ const Footer = () => {
           </nav>
         </footer>
 
-        <div className="bg-base-200">
-          <hr className="mx-8 opacity-15" />
+        <div className="bg-base-200 mx-8">
+          <hr className="opacity-15" />
         </div>
         <footer className="footer flex justify-between p-10">
           <aside>
