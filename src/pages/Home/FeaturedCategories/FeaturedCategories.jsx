@@ -48,7 +48,7 @@ const FeaturedCategories = () => {
             alt=""
             className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
-          <p className="text-[#605e8f] text-center">Speakers</p>
+          <p className="text-[#454457] text-center">Speakers</p>
         </div>
         <div className="grid grid-cols-1 gap-4">
           <img
