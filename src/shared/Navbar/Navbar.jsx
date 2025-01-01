@@ -329,7 +329,7 @@ const Navbar = () => {
           <Link className="btn bg-[#FFE6C71A] text-white text-2xl hover:bg-primary">
             <ShoppingCartOutlined />
           </Link>
-          <Link className="btn bg-[#FFE6C71A] text-white text-xl hover:bg-primary">
+          <Link to="/login" className="btn bg-[#FFE6C71A] text-white text-xl hover:bg-primary">
             <FontAwesomeIcon icon={faUser} />
           </Link>
         </div>
