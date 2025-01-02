@@ -63,6 +63,11 @@ const Login = () => {
                   placeholder="Password"
                   className="input input-bordered w-full"
                 />
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  className="input input-bordered w-full"
+                />
                 <button className="btn bg-primary text-white w-full">Signup</button>
               </form>
             </div>
