@@ -230,26 +230,8 @@ const items = [
   {
     key: "sub10",
     label: (
-      <p className="bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-semibold">Online Exclusive</p>
+      <p className="bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-semibold ">Online Exclusive</p>
     ),
-    children: [
-      {
-        key: "21",
-        label: "Option 9",
-      },
-      {
-        key: "22",
-        label: "Option 10",
-      },
-      {
-        key: "23",
-        label: "Option 11",
-      },
-      {
-        key: "23",
-        label: "Option 12",
-      },
-    ],
   },
 ];
 const onClick = (e) => {
@@ -307,16 +289,16 @@ const Navbar = () => {
             placeholder="Search products"
             allowClear
             enterButton="Search"
-            size="large"
+            size="medium"
             //   onSearch={onSearch}
           />
         </div>
 
         <div className="navbar-end lg:flex md:flex gap-4 hidden">
-          <Link className="btn bg-[#FFE6C71A] text-white hover:bg-primary">
+          <Link className="btn btn-sm bg-[#FFE6C71A] text-white hover:bg-primary h-10">
             <FaLocationDot className="text-xl" /> <p>Store Locator</p>
           </Link>
-          <Link className="btn bg-[#FFE6C71A] text-white text-2xl hover:bg-primary">
+          <Link className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10">
             <a href="#">
               <Badge count={5} className="custom-badge">
                 {" "}
@@ -326,10 +308,10 @@ const Navbar = () => {
               </Badge>
             </a>
           </Link>
-          <Link className="btn bg-[#FFE6C71A] text-white text-2xl hover:bg-primary">
+          <Link className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10">
             <ShoppingCartOutlined />
           </Link>
-          <Link to="/login" className="btn bg-[#FFE6C71A] text-white text-xl hover:bg-primary">
+          <Link to="/login" className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10">
             <FontAwesomeIcon icon={faUser} />
           </Link>
         </div>
