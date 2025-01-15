@@ -159,7 +159,7 @@ const PhoneDetails = () => {
 
               {/* Visible thumbnails */}
               {thumbnails
-                .slice(visibleThumbnails, visibleThumbnails + 3)
+                .slice(visibleThumbnails, visibleThumbnails + 4)
                 .map((img, index) => (
                   <img
                     key={index}
@@ -174,7 +174,7 @@ const PhoneDetails = () => {
               <button
                 onClick={() => handleArrowClick("down")}
                 className="text-gray-500 mt-2"
-                disabled={visibleThumbnails === thumbnails.length - 3} // Disable when at the bottom
+                disabled={visibleThumbnails === thumbnails.length - 4} // Disable when at the bottom
               >
                 <IoIosArrowDown size={24} />
               </button>
