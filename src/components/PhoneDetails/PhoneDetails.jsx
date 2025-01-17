@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowUp, IoIosArrowDown, IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
 import { TiArrowForwardOutline } from "react-icons/ti";
@@ -10,6 +10,8 @@ import { FaRegStar } from "react-icons/fa";
 import { CiCircleQuestion } from "react-icons/ci";
 import { FaStar } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
+
+import "./PhoneDetails.css";
 
 const PhoneDetails = () => {
   const [mainImage, setMainImage] = useState(
@@ -144,17 +146,22 @@ const PhoneDetails = () => {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Image Gallery */}
-        <div className="col-span-2">
-          <div className="flex space-x-4">
+        <div className="lg:col-span-2 md:col-span-2 col-span-1">
+          <div className="flex lg:flex-row md:flex-row flex-col-reverse  space-x-4">
             {/* Thumbnail Images */}
-            <div className="w-1/6 flex flex-col items-center">
+            <div className="w-1/6 flex lg:flex-col md:flex-col flex-row lg:gap-0 md:gap-0 gap-4 items-center">
               {/* Up arrow */}
               <button
                 onClick={() => handleArrowClick("up")}
                 className="text-gray-500 mb-2"
                 disabled={visibleThumbnails === 0} // Disable when at the top
               >
-                <IoIosArrowUp size={24} />
+                {/** Show different icons for mobile and desktop */}
+        {window.innerWidth < 768 ? (
+          <IoIosArrowBack size={24} /> // Back arrow for mobile
+        ) : (
+          <IoIosArrowUp size={24} /> // Up arrow for desktop
+        )}
               </button>
 
               {/* Visible thumbnails */}
@@ -176,7 +183,12 @@ const PhoneDetails = () => {
                 className="text-gray-500 mt-2"
                 disabled={visibleThumbnails === thumbnails.length - 4} // Disable when at the bottom
               >
-                <IoIosArrowDown size={24} />
+                {/** Show different icons for mobile and desktop */}
+        {window.innerWidth < 768 ? (
+          <IoIosArrowForward size={24} /> // Forward arrow for mobile
+        ) : (
+          <IoIosArrowDown size={24} /> // Down arrow for desktop
+        )}
               </button>
             </div>
 
@@ -598,10 +610,10 @@ const PhoneDetails = () => {
 
       <hr className="my-8 mb-16" />
 
-      <div className="grid grid-cols-8 gap-5">
+      <div className="grid lg:grid-cols-8 md:grid-cols-8 grid-cols-6 gap-5">
         <div className="col-span-6">
           <div className="tabs-container">
-            <ul className="flex">
+            <ul className="flex overflow-x-auto whitespace-nowrap no-scrollbar">
               <li
                 className={`text-md font-semibold px-4 py-2 cursor-pointer ${
                   activeTab === "specification"

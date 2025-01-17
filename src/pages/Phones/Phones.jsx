@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
 import "rc-slider/assets/index.css";
@@ -9,6 +9,7 @@ import "./Phones.css";
 const { Option } = Select;
 
 const Phones = () => {
+  const [isFilterVisible, setFilterVisible] = useState(false);
   return (
     <div className="max-w-7xl mx-auto px-4 my-8">
       <Breadcrumb
@@ -117,9 +118,45 @@ const Phones = () => {
           Honor
         </Link>
       </div>
-      <div className="flex border-t border-gray-300">
+
+      {/* Phones Page Content */}
+      <div className="flex flex-col md:flex-row border-t border-gray-300">
         {/* Sidebar */}
-        <div className="w-1/5 p-4 border-r border-gray-300 lg:pe-8 lg:pt-8 md:pe-8 md:pt-8">
+        <div
+          className={`w-[85%] md:w-1/5 p-4 border-r border-gray-300 lg:pe-8 lg:pt-8 md:pe-8 md:pt-8 ${
+            isFilterVisible
+              ? "block absolute top-0 left-0 z-50 bg-white h-full"
+              : "hidden md:block"
+          }`}
+        >
+          {/* Close Button for Mobile */}
+          <div className="flex justify-between items-center md:hidden">
+            <h2 className="text-lg font-semibold">Filters</h2>
+            <button
+              onClick={() => setFilterVisible(false)}
+              className="text-gray-500 hover:text-gray-800"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Sort by Option in Sidebar (Mobile Only) */}
+          <div className="mb-6 md:hidden">
+            <h2 className="text-lg font-semibold">Sort by</h2>
+            <Select
+              placeholder="Sort by"
+              className="custom-select"
+              dropdownClassName="custom-dropdown"
+              style={{ width: "100%" }}
+              dropdownStyle={{ width: "100%" }}
+              bordered={false}
+            >
+              <Option value="new-arrivals">New Arrivals</Option>
+              <Option value="price-low-high">Price Low to High</Option>
+              <Option value="price-high-low">Price High to Low</Option>
+            </Select>
+          </div>
+
           {/* Price Filter */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold">Price</h2>
@@ -139,71 +176,76 @@ const Phones = () => {
           {/* Other Filters */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold">Color</h2>
-            {/* Add color checkboxes */}
             <div className="mt-2">
               <label className="inline-flex items-center">
                 <input type="checkbox" className="form-checkbox" />
                 <span className="ml-2">Red</span>
               </label>
             </div>
-            {/* Repeat for other colors */}
           </div>
-
           <div className="mb-6">
             <h2 className="text-lg font-semibold">RAM</h2>
-            {/* Add RAM checkboxes */}
             <div className="mt-2">
               <label className="inline-flex items-center">
                 <input type="checkbox" className="form-checkbox" />
                 <span className="ml-2">4 GB</span>
               </label>
             </div>
-            {/* Repeat for other RAM options */}
           </div>
-          {/* Repeat for ROM and Storage */}
         </div>
 
         {/* Main Content */}
-        <div className="w-4/5 p-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
+        <div className="w-full md:w-4/5 p-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
           <div className="flex justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold">Phones</h2>
               <h3 className="text-sm">201 items found in Phones</h3>
             </div>
-            <div className="text-sm text-left">
+            {/* Sort by is moved to Sidebar on Mobile */}
+            <div className="text-sm text-left hidden md:block lg:block">
               <Select
-                placeholder="Sort by" // Display the placeholder
-                className="custom-select" // Add a custom class
-                dropdownClassName="custom-dropdown" // Custom dropdown class
-                style={{ width: 200 }} // Width of the Select component
-                dropdownStyle={{ width: 200 }} // Set the width of the dropdown
-                bordered={false} // Remove border
+                placeholder="Sort by"
+                className="custom-select"
+                dropdownClassName="custom-dropdown"
+                style={{ width: 200 }}
+                dropdownStyle={{ width: 200 }}
+                bordered={false}
               >
                 <Option value="new-arrivals">New Arrivals</Option>
                 <Option value="price-low-high">Price Low to High</Option>
                 <Option value="price-high-low">Price High to Low</Option>
               </Select>
             </div>
+            {/* Filter and Sort Button for Mobile */}
+            <div className="lg:hidden md:hidden flex justify-between items-center">
+              <button
+                onClick={() => setFilterVisible(true)}
+                className="bg-primary text-white px-4 py-2 rounded-md"
+              >
+                Filter
+              </button>
+            </div>
           </div>
 
           {/* Product Grid */}
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 text-center">
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 text-center">
             {/* Product Card */}
             <Link to="/phones/new">
-            <div className="shadow-xl bg-white pb-2">
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/product/20220405_1649146951_699542.png"
-                alt="Product Image"
-              />
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191204_1575461019_541440.png"
-                alt="brand icon"
-                className="w-14 h-8 mx-auto"
-              />
-              <h3 className="text-md font-semibold">Redmi Note 11S</h3>
-              <p className="text-orange-600 font-bold my-2">Tk. 27,999</p>
-              <p className="text-sm text-gray-500">No Review Yet</p>
-            </div></Link>
+              <div className="shadow-xl bg-white pb-2">
+                <img
+                  src="https://dvf83rt16ac4w.cloudfront.net/upload/product/20220405_1649146951_699542.png"
+                  alt="Product Image"
+                />
+                <img
+                  src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191204_1575461019_541440.png"
+                  alt="brand icon"
+                  className="w-14 h-8 mx-auto"
+                />
+                <h3 className="text-md font-semibold">Redmi Note 11S</h3>
+                <p className="text-orange-600 font-bold my-2">Tk. 27,999</p>
+                <p className="text-sm text-gray-500">No Review Yet</p>
+              </div>
+            </Link>
             <div className="shadow-xl bg-white pb-2">
               <img
                 src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1719983159812679.jpeg"
