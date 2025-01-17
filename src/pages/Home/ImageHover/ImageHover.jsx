@@ -38,7 +38,7 @@ const ImageHover = () => {
         />
       </div>
       {/* text description about the website products */}
-      <div className="my-8 text-justify">
+      <div className="my-8 text-justify px-3 lg:px-0 md:px-0">
         <div className="my-6">
           <h2 className="text-xl font-bold my-2">
             The ZyroMart Experience - Official Apple Products, Premium Brands,

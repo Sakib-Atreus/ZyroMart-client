@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const Accessories = () => {
   return (
     <div>
-      <div className="flex justify-between pt-12 pb-8">
+      <div className="flex justify-between pt-12 pb-8 pe-2 lg:pe-0 md:pe-0">
         <h1 className="text-2xl text-center font-semibold px-2">
           Budget Accessories
         </h1>
@@ -14,7 +14,7 @@ const Accessories = () => {
           Show All <IoIosArrowForward />
         </Link>
       </div>
-      <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-1 gap-3">
+      <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-1 gap-3 p-3 lg:p-0 md:p-0">
         <div className="row-span-2 col-span-1">
           <img
             src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1705386631054679.jpeg"

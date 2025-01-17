@@ -52,7 +52,7 @@ const ExclusiveProducts = () => {
 
   return (
     <div className="">
-      <div className="flex justify-between pt-24 pb-8">
+      <div className="flex justify-between pt-24 pb-8 pe-1 lg:pe-0 md:pe-0">
         <h1 className="text-2xl text-center font-semibold px-2">Online Exclusive Products</h1>
         <Link className="flex text-center items-center gap-2 text-sm text-primary">
           Show All <IoIosArrowForward />

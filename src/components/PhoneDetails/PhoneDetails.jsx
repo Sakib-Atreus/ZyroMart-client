@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import { IoIosArrowUp, IoIosArrowDown, IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import React, { useEffect, useState } from "react";
+import {
+  IoIosArrowUp,
+  IoIosArrowDown,
+  IoIosArrowBack,
+  IoIosArrowForward,
+} from "react-icons/io";
 import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
 import { TiArrowForwardOutline } from "react-icons/ti";
@@ -20,6 +25,7 @@ const PhoneDetails = () => {
   const [zoomImage, setZoomImage] = useState(null); // State to store zoomed image on hover
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 }); // State to store mouse position for zoom
   const [visibleThumbnails, setVisibleThumbnails] = useState(0); // Track which set of thumbnails is visible
+  const [thumbnailsToShow, setThumbnailsToShow] = useState(4);
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState("specification");
 
@@ -28,6 +34,19 @@ const PhoneDetails = () => {
   const [isGiftChecked, setIsGiftChecked] = useState(false);
   const [showGiftModal, setShowGiftModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
+
+
+  // Adjust thumbnailsToShow based on screen width
+  useEffect(() => {
+    const handleResize = () => {
+      setThumbnailsToShow(window.innerWidth < 768 ? 3 : 4); // Show 3 on mobile, 4 on desktop
+    };
+
+    handleResize(); // Initialize on component mount
+    window.addEventListener("resize", handleResize); // Update on window resize
+
+    return () => window.removeEventListener("resize", handleResize); // Cleanup
+  }, []);
 
   const handleEmiToggle = () => {
     setIsEmiChecked(!isEmiChecked);
@@ -147,9 +166,9 @@ const PhoneDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Image Gallery */}
         <div className="lg:col-span-2 md:col-span-2 col-span-1">
-          <div className="flex lg:flex-row md:flex-row flex-col-reverse  space-x-4">
+          <div className="flex lg:flex-row md:flex-row flex-col-reverse space-x-4">
             {/* Thumbnail Images */}
-            <div className="w-1/6 flex lg:flex-col md:flex-col flex-row lg:gap-0 md:gap-0 gap-4 items-center">
+            <div className="lg:w-1/6 md:w-1/6 w-[25%] flex lg:flex-col md:flex-col flex-row lg:gap-0 md:gap-0 gap-3 items-center lg:justify-center md:justify-center justify-between">
               {/* Up arrow */}
               <button
                 onClick={() => handleArrowClick("up")}
@@ -157,21 +176,21 @@ const PhoneDetails = () => {
                 disabled={visibleThumbnails === 0} // Disable when at the top
               >
                 {/** Show different icons for mobile and desktop */}
-        {window.innerWidth < 768 ? (
-          <IoIosArrowBack size={24} /> // Back arrow for mobile
-        ) : (
-          <IoIosArrowUp size={24} /> // Up arrow for desktop
-        )}
+                {window.innerWidth < 768 ? (
+                  <IoIosArrowBack size={24} /> // Back arrow for mobile
+                ) : (
+                  <IoIosArrowUp size={24} /> // Up arrow for desktop
+                )}
               </button>
 
               {/* Visible thumbnails */}
               {thumbnails
-                .slice(visibleThumbnails, visibleThumbnails + 4)
+                .slice(visibleThumbnails, visibleThumbnails + thumbnailsToShow)
                 .map((img, index) => (
                   <img
                     key={index}
                     src={img}
-                    className="w-3/4 h-1/6 object-cover border cursor-pointer mb-2"
+                    className="lg:w-3/4 md:w-3/4 lg:h-1/6 md:h-1/6 lg:mt-0 md:mt-0 mt-4 object-cover border cursor-pointer mb-2"
                     alt={`thumbnail-${index}`}
                     onClick={() => setMainImage(img)} // Change the main image on click
                   />
@@ -184,16 +203,16 @@ const PhoneDetails = () => {
                 disabled={visibleThumbnails === thumbnails.length - 4} // Disable when at the bottom
               >
                 {/** Show different icons for mobile and desktop */}
-        {window.innerWidth < 768 ? (
-          <IoIosArrowForward size={24} /> // Forward arrow for mobile
-        ) : (
-          <IoIosArrowDown size={24} /> // Down arrow for desktop
-        )}
+                {window.innerWidth < 768 ? (
+                  <IoIosArrowForward size={24} /> // Forward arrow for mobile
+                ) : (
+                  <IoIosArrowDown size={24} /> // Down arrow for desktop
+                )}
               </button>
             </div>
 
             {/* Main Image */}
-            <div className="w-[75%] relative">
+            <div className="lg:w-[75%] md:w-[75%] relative">
               <img
                 src={mainImage}
                 className="w-full h-full object-cover"
@@ -205,7 +224,7 @@ const PhoneDetails = () => {
 
               {/* Zoomed Image */}
               {zoomImage && (
-                <div className="absolute left-full top-0 ml-4 w-96 h-96 border overflow-hidden">
+                <div className="absolute left-full top-0 ml-4 w-96 h-96 border overflow-hidden lg:block md:block hidden">
                   <img
                     src={zoomImage}
                     className="w-full h-full object-cover"
@@ -615,7 +634,7 @@ const PhoneDetails = () => {
           <div className="tabs-container">
             <ul className="flex overflow-x-auto whitespace-nowrap no-scrollbar">
               <li
-                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
                   activeTab === "specification"
                     ? "text-orange-500 border-b-2 border-orange-500"
                     : "text-black hover:text-orange-500"
@@ -625,7 +644,7 @@ const PhoneDetails = () => {
                 Specification
               </li>
               <li
-                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
                   activeTab === "description"
                     ? "text-orange-500 border-b-2 border-orange-500"
                     : "text-black hover:text-orange-500"
@@ -635,7 +654,7 @@ const PhoneDetails = () => {
                 <a href="#desc">Description</a>
               </li>
               <li
-                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
                   activeTab === "reviews"
                     ? "text-orange-500 border-b-2 border-orange-500"
                     : "text-black hover:text-orange-500"
@@ -645,7 +664,7 @@ const PhoneDetails = () => {
                 <a href="#rev">Reviews (0)</a>
               </li>
               <li
-                className={`text-md font-semibold px-4 py-2 cursor-pointer ${
+                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
                   activeTab === "questions"
                     ? "text-orange-500 border-b-2 border-orange-500"
                     : "text-black hover:text-orange-500"
@@ -1067,7 +1086,7 @@ const PhoneDetails = () => {
             </div>
           </div>
         </div>
-        <div className="col-span-2">
+        <div className="lg:col-span-2 md:col-span-2 col-span-6">
           <div>
             <h2 className="text-2xl font-semibold">Related Products</h2>
             <div className="mt-6">

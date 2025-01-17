@@ -125,13 +125,15 @@ const Phones = () => {
         <div
           className={`w-[85%] md:w-1/5 p-4 border-r border-gray-300 lg:pe-8 lg:pt-8 md:pe-8 md:pt-8 ${
             isFilterVisible
-              ? "block absolute top-0 left-0 z-50 bg-white h-full"
+              ? "block fixed top-0 left-0 z-50 bg-white h-full"
               : "hidden md:block"
           }`}
         >
           {/* Close Button for Mobile */}
-          <div className="flex justify-between items-center md:hidden">
-            <h2 className="text-lg font-semibold">Filters</h2>
+          <div className="flex justify-between items-center md:hidden mb-2">
+            <h2 className="text-lg font-semibold text-primary opacity-70">
+              Filters
+            </h2>
             <button
               onClick={() => setFilterVisible(false)}
               className="text-gray-500 hover:text-gray-800"
@@ -142,10 +144,10 @@ const Phones = () => {
 
           {/* Sort by Option in Sidebar (Mobile Only) */}
           <div className="mb-6 md:hidden">
-            <h2 className="text-lg font-semibold">Sort by</h2>
+            <h2 className="text-lg font-semibold mb-2">Sort by</h2>
             <Select
               placeholder="Sort by"
-              className="custom-select"
+              className="custom-select shadow border border-gray-100 rounded-md"
               dropdownClassName="custom-dropdown"
               style={{ width: "100%" }}
               dropdownStyle={{ width: "100%" }}
@@ -195,7 +197,7 @@ const Phones = () => {
         </div>
 
         {/* Main Content */}
-        <div className="w-full md:w-4/5 p-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
+        <div className="w-full md:w-4/5 mt-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
           <div className="flex justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold">Phones</h2>

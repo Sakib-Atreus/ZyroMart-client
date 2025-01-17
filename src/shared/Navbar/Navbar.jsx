@@ -24,7 +24,11 @@ const items = [
   {
     key: "sub1",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/phones">Phones</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/phones">
+          Phones
+        </Link>
+      </p>
     ),
     danger: true,
     children: [
@@ -56,7 +60,11 @@ const items = [
   {
     key: "sub2",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">iPad & Tab</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          iPad & Tab
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -86,7 +94,11 @@ const items = [
   {
     key: "sub4",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Mac</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Mac
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -110,7 +122,11 @@ const items = [
   {
     key: "sub5",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Wearable</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Wearable
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -134,7 +150,11 @@ const items = [
   {
     key: "sub6",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Headphone & Speaker</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Headphone & Speaker
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -158,7 +178,11 @@ const items = [
   {
     key: "sub7",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Accessories</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Accessories
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -182,7 +206,11 @@ const items = [
   {
     key: "sub8",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Camera</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Camera
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -206,7 +234,11 @@ const items = [
   {
     key: "sub9",
     label: (
-      <p className="lg:text-white md:text-white text-black"><Link className="hover:text-white" to="/">Video Games</Link></p>
+      <p className="lg:text-white md:text-white text-black">
+        <Link className="hover:text-white" to="/">
+          Video Games
+        </Link>
+      </p>
     ),
     children: [
       {
@@ -230,7 +262,9 @@ const items = [
   {
     key: "sub10",
     label: (
-      <p className="bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-semibold ">Online Exclusive</p>
+      <p className="bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent font-semibold ">
+        Online Exclusive
+      </p>
     ),
   },
 ];
@@ -262,7 +296,7 @@ const Navbar = () => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content rounded-box z-[1] mt-3 w-52 p-2 shadow "
+              className="menu menu-sm dropdown-content rounded-box z-[1] mt-0 left-0 w-52  "
             >
               <Menu
                 className="bg-white text-black"
@@ -311,25 +345,28 @@ const Navbar = () => {
           <Link className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10">
             <ShoppingCartOutlined />
           </Link>
-          <Link to="/login" className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10">
+          <Link
+            to="/login"
+            className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10"
+          >
             <FontAwesomeIcon icon={faUser} />
           </Link>
         </div>
         {/* Search for mobile device */}
         <Search
-            className="lg:hidden md:hidden flex w-full justify-end px-4 py-4 custom-search"
-            placeholder="Search"
-            allowClear
-            enterButton
-            size="large"
-            //   onSearch={onSearch}
-            style={{
-              width: "100%",
-            }}
-            inputStyle={{
-              color: "black", // Adjust the font size of the input (affects placeholder too)
-            }}
-          />
+          className="lg:hidden md:hidden flex w-full justify-end px-4 py-2 custom-search"
+          placeholder="Search"
+          allowClear
+          enterButton
+          size="medium"
+          //   onSearch={onSearch}
+          style={{
+            width: "100%",
+          }}
+          inputStyle={{
+            color: "black", // Adjust the font size of the input (affects placeholder too)
+          }}
+        />
       </div>
 
       {/* For mobile phone */}
@@ -363,7 +400,7 @@ const Navbar = () => {
             onClick={onClick}
             style={{
               width: 1080,
-              border: "2px solid black"
+              border: "2px solid black",
             }}
             mode="horizontal"
             horizontalItemHoverColor="#ff4d4f"
@@ -376,7 +413,6 @@ const Navbar = () => {
             horizontalLineHeight="12px"
             itemMarginInline="0"
             activeBarBorderWidth="0"
-            
             items={items}
           />
           <div className="flex justify-center items-center gap-4 text-sm font-semibold hover:text-primary">

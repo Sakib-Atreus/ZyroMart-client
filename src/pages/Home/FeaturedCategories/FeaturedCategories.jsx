@@ -23,13 +23,13 @@ const FeaturedCategories = () => {
       <h2 className="text-2xl font-semibold text-center pb-12 lg:mt-0 md:mt-0 mt-8">
         Featured Categories
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-8 justify-items-center font-semibold text-md ">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-8 justify-items-center font-semibold text-md lg:px-0 md:px-0 px-2">
         <Link to="/phones">
           <div className="grid grid-cols-1 gap-4">
             <img
               src={fc1}
               alt=""
-              className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+              className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
             />
             <p className="text-[#454457] text-center">Phones</p>
           </div>
@@ -38,7 +38,7 @@ const FeaturedCategories = () => {
           <img
             src={fc2}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Power Bank</p>
         </div>
@@ -46,7 +46,7 @@ const FeaturedCategories = () => {
           <img
             src={fc3}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Speakers</p>
         </div>
@@ -54,7 +54,7 @@ const FeaturedCategories = () => {
           <img
             src={fc4}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Camera/Gimbal</p>
         </div>
@@ -62,7 +62,7 @@ const FeaturedCategories = () => {
           <img
             src={fc5}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Cases & Protector</p>
         </div>
@@ -70,7 +70,7 @@ const FeaturedCategories = () => {
           <img
             src={fc6}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Cable & Adapter</p>
         </div>
@@ -78,7 +78,7 @@ const FeaturedCategories = () => {
           <img
             src={fc7}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">iPad</p>
         </div>
@@ -86,7 +86,7 @@ const FeaturedCategories = () => {
           <img
             src={fc8}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-md text-[#454457] text-center">Headset</p>
         </div>
@@ -94,7 +94,7 @@ const FeaturedCategories = () => {
           <img
             src={fc9}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-md text-[#454457] text-center">Car Accessories</p>
         </div>
@@ -102,7 +102,7 @@ const FeaturedCategories = () => {
           <img
             src={fc10}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Wearables</p>
         </div>
@@ -110,7 +110,7 @@ const FeaturedCategories = () => {
           <img
             src={fc11}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Mac</p>
         </div>
@@ -118,7 +118,7 @@ const FeaturedCategories = () => {
           <img
             src={fc12}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Video Games</p>
         </div>
@@ -126,7 +126,7 @@ const FeaturedCategories = () => {
           <img
             src={fc13}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Earbuds</p>
         </div>
@@ -134,7 +134,7 @@ const FeaturedCategories = () => {
           <img
             src={fc14}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">AirPods</p>
         </div>
@@ -142,7 +142,7 @@ const FeaturedCategories = () => {
           <img
             src={fc15}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">Tablets</p>
         </div>
@@ -150,7 +150,7 @@ const FeaturedCategories = () => {
           <img
             src={fc16}
             alt=""
-            className="w-28 h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
+            className="w-24 h-24 lg:w-28 lg:h-28 md:w-28 h:w-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg"
           />
           <p className="text-[#454457] text-center">All Categories</p>
         </div>

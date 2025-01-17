@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const Login = () => {
-    const [activeTab, setActiveTab] = useState("login");
-    return (
-        <div className="h-screen w-full flex justify-center items-center bg-cover bg-center bg-no-repeat relative">
+  const [activeTab, setActiveTab] = useState("login");
+  return (
+    <div className="w-full mx-auto flex justify-center items-center bg-cover bg-center bg-no-repeat relative py-16">
       {/* Blur Background */}
       <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-md"></div>
 
@@ -12,13 +12,21 @@ const Login = () => {
         {/* Header with Tabs */}
         <div className="tabs tabs-boxed flex justify-center">
           <a
-            className={`tab ${activeTab === "login" ? "tab-active bg-primary text-white" : "text-gray-500"}`}
+            className={`tab ${
+              activeTab === "login"
+                ? "tab-active bg-primary text-white"
+                : "text-gray-500"
+            }`}
             onClick={() => setActiveTab("login")}
           >
             Login
           </a>
           <a
-            className={`tab ${activeTab === "signup" ? "tab-active bg-primary text-white" : "text-gray-500"}`}
+            className={`tab ${
+              activeTab === "signup"
+                ? "tab-active bg-primary text-white"
+                : "text-gray-500"
+            }`}
             onClick={() => setActiveTab("signup")}
           >
             Signup
@@ -41,7 +49,9 @@ const Login = () => {
                   placeholder="Password"
                   className="input input-bordered w-full"
                 />
-                <button className="btn bg-primary text-white w-full">Login</button>
+                <button className="btn bg-primary text-white w-full">
+                  Login
+                </button>
               </form>
             </div>
           ) : (
@@ -68,14 +78,16 @@ const Login = () => {
                   placeholder="Confirm Password"
                   className="input input-bordered w-full"
                 />
-                <button className="btn bg-primary text-white w-full">Signup</button>
+                <button className="btn bg-primary text-white w-full">
+                  Signup
+                </button>
               </form>
             </div>
           )}
         </div>
       </div>
     </div>
-    );
+  );
 };
 
 export default Login;
