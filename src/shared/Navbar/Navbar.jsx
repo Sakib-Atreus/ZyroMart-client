@@ -13,6 +13,8 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FaPhoneAlt, FaHeart } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { ClockCircleOutlined } from "@ant-design/icons";
+import { Button, Drawer } from "antd";
+import { useState } from "react";
 
 // type SearchProps = GetProps<typeof Input.Search>;
 
@@ -273,12 +275,23 @@ const onClick = (e) => {
 };
 
 const Navbar = () => {
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
   return (
     <nav className="bg-[#191A20] sticky top-0 z-50">
       <div className="navbar max-w-7xl mx-auto">
         <div className="navbar-start">
           <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost lg:hidden md:hidden"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-white"
@@ -313,7 +326,7 @@ const Navbar = () => {
             Zyro<span className="text-primary">Mart</span>
           </Link>
         </div>
-        <div className="navbar-center hidden lg:flex md:flex justify-center lg:w-[650px] md:w-3/2 lg:-ms-44">
+        <div className="navbar-center hidden lg:flex md:flex justify-center lg:w-[650px] md:w-3/2 lg:-ms-44 md:me-32">
           <Search
             // style={{
             //   backgroundColor: "green",
@@ -342,9 +355,27 @@ const Navbar = () => {
               </Badge>
             </a>
           </Link>
-          <Link className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10">
+
+          {/* Cart Drawer */}
+          <button
+            onClick={showDrawer}
+            className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10"
+          >
             <ShoppingCartOutlined />
+          </button>
+          <Drawer title="My Cart" onClose={onClose} open={open}>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+
+            <Link
+            className="btn btn-sm bg-white text-primary text-md border-1 border-primary hover:bg-primary hover:text-white hover:border-none h-4"
+          >
+            <ShoppingCartOutlined /> View All Cart
           </Link>
+          </Drawer>
+          {/* Cart Drawer close */}
+
           <Link
             to="/login"
             className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10"

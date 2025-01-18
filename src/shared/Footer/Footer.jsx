@@ -103,7 +103,7 @@ const Footer = () => {
             <h6 className="text-gray-500 lg:text-white lg:opacity-60 md:text-white md:opacity-60 font-bold text-xl lg:text-sm md:text-sm lg:footer-title md:footer-title">
               Services
             </h6>
-            <div className="flex flex-row lg:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
+            <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <a className="link link-hover">Branding</a>
               <a className="link link-hover">Design</a>
               <a className="link link-hover">Marketing</a>
@@ -114,7 +114,7 @@ const Footer = () => {
             <h6 className="text-gray-500 lg:text-white lg:opacity-60 md:text-white md:opacity-60 font-bold text-xl lg:text-sm md:text-sm lg:footer-title md:footer-title">
               Support
             </h6>
-            <div className="flex flex-row lg:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
+            <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <a className="link link-hover">Pricing</a>
               <a className="link link-hover">Documentation</a>
               <a className="link link-hover">Guides</a>
@@ -125,7 +125,7 @@ const Footer = () => {
             <h6 className="text-gray-500 lg:text-white lg:opacity-60 md:text-white md:opacity-60 font-bold text-xl lg:text-sm md:text-sm lg:footer-title md:footer-title">
               Company
             </h6>
-            <div className="flex flex-row lg:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
+            <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <a className="link link-hover">About</a>
               <a className="link link-hover">Contact</a>
               <a className="link link-hover">Jobs</a>
@@ -137,7 +137,7 @@ const Footer = () => {
             <h6 className="text-gray-500 lg:text-white lg:opacity-60 md:text-white md:opacity-60 font-bold text-xl lg:text-sm md:text-sm lg:footer-title md:footer-title">
               Legal
             </h6>
-            <div className="flex flex-row lg:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
+            <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <a className="link link-hover">Claim</a>
               <a className="link link-hover">Privacy</a>
               <a className="link link-hover">Terms</a>
