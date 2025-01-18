@@ -5,6 +5,7 @@ import Phones from "../pages/Phones/Phones";
 import PhoneDetails from "../components/PhoneDetails/PhoneDetails";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
+import Cart from "../pages/Cart/Cart";
 
 export const router = createBrowserRouter([
   {
@@ -25,12 +26,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/phones",
-        element: <Phones/>
+        element: <Phones/>,
       },
       {
         path: "/phones/new",
         element: <PhoneDetails/>,
       },
+      {
+        path: "/cart",
+        element: <Cart/>,
+      }
     ],
   },
 ]);
