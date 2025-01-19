@@ -6,6 +6,8 @@ import PhoneDetails from "../components/PhoneDetails/PhoneDetails";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Cart from "../pages/Cart/Cart";
+import Wishlist from "../pages/Wishlist/Wishlist";
+import StoreLocations from "../pages/StoreLocations/StoreLocations";
 
 export const router = createBrowserRouter([
   {
@@ -14,27 +16,35 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home/>,
+        element: <Home />,
       },
       {
         path: "/login",
-        element: <Login/>,
+        element: <Login />,
       },
       {
         path: "/register",
-        element: <Login/>,
+        element: <Login />,
       },
       {
         path: "/phones",
-        element: <Phones/>,
+        element: <Phones />,
       },
       {
         path: "/phones/new",
-        element: <PhoneDetails/>,
+        element: <PhoneDetails />,
       },
       {
         path: "/cart",
-        element: <Cart/>,
+        element: <Cart />,
+      },
+      {
+        path: "/wishlist",
+        element: <Wishlist />,
+      },
+      {
+        path: "/storeLocations",
+        element: <StoreLocations />,
       }
     ],
   },

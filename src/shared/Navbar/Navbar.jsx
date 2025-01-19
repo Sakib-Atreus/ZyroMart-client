@@ -15,6 +15,7 @@ import { FaLocationDot } from "react-icons/fa6";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { Button, Drawer } from "antd";
 import { useState } from "react";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 // type SearchProps = GetProps<typeof Input.Search>;
 
@@ -365,7 +366,7 @@ const Navbar = () => {
             Zyro<span className="text-primary">Mart</span>
           </Link>
         </div>
-        <div className="navbar-center hidden lg:flex md:flex justify-center lg:w-[650px] md:w-3/2 lg:-ms-44 md:me-32">
+        <div className="navbar-center hidden lg:flex md:flex justify-center lg:w-[50%] md:w-[30%] lg:-ms-8 md:me-20">
           <Search
             // style={{
             //   backgroundColor: "green",
@@ -381,11 +382,14 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-end lg:flex md:flex gap-4 hidden">
-          <Link className="btn btn-sm bg-[#FFE6C71A] text-white hover:bg-primary h-10">
+          <Link to="/storeLocations" className="btn btn-sm bg-[#FFE6C71A] text-white hover:bg-primary h-10">
             <FaLocationDot className="text-xl" /> <p>Store Locator</p>
           </Link>
-          <Link className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10">
-            <a href="#">
+          <Link
+            to="/wishlist"
+            className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10"
+          >
+            <a href="/wishlist">
               <Badge count={5} className="custom-badge">
                 {" "}
                 {/* Apply custom class */}
@@ -403,43 +407,53 @@ const Navbar = () => {
             <ShoppingCartOutlined />
           </button>
           <Drawer title="My Cart" onClose={onClose} open={open}>
-            <div className="grid grid-cols-1">
-              {/* Cart Items (Left Side) */}
-              <div className="space-y-6 col-span-2">
-                {products.slice(0, 3).map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between p-2 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-md shadow-sm"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {product.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {product.category}
-                        </p>
-                        <p className="text-xl font-semibold text-gray-900">
-                          ${product.price}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      className="text-red-500 text-2xl"
-                      onClick={() => removeProduct(product.id)}
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1">
+                {/* Cart Items (Left Side) */}
+                <div className="space-y-6 col-span-2">
+                  {products.slice(0, 3).map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between p-2 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                     >
-                      &times;
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-24 h-24 object-cover rounded-md shadow-sm"
+                        />
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            {product.name}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {product.category}
+                          </p>
+                          <p className="text-xl font-semibold text-gray-900">
+                            ${product.price}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        className="text-red-500 text-2xl"
+                        onClick={() => removeProduct(product.id)}
+                      >
+                        <RiDeleteBin5Line />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="text-center text-gray-500 mt-8 text-lg">
+                Your cart is empty.{" "}
+                <a href="/" className="text-blue-600 underline">
+                  Start shopping
+                </a>
+                .
+              </p>
+            )}
 
             <div className="text-center my-6">
               <Link
