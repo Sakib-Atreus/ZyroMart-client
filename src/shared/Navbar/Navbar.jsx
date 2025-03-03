@@ -368,10 +368,6 @@ const Navbar = () => {
         </div>
         <div className="navbar-center hidden lg:flex md:flex justify-center lg:w-[50%] md:w-[30%] lg:-ms-8 md:me-20">
           <Search
-            // style={{
-            //   backgroundColor: "green",
-            //   color: "white",
-            // }}
             className="custom-search"
             placeholder="Search products"
             allowClear
