@@ -153,7 +153,7 @@ const Footer = () => {
             <p>
               {/* Copyright © {new Date().getFullYear()} - All right reserved by ACME
             Industries Ltd */}
-              © {new Date().getFullYear} ZyroMart Company, Inc. All rights reserved.
+              © {new Date().getFullYear()} ZyroMart Company, Inc. All rights reserved.
             </p>
           </aside>
           <p>Developed by Sakib</p>
