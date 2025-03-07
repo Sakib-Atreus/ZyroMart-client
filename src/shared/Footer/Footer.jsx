@@ -151,8 +151,6 @@ const Footer = () => {
         <footer className="footer flex justify-between p-10">
           <aside>
             <p>
-              {/* Copyright © {new Date().getFullYear()} - All right reserved by ACME
-            Industries Ltd */}
               © {new Date().getFullYear()} ZyroMart Company, Inc. All rights reserved.
             </p>
           </aside>
