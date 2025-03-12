@@ -33,14 +33,14 @@ const mapContainerStyle = {
   height: "500px",
 };
 
-const center = { lat: 23.8103, lng: 90.4125 }; // Default center (Dhaka)
+const center = { lat: 23.8103, lng: 90.4125 }; 
 
 const StoreLocations = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [search, setSearch] = useState("");
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.GOOGLE_MAPS_API_KEY, // Replace with your API key
+    googleMapsApiKey: import.meta.env.GOOGLE_MAPS_API_KEY,
   });
 
   if (!isLoaded) return <div>Loading...</div>;
