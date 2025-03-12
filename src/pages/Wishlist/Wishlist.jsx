@@ -48,12 +48,12 @@ const Wishlist = () => {
     setProducts(updatedProducts);
 
     if (updatedProducts.length === 0) {
-      setShowAlert(true); // Show alert when no products are left
+      setShowAlert(true);
     }
   };
 
   const closeAlert = () => {
-    setShowAlert(false); // Close alert
+    setShowAlert(false);
   };
 
   return (
