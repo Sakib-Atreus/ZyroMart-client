@@ -34,13 +34,13 @@ const Cart = () => {
   ];
 
   const [products, setProducts] = useState(initialProducts);
-  const [coupon, setCoupon] = useState(""); // For coupon input
-  const [discount, setDiscount] = useState(0); // For discount amount
-  const [showAlert, setShowAlert] = useState(products.length === 0); // Show alert if cart is empty
+  const [coupon, setCoupon] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [showAlert, setShowAlert] = useState(products.length === 0); 
 
   const validCoupons = {
-    HAPPY10: 10, // 10% discount
-    SAVE20: 20, // 20% discount
+    HAPPY10: 10, 
+    SAVE20: 20, 
   };
 
   const updateQuantity = (id, newQuantity) => {
@@ -93,7 +93,7 @@ const Cart = () => {
       setDiscount((subtotal * discountPercentage) / 100);
     } else {
       alert("Invalid coupon code!");
-      setDiscount(0); // Reset discount if the coupon is invalid
+      setDiscount(0);
     }
   };
 
