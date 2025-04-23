@@ -58,7 +58,7 @@ const Login = () => {
                   <FaEnvelope className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Enter Your Email"
                     className="input input-bordered pl-10 w-full bg-white"
                   />
                 </div>
