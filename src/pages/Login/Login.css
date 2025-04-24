@@ -29,7 +29,6 @@
   color: var(--inactive-tab-color);
 }
 
-
 /* For tablets (width between 768px and 1024px) */
 @media (max-width: 1024px) {
     .bg-video {
