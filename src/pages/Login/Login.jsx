@@ -19,6 +19,7 @@ const Login = () => {
     }
   }, [location.pathname]);
 
+  // for active route
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     navigate(tab === "login" ? "/login" : "/register");
@@ -154,6 +155,7 @@ const Login = () => {
                     Login Here
                   </Link>
                 </p>
+                
               </form>
             )}
           </div>
