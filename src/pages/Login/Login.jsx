@@ -148,14 +148,12 @@ const Login = () => {
                 <button className="btn border-none bg-primary text-xl font-semibold text-white w-full hover:bg-primary hover:text-white">
                   Sign Up
                 </button>
-                
                 <p className="text-center font-medium pt-2">
                   Already have an account?{" "}
                   <Link className="text-primary opacity-75" to="/login">
                     Login Here
                   </Link>
                 </p>
-                
               </form>
             )}
           </div>
