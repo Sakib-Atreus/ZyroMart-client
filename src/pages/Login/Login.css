@@ -29,17 +29,16 @@
   color: var(--inactive-tab-color);
 }
 
-
 /* For tablets (width between 768px and 1024px) */
 @media (max-width: 1024px) {
     .bg-video {
-      height: 65vh; /* Reduce height for tablets */
+      height: 65vh;
     }
   }
   
   /* For mobile devices (width less than 768px) */
   @media (max-width: 768px) {
     .bg-video {
-      height: 80vh; /* Reduce height further for mobile screens */
+      height: 80vh;
     }
   }

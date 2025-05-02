@@ -19,6 +19,7 @@ const Login = () => {
     }
   }, [location.pathname]);
 
+  // for active route
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     navigate(tab === "login" ? "/login" : "/register");
@@ -82,7 +83,6 @@ const Login = () => {
                 <button className="btn border-none bg-primary text-xl font-semibold text-white w-full hover:bg-primary hover:text-white">
                   Log In
                 </button>
-                
                 <p className="text-center font-medium pt-2">
                   Don{"'"}t have an account?{" "}
                   <Link className="text-primary opacity-75" to="/register">
