@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 export const LogOut = async () => {
   try {
     await axios.post("http://localhost:5000/api/v1/auth/logout", {
-    //   withCredentials: true, // if using cookies
+      //   withCredentials: true, // if using cookies
     });
     setUser(null);
     localStorage.removeItem("user");
