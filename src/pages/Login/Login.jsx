@@ -1,28 +1,81 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import {
+  FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaMapMarkerAlt,
+} from "react-icons/fa";
 import "./Login.css";
+import { toast } from "react-toastify";
+
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+  });
+
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
-  // Sync active tab with route
   useEffect(() => {
-    if (location.pathname === "/login") {
-      setActiveTab("login");
-    } else if (location.pathname === "/register") {
-      setActiveTab("register");
-    }
+    if (location.pathname === "/login") setActiveTab("login");
+    else if (location.pathname === "/register") setActiveTab("register");
   }, [location.pathname]);
 
-  // for active route
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     navigate(tab === "login" ? "/login" : "/register");
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/v1/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      login(res.data.data); // Store token or user info
+      toast.success("Login successful!");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      return alert("Passwords do not match");
+    }
+    try {
+      const res = await axios.post("http://localhost:5000/api/v1/auth/signup", {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        address: formData.address,
+      });
+
+      login(res.data.data);
+      toast.success("Registration successful!");
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -33,9 +86,7 @@ const Login = () => {
           <div className="tabs w-[70%] mx-auto grid grid-cols-2 justify-center bg-gray-100 rounded-full mb-4">
             <button
               className={`tab border-none text-lg font-medium rounded-full ${
-                activeTab === "login"
-                  ? " bg-white text-primary m-1 tab-active hover:bg-white hover:text-primary"
-                  : " bg-gray-100 m-1 tab-inactive hover:bg-gray-100 hover:text-black"
+                activeTab === "login" ? "bg-white text-primary m-1" : "m-1"
               }`}
               onClick={() => handleTabChange("login")}
             >
@@ -43,32 +94,39 @@ const Login = () => {
             </button>
             <button
               className={`tab border-none text-lg font-medium rounded-full ${
-                activeTab === "register"
-                  ? " bg-white text-primary m-1 tab-active hover:bg-white hover:text-primary"
-                  : " bg-gray-100 m-1 tab-inactive hover:bg-gray-100 hover:text-black"
+                activeTab === "register" ? "bg-white text-primary m-1" : "m-1"
               }`}
               onClick={() => handleTabChange("register")}
             >
               Register
             </button>
           </div>
+
           <div className="p-6">
             {activeTab === "login" ? (
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleLogin}>
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type="email"
+                    name="email"
                     placeholder="Enter Your Email"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
                     placeholder="Password"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
                   />
                   <span
                     className="absolute right-3 top-4 text-gray-400 cursor-pointer"
@@ -77,51 +135,68 @@ const Login = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
-                <p className="text-right text-primary opacity-75 font-medium pb-2">
-                  Forgot Password?
-                </p>
-                <button className="btn border-none bg-primary text-xl font-semibold text-white w-full hover:bg-primary hover:text-white">
-                  Log In
-                </button>
-                <p className="text-center font-medium pt-2">
-                  Don{"'"}t have an account?{" "}
-                  <Link className="text-primary opacity-75" to="/register">
-                    Register Here
-                  </Link>
-                </p>
+                <button className="btn bg-primary text-white w-full">Log In</button>
               </form>
             ) : (
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleRegister}>
                 <div className="relative">
                   <FaUser className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type="text"
+                    name="name"
                     placeholder="Name"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type="email"
+                    name="email"
                     placeholder="Email"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="relative">
                   <FaPhone className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type="text"
+                    name="phone"
                     placeholder="Phone"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <FaMapMarkerAlt className="absolute left-3 top-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="address"
+                    placeholder="Address"
+                    className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.address}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
                     placeholder="Password"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
                   />
                   <span
                     className="absolute right-3 top-4 text-gray-400 cursor-pointer"
@@ -134,25 +209,23 @@ const Login = () => {
                   <FaLock className="absolute left-3 top-4 text-gray-400" />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
                     placeholder="Confirm Password"
                     className="input input-bordered pl-10 w-full bg-white"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
                   />
                   <span
                     className="absolute right-3 top-4 text-gray-400 cursor-pointer"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
                   >
                     {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
-                <button className="btn border-none bg-primary text-xl font-semibold text-white w-full hover:bg-primary hover:text-white">
-                  Sign Up
-                </button>
-                <p className="text-center font-medium pt-2">
-                  Already have an account?{" "}
-                  <Link className="text-primary opacity-75" to="/login">
-                    Login Here
-                  </Link>
-                </p>
+                <button className="btn bg-primary text-white w-full">Sign Up</button>
               </form>
             )}
           </div>

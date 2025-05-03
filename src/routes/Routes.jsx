@@ -8,6 +8,7 @@ import Register from "../pages/Register/Register";
 import Cart from "../pages/Cart/Cart";
 import Wishlist from "../pages/Wishlist/Wishlist";
 import StoreLocations from "../pages/StoreLocations/StoreLocations";
+import PrivateRoute from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -40,12 +41,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/wishlist",
-        element: <Wishlist />,
+        element: (
+          <PrivateRoute>
+            <Wishlist />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/storeLocations",
         element: <StoreLocations />,
-      }
+      },
     ],
   },
 ]);

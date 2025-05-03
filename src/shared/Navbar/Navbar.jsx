@@ -7,7 +7,7 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FaPhoneAlt, FaHeart } from "react-icons/fa";
@@ -16,6 +16,8 @@ import { ClockCircleOutlined } from "@ant-design/icons";
 import { Button, Drawer } from "antd";
 import { useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { useAuth } from "../../context/AuthContext";
+import { LogOut } from "../../providers/AuthProvider";
 
 // type SearchProps = GetProps<typeof Input.Search>;
 
@@ -276,6 +278,15 @@ const onClick = (e) => {
 };
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+    // LogOut();
+  };
+
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
@@ -378,7 +389,10 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-end lg:flex md:flex gap-4 hidden">
-          <Link to="/storeLocations" className="btn btn-sm bg-[#FFE6C71A] text-white hover:bg-primary h-10">
+          <Link
+            to="/storeLocations"
+            className="btn btn-sm bg-[#FFE6C71A] text-white hover:bg-primary h-10"
+          >
             <FaLocationDot className="text-xl" /> <p>Store Locator</p>
           </Link>
           <Link
@@ -463,12 +477,32 @@ const Navbar = () => {
           </Drawer>
           {/* Cart Drawer close */}
 
-          <Link
+          {user ? (
+            <div title="Logout">
+              <button
+                onClick={handleLogout}
+                className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10"
+              >
+                <FontAwesomeIcon icon={faUser} />
+              </button>
+            </div>
+          ) : (
+            <div title="Login">
+              <Link
+                to="/login"
+                className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10"
+              >
+                <FontAwesomeIcon icon={faUser} />
+              </Link>
+            </div>
+          )}
+
+          {/* <Link
             to="/login"
             className="btn btn-sm bg-[#FFE6C71A] text-white text-xl hover:bg-primary h-10"
           >
             <FontAwesomeIcon icon={faUser} />
-          </Link>
+          </Link> */}
         </div>
         {/* Search for mobile device */}
         <Search
