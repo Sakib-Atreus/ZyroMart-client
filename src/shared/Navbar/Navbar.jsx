@@ -1,21 +1,23 @@
-import { Input, Space, Avatar, Badge } from "antd";
+import { Input, Space, Avatar, Badge, Menu, Dropdown } from "antd";
 // import type { GetProps } from 'antd';
 import "./Navbar.css";
 import {
   AudioOutlined,
   MenuOutlined,
   ShoppingCartOutlined,
+  DownOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FaPhoneAlt, FaHeart } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { ClockCircleOutlined } from "@ant-design/icons";
+import { CgProfile } from "react-icons/cg";
 import { Button, Drawer } from "antd";
 import { useState } from "react";
-import { RiDeleteBin5Line } from "react-icons/ri";
+import { RiDeleteBin5Line, RiProfileFill } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import { LogOut } from "../../providers/AuthProvider";
 
@@ -295,6 +297,49 @@ const Navbar = () => {
     setOpen(false);
   };
 
+  const onMenuClick = ({ key }) => {
+    if (key === "logout") {
+      handleLogout();
+    }
+  };
+
+  // navbar profile icon
+  const profileItems = user
+    ? [
+        // {
+        //   key: "1",
+        //   label: "My Account",
+        //   disabled: true,
+        // },
+        // {
+        //   type: "divider",
+        // },
+        {
+          key: "2",
+          label: "Profile",
+          icon: <CgProfile />,
+        },
+        {
+          key: "4",
+          label: "Settings",
+          icon: <SettingOutlined />,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "logout",
+          label: <span className="text-primary font-medium">LogOut</span>,
+          // onClick: handleLogout,
+        },
+      ]
+    : [
+        {
+          key: "login",
+          label: <Link to="/login">Login</Link>,
+        },
+      ];
+
   const initialProducts = [
     {
       id: 1,
@@ -477,7 +522,30 @@ const Navbar = () => {
           </Drawer>
           {/* Cart Drawer close */}
 
-          {user ? (
+          {/* Profile dropdown menu */}
+          <div className="flex justify-center items-center hover:text-primary">
+            {user ? (
+              <Dropdown menu={{ items: profileItems, onClick: onMenuClick }}>
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                    />
+                  </Space>
+                </a>
+              </Dropdown>
+            ) : (
+              <Link to="/login">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                />
+              </Link>
+            )}
+          </div>
+
+          {/* {user ? (
             <div title="Logout">
               <button
                 onClick={handleLogout}
@@ -495,7 +563,7 @@ const Navbar = () => {
                 <FontAwesomeIcon icon={faUser} />
               </Link>
             </div>
-          )}
+          )} */}
 
           {/* <Link
             to="/login"
