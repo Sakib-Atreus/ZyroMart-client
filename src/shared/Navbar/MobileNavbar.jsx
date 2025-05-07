@@ -1,14 +1,15 @@
 import React from "react";
-import { Input, Space, Avatar, Badge } from "antd";
+import { Input, Space, Avatar, Badge, Dropdown } from "antd";
 // import type { GetProps } from 'antd';
 import "./Navbar.css";
 import {
   AudioOutlined,
   MenuOutlined,
+  SettingOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FaPhoneAlt, FaHeart } from "react-icons/fa";
@@ -17,8 +18,19 @@ import { ClockCircleOutlined } from "@ant-design/icons";
 import { Button, Drawer } from "antd";
 import { useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { useAuth } from "../../context/AuthContext";
+import { CgProfile } from "react-icons/cg";
 
 const MobileNavbar = () => {
+  const { user, logout } = useAuth();
+    const navigate = useNavigate();
+  
+    const handleLogout = async () => {
+      await logout();
+      navigate("/login");
+      // LogOut();
+    };
+  
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);
@@ -26,6 +38,49 @@ const MobileNavbar = () => {
   const onClose = () => {
     setOpen(false);
   };
+
+  const onMenuClick = ({ key }) => {
+    if (key === "logout") {
+      handleLogout();
+    }
+  };
+
+  // navbar profile icon
+  const profileItems = user
+    ? [
+        // {
+        //   key: "1",
+        //   label: "My Account",
+        //   disabled: true,
+        // },
+        // {
+        //   type: "divider",
+        // },
+        {
+          key: "2",
+          label: "Profile",
+          icon: <CgProfile />,
+        },
+        {
+          key: "4",
+          label: "Settings",
+          icon: <SettingOutlined />,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "logout",
+          label: <span className="text-primary font-medium">LogOut</span>,
+          // onClick: handleLogout,
+        },
+      ]
+    : [
+        {
+          key: "login",
+          label: <Link to="/login">Login</Link>,
+        },
+      ];
 
   const initialProducts = [
     {
@@ -148,12 +203,39 @@ const MobileNavbar = () => {
           </div>
         </Drawer>
         {/* Cart Drawer close */}
-        <Link
+
+        {/* Profile dropdown menu */}
+        <div className="flex justify-center items-center hover:text-primary">
+            {user ? (
+              <Dropdown menu={{ items: profileItems, onClick: onMenuClick }}>
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                    />
+                  </Space>
+                </a>
+              </Dropdown>
+            ) : (
+              <Link to="/login">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                />
+              </Link>
+            )}
+          </div>
+
+
+        {/* <Link
           to="/login"
           className="btn bg-[#FFE6C71A] text-white text-xl hover:bg-primary"
         >
           <FontAwesomeIcon icon={faUser} />
-        </Link>
+        </Link> */}
+
+
       </div>
     </div>
   );
