@@ -572,6 +572,7 @@ const Navbar = () => {
           >
             <FontAwesomeIcon icon={faUser} />
           </Link> */}
+          
         </div>
         {/* Search for mobile device */}
         <Search

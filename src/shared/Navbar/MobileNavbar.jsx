@@ -32,9 +32,11 @@ const MobileNavbar = () => {
     };
   
   const [open, setOpen] = useState(false);
+  
   const showDrawer = () => {
     setOpen(true);
   };
+  
   const onClose = () => {
     setOpen(false);
   };
@@ -110,7 +112,6 @@ const MobileNavbar = () => {
       imageUrl:
         "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
     },
-    // Add more products here
   ];
 
   const [products, setProducts] = useState(initialProducts);
@@ -120,6 +121,7 @@ const MobileNavbar = () => {
       prevProducts.filter((product) => product.id !== id)
     );
   };
+  
   return (
     <div className="sticky bottom-0 z-50">
       <div className="bg-black lg:hidden md:hidden flex w-full mx-auto justify-between p-2 border-t-2 border-gray-500">
