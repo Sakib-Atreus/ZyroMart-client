@@ -369,7 +369,6 @@ const Navbar = () => {
       imageUrl:
         "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
     },
-    // Add more products here
   ];
 
   const [products, setProducts] = useState(initialProducts);
