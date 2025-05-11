@@ -1,5 +1,4 @@
 import { Input, Space, Avatar, Badge, Menu, Dropdown } from "antd";
-// import type { GetProps } from 'antd';
 import "./Navbar.css";
 import {
   AudioOutlined,
