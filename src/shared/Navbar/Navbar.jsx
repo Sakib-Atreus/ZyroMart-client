@@ -446,9 +446,7 @@ const Navbar = () => {
             <a href="/wishlist">
               <Badge count={5} className="custom-badge">
                 {" "}
-                {/* Apply custom class */}
                 <FaHeart className="custom-icon" />{" "}
-                {/* Apply custom icon class */}
               </Badge>
             </a>
           </Link>
