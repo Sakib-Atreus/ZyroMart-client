@@ -20,7 +20,7 @@ const Cart = () => {
       price: 29.99,
       quantity: 1,
       imageUrl:
-        "https://smartbuy-me.com/cdn/shop/files/ABJ1501ST0241_1.jpg?v=1722968254&width=1200",
+        "https://9to5google.com/wp-content/uploads/sites/4/2024/01/pixel-9-onl-3.jpg",
     },
     {
       id: 3,
@@ -29,7 +29,7 @@ const Cart = () => {
       price: 19.99,
       quantity: 1,
       imageUrl:
-        "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
+        "https://mobilerelation.sg/wp-content/uploads/2024/05/samsung-galaxy-s24-ultra-5g-grey.webp",
     },
   ];
 
