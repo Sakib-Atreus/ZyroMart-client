@@ -101,7 +101,7 @@ const MobileNavbar = () => {
       price: 29.99,
       quantity: 1,
       imageUrl:
-        "https://smartbuy-me.com/cdn/shop/files/ABJ1501ST0241_1.jpg?v=1722968254&width=1200",
+        "https://9to5google.com/wp-content/uploads/sites/4/2024/01/pixel-9-onl-3.jpg",
     },
     {
       id: 3,

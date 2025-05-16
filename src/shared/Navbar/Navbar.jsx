@@ -1,5 +1,4 @@
 import { Input, Space, Avatar, Badge, Menu, Dropdown } from "antd";
-// import type { GetProps } from 'antd';
 import "./Navbar.css";
 import {
   AudioOutlined,
@@ -26,6 +25,7 @@ import { LogOut } from "../../providers/AuthProvider";
 const { Search } = Input;
 
 // const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+
 
 const items = [
   {
@@ -358,7 +358,7 @@ const Navbar = () => {
       price: 29.99,
       quantity: 1,
       imageUrl:
-        "https://smartbuy-me.com/cdn/shop/files/ABJ1501ST0241_1.jpg?v=1722968254&width=1200",
+        "https://9to5google.com/wp-content/uploads/sites/4/2024/01/pixel-9-onl-3.jpg",
     },
     {
       id: 3,
@@ -369,7 +369,6 @@ const Navbar = () => {
       imageUrl:
         "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
     },
-    // Add more products here
   ];
 
   const [products, setProducts] = useState(initialProducts);
@@ -448,9 +447,7 @@ const Navbar = () => {
             <a href="/wishlist">
               <Badge count={5} className="custom-badge">
                 {" "}
-                {/* Apply custom class */}
                 <FaHeart className="custom-icon" />{" "}
-                {/* Apply custom icon class */}
               </Badge>
             </a>
           </Link>
@@ -648,3 +645,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
