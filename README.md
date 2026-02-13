@@ -1,4 +1,4 @@
-# [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=33&pause=1000&color=F07025&width=435&lines=ZyroMart+eCommerce+Frontend;Modern+React+Application;)](https://git.io/typing-svg)
+# [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=33&pause=1000&color=F07025&width=435&lines=ZyroMart+eCommerce+Website;React+Application;)](https://git.io/typing-svg)
 
 ---
 
@@ -21,10 +21,11 @@ This project focuses on:
 <!--
 ## 🚀 Live Demo
 
-> Add your deployed frontend URL here
--->
+> 
 
 ---
+
+-->
 
 ## 🛠️ Tech Stack
 
@@ -63,24 +64,6 @@ This project focuses on:
 
 ---
 
-## 📂 Project Structure
-
-ZyroMart-client/
-│
-├── public/
-├── src/
-│ ├── components/
-│ ├── pages/
-│ ├── services/
-│ ├── hooks/
-│ ├── context/
-│ └── App.js
-│
-└── package.json
-
-
----
-
 ## ⚡ Quick Start
 
 Follow these steps to run the project locally.
@@ -116,27 +99,27 @@ npm start
 
 ### 📈 Future Improvements
 
-User authentication (JWT)
+- User authentication (JWT)
 
-Payment gateway integration
+- Payment gateway integration
 
-Admin dashboard
+- Admin dashboard
 
-Wishlist feature
+- Wishlist feature
 
-Product reviews & ratings
+- Product reviews & ratings
 
 ### 🤝 Contributing
 
-Contributions are welcome!
+- Contributions are welcome!
 
-Fork the repository
+- Fork the repository
 
-Create a new branch
+- Create a new branch
 
-Commit your changes
+- Commit your changes
 
-Open a pull request
+- Open a pull request
 
 ### 📧 Contact
 
