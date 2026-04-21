@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -7,6 +6,7 @@ import {
 } from "react-icons/fa";
 import "./Login.css";
 import { toast } from "react-toastify";
+import { authApi } from "../../api/endpoints";
 
 
 const Login = () => {
@@ -24,12 +24,19 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   useEffect(() => {
     if (location.pathname === "/login") setActiveTab("login");
     else if (location.pathname === "/register") setActiveTab("register");
   }, [location.pathname]);
+
+  // If already authenticated, skip the form and send the user to the right place.
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === "admin" ? "/admin" : "/", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -43,38 +50,41 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/auth/login", {
+      const res = await authApi.login({
         email: formData.email,
         password: formData.password,
       });
-
-      login(res.data.data); // Store token or user info
+      login({ user: res.data, token: res.token });
       toast.success("Login successful!");
-      navigate("/");
+      navigate(res.data?.role === "admin" ? "/admin" : "/", { replace: true });
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      return alert("Passwords do not match");
+      return toast.error("Passwords do not match");
     }
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/auth/signup", {
+      await authApi.signup({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
         address: formData.address,
       });
-
-      login(res.data.data);
+      // Registration doesn't return a token — auto-login after signup.
+      const loginRes = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+      login({ user: loginRes.data, token: loginRes.token });
       toast.success("Registration successful!");
-      navigate("/");
+      navigate(loginRes.data?.role === "admin" ? "/admin" : "/", { replace: true });
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || err.message || "Registration failed");
     }
   };
 

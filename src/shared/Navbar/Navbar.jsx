@@ -299,39 +299,76 @@ const Navbar = () => {
   };
 
   const onMenuClick = ({ key }) => {
-    if (key === "logout") {
-      handleLogout();
+    switch (key) {
+      case "profile":
+        navigate("/profile?tab=profile");
+        break;
+      case "orders":
+        navigate("/profile?tab=orders");
+        break;
+      case "password":
+        navigate("/profile?tab=password");
+        break;
+      case "vendor":
+        navigate("/profile?tab=vendor");
+        break;
+      case "admin":
+        navigate("/admin");
+        break;
+      case "logout":
+        handleLogout();
+        break;
+      default:
+        break;
     }
   };
 
   // navbar profile icon
   const profileItems = user
     ? [
-        // {
-        //   key: "1",
-        //   label: "My Account",
-        //   disabled: true,
-        // },
-        // {
-        //   type: "divider",
-        // },
         {
-          key: "2",
-          label: "Profile",
+          key: "greeting",
+          label: (
+            <div className="py-1">
+              <div className="text-xs text-gray-500">Signed in as</div>
+              <div className="font-medium truncate max-w-[180px]">
+                {user.name || user.email}
+              </div>
+            </div>
+          ),
+          disabled: true,
+        },
+        { type: "divider" },
+        {
+          key: "profile",
+          label: "My Profile",
           icon: <CgProfile />,
         },
         {
-          key: "4",
-          label: "Settings",
+          key: "orders",
+          label: "My Orders",
+          icon: <ShoppingCartOutlined />,
+        },
+        {
+          key: "vendor",
+          label: user.role === "vendor" ? "Vendor Profile" : "Become a Vendor",
           icon: <SettingOutlined />,
         },
         {
-          type: "divider",
+          key: "password",
+          label: "Change Password",
+          icon: <SettingOutlined />,
         },
+        ...(user.role === "admin"
+          ? [
+              { type: "divider" },
+              { key: "admin", label: "Admin Dashboard", icon: <SettingOutlined /> },
+            ]
+          : []),
+        { type: "divider" },
         {
           key: "logout",
           label: <span className="text-primary font-medium">LogOut</span>,
-          // onClick: handleLogout,
         },
       ]
     : [
