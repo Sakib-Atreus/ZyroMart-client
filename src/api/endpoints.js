@@ -72,3 +72,33 @@ export const cartApi = {
 export const paymentApi = {
   createCheckoutSession: (body) => unwrap(api.post("/payments/checkout-session", body)),
 };
+
+export const wishlistApi = {
+  get: () => unwrap(api.get("/wishlist")),
+  add: (productId) => unwrap(api.post("/wishlist/items", { product: productId })),
+  remove: (productId) => unwrap(api.delete(`/wishlist/items/${productId}`)),
+  clear: () => unwrap(api.delete("/wishlist")),
+};
+
+export const reviewApi = {
+  listByProduct: (productId, params) =>
+    unwrap(api.get(`/reviews/product/${productId}`, { params })),
+  myReviewForProduct: (productId) =>
+    unwrap(api.get(`/reviews/product/${productId}/me`)),
+  create: (body) => unwrap(api.post("/reviews", body)),
+  update: (id, body) => unwrap(api.patch(`/reviews/${id}`, body)),
+  remove: (id) => unwrap(api.delete(`/reviews/${id}`)),
+};
+
+export const questionApi = {
+  listByProduct: (productId, params) =>
+    unwrap(api.get(`/questions/product/${productId}`, { params })),
+  create: (body) => unwrap(api.post("/questions", body)),
+  answer: (id, body) => unwrap(api.post(`/questions/${id}/answer`, body)),
+  remove: (id) => unwrap(api.delete(`/questions/${id}`)),
+};
+
+export const analyticsApi = {
+  platform: () => unwrap(api.get("/analytics/platform")),
+  vendor: () => unwrap(api.get("/analytics/vendor")),
+};
