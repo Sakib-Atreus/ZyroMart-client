@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Main from "../layout/Main";
 import AdminLayout from "../layout/AdminLayout";
+import VendorLayout from "../layout/VendorLayout";
 import Home from "../pages/Home/Home";
 import Phones from "../pages/Phones/Phones";
 import PhoneDetails from "../components/PhoneDetails/PhoneDetails";
@@ -11,12 +12,18 @@ import StoreLocations from "../pages/StoreLocations/StoreLocations";
 import Profile from "../pages/Profile/Profile";
 import PrivateRoute from "./PrivateRoutes";
 import AdminRoute from "./AdminRoute";
+import VendorRoute from "./VendorRoute";
 
 import Dashboard from "../pages/Admin/Dashboard";
 import AdminCategories from "../pages/Admin/Categories";
 import AdminVendors from "../pages/Admin/Vendors";
 import AdminProducts from "../pages/Admin/Products";
 import AdminOrders from "../pages/Admin/Orders";
+
+import VendorDashboard from "../pages/Vendor/Dashboard";
+import VendorProducts from "../pages/Vendor/MyProducts";
+import VendorOrders from "../pages/Vendor/Orders";
+import VendorShopSettings from "../pages/Vendor/ShopSettings";
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +69,21 @@ export const router = createBrowserRouter([
       { path: "products", element: <AdminProducts /> },
       { path: "orders", element: <AdminOrders /> },
       { path: "*", element: <Navigate to="/admin" replace /> },
+    ],
+  },
+  {
+    path: "/vendor",
+    element: (
+      <VendorRoute>
+        <VendorLayout />
+      </VendorRoute>
+    ),
+    children: [
+      { index: true, element: <VendorDashboard /> },
+      { path: "products", element: <VendorProducts /> },
+      { path: "orders", element: <VendorOrders /> },
+      { path: "settings", element: <VendorShopSettings /> },
+      { path: "*", element: <Navigate to="/vendor" replace /> },
     ],
   },
 ]);

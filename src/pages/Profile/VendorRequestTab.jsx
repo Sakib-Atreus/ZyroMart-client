@@ -3,7 +3,8 @@ import {
   Alert, Button, Card, Col, Descriptions, Empty, Form, Input, Result, Row, Space,
   Spin, Tag, Typography, message,
 } from "antd";
-import { ShopOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { ShopOutlined, CheckCircleOutlined, ClockCircleOutlined, DashboardOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import { vendorApi } from "../../api/endpoints";
 
 const { Paragraph, Title } = Typography;
@@ -96,7 +97,14 @@ const VendorRequestTab = () => {
             type="success"
             showIcon
             message="Your vendor account is active"
-            description="You can now manage products and orders through the vendor tools. Log out and back in if your menu doesn't update."
+            description="Open your Seller Dashboard to manage products, variants, orders, and shop settings."
+            action={
+              <Link to="/vendor">
+                <Button type="primary" icon={<DashboardOutlined />}>
+                  Open Seller Dashboard
+                </Button>
+              </Link>
+            }
             style={{ marginBottom: 24 }}
           />
         )}

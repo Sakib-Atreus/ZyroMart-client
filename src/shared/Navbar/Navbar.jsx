@@ -312,6 +312,9 @@ const Navbar = () => {
       case "vendor":
         navigate("/profile?tab=vendor");
         break;
+      case "vendorDashboard":
+        navigate("/vendor");
+        break;
       case "admin":
         navigate("/admin");
         break;
@@ -349,11 +352,21 @@ const Navbar = () => {
           label: "My Orders",
           icon: <ShoppingCartOutlined />,
         },
-        {
-          key: "vendor",
-          label: user.role === "vendor" ? "Vendor Profile" : "Become a Vendor",
-          icon: <SettingOutlined />,
-        },
+        ...(user.role === "vendor"
+          ? [
+              {
+                key: "vendorDashboard",
+                label: <span className="font-medium text-purple-600">Seller Dashboard</span>,
+                icon: <SettingOutlined />,
+              },
+            ]
+          : [
+              {
+                key: "vendor",
+                label: "Become a Vendor",
+                icon: <SettingOutlined />,
+              },
+            ]),
         {
           key: "password",
           label: "Change Password",

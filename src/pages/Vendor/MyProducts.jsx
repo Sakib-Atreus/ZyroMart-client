@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  Table, Tag, Space, Button, Modal, Form, Input, Select, Card, Typography,
-  Image, message, Popconfirm, Segmented,
+  Table, Tag, Space, Button, Card, Typography, Image, Popconfirm, Segmented, Input, message,
 } from "antd";
-import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
+import { PlusOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined } from "@ant-design/icons";
 import { productApi } from "../../api/endpoints";
-import ProductCreateModal from "./ProductCreateModal";
+import ProductFormModal from "./ProductFormModal";
+import VariantsDrawer from "./VariantsDrawer";
 
 const { Title } = Typography;
 
@@ -20,16 +20,18 @@ const statusColor = {
 const money = (n, ccy = "BDT") =>
   new Intl.NumberFormat(undefined, { style: "currency", currency: ccy }).format(n ?? 0);
 
-const Products = () => {
+const MyProducts = () => {
   const [rows, setRows] = useState([]);
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [form] = Form.useForm();
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+
+  const [variantsOpen, setVariantsOpen] = useState(false);
+  const [variantsProduct, setVariantsProduct] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -37,9 +39,11 @@ const Products = () => {
       const params = { page: meta.page, limit: meta.limit, sort: "-createdAt" };
       if (statusFilter !== "all") params.status = statusFilter;
       if (search) params.searchTerm = search;
-      const res = await productApi.list(params);
+      const res = await productApi.vendorMe(params);
       setRows(res.data || []);
       setMeta((m) => ({ ...m, total: res.meta?.total ?? (res.data?.length ?? 0) }));
+    } catch (err) {
+      message.error(err.message || "Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -49,33 +53,13 @@ const Products = () => {
     load();
   }, [load]);
 
-  const openStatus = (row) => {
-    setSelected(row);
-    form.setFieldsValue({
-      status: row.status,
-      rejectionReason: row.rejectionReason,
-    });
-    setModalOpen(true);
-  };
-
-  const handleStatus = async (values) => {
-    try {
-      await productApi.changeStatus(selected._id, values);
-      message.success("Product status updated");
-      setModalOpen(false);
-      load();
-    } catch (err) {
-      message.error(err.message || "Failed");
-    }
-  };
-
   const handleDelete = async (id) => {
     try {
       await productApi.remove(id);
       message.success("Product deleted");
       load();
     } catch (err) {
-      message.error(err.message || "Failed");
+      message.error(err.message || "Delete failed");
     }
   };
 
@@ -106,14 +90,22 @@ const Products = () => {
       render: (v, row) => money(v, row.currency),
     },
     {
-      title: "Variants",
+      title: "Type",
       dataIndex: "hasVariants",
-      render: (v, row) => (v ? <Tag color="cyan">{row.variantOptions?.length || 0} options</Tag> : <Tag>Single</Tag>),
+      render: (v, row) =>
+        v ? <Tag color="cyan">{row.variantOptions?.length || 0} option(s)</Tag> : <Tag>Single</Tag>,
     },
     {
       title: "Status",
       dataIndex: "status",
-      render: (s) => <Tag color={statusColor[s]}>{s}</Tag>,
+      render: (s, row) => (
+        <Space direction="vertical" size={0}>
+          <Tag color={statusColor[s]}>{s}</Tag>
+          {s === "rejected" && row.rejectionReason && (
+            <span style={{ color: "#cf1322", fontSize: 11 }}>{row.rejectionReason}</span>
+          )}
+        </Space>
+      ),
     },
     {
       title: "Sold",
@@ -125,11 +117,29 @@ const Products = () => {
       key: "actions",
       render: (_, row) => (
         <Space>
-          <Button size="small" onClick={() => openStatus(row)}>
-            Review
+          <Button
+            size="small"
+            icon={<AppstoreOutlined />}
+            onClick={() => {
+              setVariantsProduct(row);
+              setVariantsOpen(true);
+            }}
+            disabled={!row.hasVariants}
+          >
+            Variants
           </Button>
-          <Popconfirm title="Delete product?" onConfirm={() => handleDelete(row._id)}>
-            <Button size="small" danger>Delete</Button>
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setEditing(row);
+              setFormOpen(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Popconfirm title="Delete this product?" onConfirm={() => handleDelete(row._id)}>
+            <Button size="small" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -140,21 +150,27 @@ const Products = () => {
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <Title level={3} style={{ margin: 0 }}>Products</Title>
+          <Title level={3} style={{ margin: 0 }}>My Products</Title>
           <p style={{ color: "#8c8c8c", margin: 0 }}>
-            Create, moderate, or manage all catalog products.
+            Create products, generate SKUs, and manage inventory.
           </p>
         </div>
         <Space>
           <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-            Create Product
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            New Product
           </Button>
         </Space>
       </div>
 
       <Card
-        styles={{ body: { paddingTop: 16 } }}
         title={
           <Space wrap>
             <Segmented
@@ -169,9 +185,9 @@ const Products = () => {
               ]}
             />
             <Input.Search
-              placeholder="Search by name/brand/tag"
+              placeholder="Search name / brand / tag"
               allowClear
-              style={{ width: 280 }}
+              style={{ width: 260 }}
               onSearch={(v) => {
                 setMeta((m) => ({ ...m, page: 1 }));
                 setSearch(v);
@@ -195,37 +211,20 @@ const Products = () => {
         />
       </Card>
 
-      <Modal
-        title={`Review: ${selected?.name ?? ""}`}
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        onOk={() => form.submit()}
-        okText="Save"
-      >
-        <Form form={form} layout="vertical" onFinish={handleStatus}>
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-            <Select
-              options={[
-                { value: "pending", label: "Pending" },
-                { value: "approved", label: "Approved" },
-                { value: "rejected", label: "Rejected" },
-                { value: "archived", label: "Archived" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name="rejectionReason" label="Rejection reason (optional)">
-            <Input.TextArea rows={3} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <ProductFormModal
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSaved={load}
+        product={editing}
+      />
 
-      <ProductCreateModal
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCreated={load}
+      <VariantsDrawer
+        open={variantsOpen}
+        onClose={() => setVariantsOpen(false)}
+        product={variantsProduct}
       />
     </>
   );
 };
 
-export default Products;
+export default MyProducts;

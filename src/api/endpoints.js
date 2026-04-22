@@ -12,6 +12,7 @@ export const authApi = {
 export const userApi = {
   getMe: () => unwrap(api.get("/users/me")),
   updateMe: (body) => unwrap(api.patch("/users/me", body)),
+  adminList: (params) => unwrap(api.get("/users/admin/list", { params })),
 };
 
 export const categoryApi = {
@@ -28,6 +29,8 @@ export const vendorApi = {
   me: () => unwrap(api.get("/vendors/me")),
   updateMe: (body) => unwrap(api.patch("/vendors/me", body)),
   changeStatus: (id, body) => unwrap(api.patch(`/vendors/${id}/status`, body)),
+  adminList: (params) => unwrap(api.get("/vendors/admin/list", { params })),
+  adminCreate: (body) => unwrap(api.post("/vendors/admin/create", body)),
 };
 
 export const productApi = {

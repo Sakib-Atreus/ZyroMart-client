@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  Button, Table, Tag, Space, Modal, Form, Input, Select, Switch,
+  Alert, Button, Table, Tag, Space, Modal, Form, Input, Select, Switch,
   Popconfirm, Typography, Card, Divider, InputNumber, message,
 } from "antd";
 import {
-  PlusOutlined, DeleteOutlined, EditOutlined, MinusCircleOutlined,
+  PlusOutlined, DeleteOutlined, EditOutlined, MinusCircleOutlined, InfoCircleOutlined,
 } from "@ant-design/icons";
 import { categoryApi } from "../../api/endpoints";
 
@@ -100,7 +100,18 @@ const Categories = () => {
       title: "Attributes",
       dataIndex: "attributeSchema",
       key: "attributeSchema",
-      render: (a) => <Tag>{a?.length ?? 0} fields</Tag>,
+      render: (a) => {
+        const total = a?.length ?? 0;
+        const variantable = (a || []).filter((x) => x.isVariantOption).length;
+        return (
+          <Space size={4}>
+            <Tag>{total} total</Tag>
+            <Tag color={variantable > 0 ? "purple" : "default"}>
+              {variantable} variant-capable
+            </Tag>
+          </Space>
+        );
+      },
     },
     {
       title: "Active",
@@ -171,9 +182,31 @@ const Categories = () => {
           </Form.Item>
 
           <Divider orientation="left">Attribute Schema</Divider>
-          <p style={{ color: "#8c8c8c", marginTop: -8 }}>
-            Mark <code>isVariantOption</code> for attributes that differentiate variants (color, RAM, storage).
-          </p>
+          <Alert
+            type="info"
+            showIcon
+            icon={<InfoCircleOutlined />}
+            message="About attributes"
+            description={
+              <ul style={{ paddingLeft: 20, margin: 0 }}>
+                <li>
+                  <b>Fixed attributes</b> (display size, battery, OS): one value per product.
+                  Vendors set these on the product form.
+                </li>
+                <li>
+                  <b>Variant-capable attributes</b> (color, RAM, storage): enable the
+                  <Tag color="purple" style={{ marginInline: 4 }}>variant-capable</Tag>
+                  switch. Vendors then pick these to declare variants (e.g. Black+6GB, Black+4GB, Green+6GB).
+                </li>
+                <li>
+                  Without at least one variant-capable attribute, products in this category can
+                  only have a single SKU.
+                </li>
+              </ul>
+            }
+            style={{ marginBottom: 16 }}
+          />
+
 
           <Form.List name="attributeSchema">
             {(fields, { add, remove }) => (
@@ -219,7 +252,13 @@ const Categories = () => {
                       <Form.Item {...rest} name={[name, "required"]} label="required" valuePropName="checked">
                         <Switch size="small" />
                       </Form.Item>
-                      <Form.Item {...rest} name={[name, "isVariantOption"]} label="variant-capable" valuePropName="checked">
+                      <Form.Item
+                        {...rest}
+                        name={[name, "isVariantOption"]}
+                        label={<span style={{ color: "#722ed1", fontWeight: 600 }}>variant-capable</span>}
+                        valuePropName="checked"
+                        tooltip="Turn on for attributes that differentiate variants (color / RAM / storage). Vendors can only pick these when declaring a product's variant dimensions."
+                      >
                         <Switch size="small" />
                       </Form.Item>
                       <Form.Item {...rest} name={[name, "filterable"]} label="filterable" valuePropName="checked">

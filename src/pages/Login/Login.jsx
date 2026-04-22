@@ -31,10 +31,16 @@ const Login = () => {
     else if (location.pathname === "/register") setActiveTab("register");
   }, [location.pathname]);
 
+  const destinationForRole = (role) => {
+    if (role === "admin") return "/admin";
+    if (role === "vendor") return "/vendor";
+    return "/";
+  };
+
   // If already authenticated, skip the form and send the user to the right place.
   useEffect(() => {
     if (user) {
-      navigate(user.role === "admin" ? "/admin" : "/", { replace: true });
+      navigate(destinationForRole(user.role), { replace: true });
     }
   }, [user, navigate]);
 
@@ -56,7 +62,7 @@ const Login = () => {
       });
       login({ user: res.data, token: res.token });
       toast.success("Login successful!");
-      navigate(res.data?.role === "admin" ? "/admin" : "/", { replace: true });
+      navigate(destinationForRole(res.data?.role), { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Login failed");
     }
@@ -82,7 +88,7 @@ const Login = () => {
       });
       login({ user: loginRes.data, token: loginRes.token });
       toast.success("Registration successful!");
-      navigate(loginRes.data?.role === "admin" ? "/admin" : "/", { replace: true });
+      navigate(destinationForRole(loginRes.data?.role), { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Registration failed");
     }
