@@ -1,142 +1,149 @@
-import React from "react";
-import { IoIosArrowForward } from "react-icons/io";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import na1 from "../../../assets/NewArrival/na1.png";
-import na2 from "../../../assets/NewArrival/na2.png";
+import { IoIosArrowForward } from "react-icons/io";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
-import { Avatar, Card } from "antd";
-const { Meta } = Card;
+import { productApi, cartApi } from "../../../api/endpoints";
+import { toast } from "react-toastify";
+import na1 from "../../../assets/NewArrival/na1.png";
+import na2 from "../../../assets/NewArrival/na2.png";
+
+const sliderSettings = {
+  dots: false,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 4,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 2000,
+  arrows: false,
+  responsive: [
+    { breakpoint: 1024, settings: { slidesToShow: 3 } },
+    { breakpoint: 768, settings: { slidesToShow: 2, centerMode: true } },
+    { breakpoint: 480, settings: { slidesToShow: 1, centerMode: true } },
+  ],
+};
+
+const ProductCard = ({ product }) => {
+  const handleAddToCart = async () => {
+    try {
+      // Products may have variants — navigate to detail page for variant selection
+      toast.info("Select a variant on the product page to add to cart.");
+    } catch (err) {
+      toast.error(err.message || "Could not add to cart");
+    }
+  };
+
+  const discount = product.compareAtPrice
+    ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
+    : 0;
+
+  return (
+    <div className="mx-2">
+      <div className="bg-white rounded-lg border hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+        <Link to={`/products/${product.slug}`}>
+          <div className="relative">
+            <img
+              src={product.thumbnail}
+              alt={product.name}
+              className="w-full h-48 object-contain p-2"
+            />
+            {discount > 0 && (
+              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                -{discount}%
+              </span>
+            )}
+            {product.isOnlineExclusive && (
+              <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                Online Only
+              </span>
+            )}
+          </div>
+        </Link>
+        <div className="p-3">
+          <Link to={`/products/${product.slug}`}>
+            <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-primary transition-colors">
+              {product.name}
+            </h3>
+          </Link>
+          <p className="text-xs text-gray-400 mb-2">{product.brand}</p>
+          <div className="flex items-center gap-2">
+            <span className="text-primary font-bold">৳{product.basePrice?.toLocaleString()}</span>
+            {product.compareAtPrice && (
+              <span className="text-xs text-gray-400 line-through">
+                ৳{product.compareAtPrice?.toLocaleString()}
+              </span>
+            )}
+          </div>
+          {product.averageRating > 0 && (
+            <div className="text-xs text-yellow-500 mt-1">
+              {"★".repeat(Math.round(product.averageRating))} ({product.reviewCount})
+            </div>
+          )}
+          <div className="flex gap-2 mt-3">
+            <Link
+              to={`/products/${product.slug}`}
+              className="flex-1 text-center bg-orange-100 text-primary px-3 py-1.5 rounded text-sm font-semibold hover:bg-primary hover:text-white transition"
+            >
+              Buy Now
+            </Link>
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 bg-gray-200 text-gray-600 px-3 py-1.5 rounded text-sm font-semibold hover:bg-gray-700 hover:text-white transition"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const NewArrival = () => {
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 1500,
-    arrows: false,
-    responsive: [
-      {
-        breakpoint: 1024, // For devices with width <= 1024px
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 768, // For devices with width <= 768px
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          centerMode: true,
-        },
-      },
-      {
-        breakpoint: 480, // For devices with width <= 480px (mobile)
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          centerMode: true,
-        },
-      },
-    ],
-  };
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    productApi
+      .newArrivals(12)
+      .then((res) => setProducts(res.data ?? []))
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className="">
-      <div className="pt-4 pb-8">
-        <h1 className="text-3xl text-center font-semibold">New Arrival</h1>
+    <div className="py-8">
+      <div className="flex justify-between items-center pb-6 px-2">
+        <h1 className="text-2xl font-semibold">New Arrivals</h1>
+        <Link
+          to="/phones?sort=-createdAt"
+          className="flex items-center gap-1 text-sm text-primary"
+        >
+          See All <IoIosArrowForward />
+        </Link>
       </div>
 
-      <Slider {...settings}>
-        {[
-          "https://dvf83rt16ac4w.cloudfront.net/upload/product/20220820_1660984332_600269.jpeg",
-          "https://dvf83rt16ac4w.cloudfront.net/upload/product/20240104_1704359142_975696.jpeg",
-          "https://dvf83rt16ac4w.cloudfront.net/upload/product/20220113_1642052594_412206.jpeg",
-          "https://dvf83rt16ac4w.cloudfront.net/upload/product/20231223_1703312020_658522.jpeg",
-          "https://dvf83rt16ac4w.cloudfront.net/upload/media/1725942431648642.jpeg",
-          "https://dvf83rt16ac4w.cloudfront.net/upload/media/1725772826476726.jpeg",
-        ].map((src, index) => (
-          <div key={index} className="mx-auto">
-            {" "}
-            {/* Center each product card */}
-            <Card
-              style={{
-                width: 300,
-                position: "relative", // Ensure positioning for the overlay
-              }}
-              cover={
-                <div style={{ position: "relative" }}>
-                  <img
-                    alt="example"
-                    src={src}
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "5px",
-                      right: "10px",
-                      color: "white",
-                      padding: "5px 10px",
-                      borderRadius: "5px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    <img
-                      src="https://gadgetandgear.com/_next/static/media/online-only.6c507492.svg"
-                      className="w-16 h-16"
-                      alt=""
-                    />
-                  </div>
-                </div>
-              }
-              actions={[
-                // <SettingOutlined key="setting" />,
-                // <EditOutlined key="edit" />,
-                // <EllipsisOutlined key="ellipsis" />,
-                <div className="flex gap-2">
-                  {/* Customize Buy Now button */}
-                  <Link
-                    to=""
-                    className="bg-orange-100 !text-primary px-4 py-2 rounded-md hover:bg-primary hover:!text-white text-md font-semibold"
-                  >
-                    Buy Now
-                  </Link>
-                  {/* Customize Add To Cart button */}
-                  <Link
-                    to=""
-                    className="bg-gray-200 !text-gray-600 px-4 py-2 rounded-md hover:bg-gray-700 hover:!text-white text-md font-semibold"
-                  >
-                    Add To Cart
-                  </Link>
-                </div>,
-              ]}
-            >
-              <Meta
-                avatar={
-                  <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />
-                }
-                title="Card title"
-                description="This is the description"
-              />
-            </Card>
-          </div>
-        ))}
-      </Slider>
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : products.length > 0 ? (
+        <Slider {...sliderSettings}>
+          {products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </Slider>
+      ) : (
+        <p className="text-center text-gray-400 py-8">No products yet.</p>
+      )}
 
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 justify-between gap-2 my-8">
-        <img src={na1} alt="" />
-        <img src={na2} alt="" />
+      <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-2 mt-8">
+        <img src={na1} alt="New Arrival Banner 1" className="w-full rounded-lg" />
+        <img src={na2} alt="New Arrival Banner 2" className="w-full rounded-lg" />
       </div>
     </div>
   );

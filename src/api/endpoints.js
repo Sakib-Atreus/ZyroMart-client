@@ -41,6 +41,10 @@ export const productApi = {
   remove: (id) => unwrap(api.delete(`/products/${id}`)),
   changeStatus: (id, body) => unwrap(api.patch(`/products/${id}/status`, body)),
   vendorMe: (params) => unwrap(api.get("/products/vendor/me", { params })),
+  newArrivals: (limit) => unwrap(api.get("/products/featured/new-arrivals", { params: { limit } })),
+  topSelling: (limit) => unwrap(api.get("/products/featured/top-selling", { params: { limit } })),
+  onlineExclusive: (limit) => unwrap(api.get("/products/featured/online-exclusive", { params: { limit } })),
+  similar: (id, limit) => unwrap(api.get(`/products/similar/${id}`, { params: { limit } })),
 };
 
 export const variantApi = {
@@ -101,4 +105,21 @@ export const questionApi = {
 export const analyticsApi = {
   platform: () => unwrap(api.get("/analytics/platform")),
   vendor: () => unwrap(api.get("/analytics/vendor")),
+};
+
+export const userDashboardApi = {
+  get: () => unwrap(api.get("/users/dashboard")),
+};
+
+export const chatApi = {
+  // Vendor
+  sendMessage: (body) => unwrap(api.post("/chat/messages", { body })),
+  myConversation: () => unwrap(api.get("/chat/me")),
+  // Admin
+  listConversations: () => unwrap(api.get("/chat")),
+  adminSend: (conversationId, body) =>
+    unwrap(api.post(`/chat/${conversationId}/messages`, { body })),
+  // Shared
+  getMessages: (conversationId, params) =>
+    unwrap(api.get(`/chat/${conversationId}/messages`, { params })),
 };

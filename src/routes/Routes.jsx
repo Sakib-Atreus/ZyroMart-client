@@ -6,6 +6,7 @@ import Home from "../pages/Home/Home";
 import Phones from "../pages/Phones/Phones";
 import PhoneDetails from "../components/PhoneDetails/PhoneDetails";
 import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
 import Cart from "../pages/Cart/Cart";
 import Wishlist from "../pages/Wishlist/Wishlist";
 import StoreLocations from "../pages/StoreLocations/StoreLocations";
@@ -32,8 +33,9 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/login", element: <Login /> },
-      { path: "/register", element: <Login /> },
+      { path: "/register", element: <Register /> },
       { path: "/phones", element: <Phones /> },
+      { path: "/products/:slug", element: <PhoneDetails /> },
       { path: "/phones/new", element: <PhoneDetails /> },
       { path: "/cart", element: <Cart /> },
       {
