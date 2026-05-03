@@ -7,7 +7,7 @@ import {
   ShoppingCartOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
-import { categoryApi, vendorApi, productApi, orderApi } from "../../api/endpoints";
+import { analyticsApi } from "../../api/endpoints";
 
 const statusColor = {
   pending: "gold",
@@ -39,24 +39,18 @@ const Dashboard = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const [cats, vendors, products, orders] = await Promise.all([
-          categoryApi.list(),
-          vendorApi.list(),
-          productApi.list({ limit: 1 }),
-          orderApi.listAll({ limit: 5, sort: "-createdAt" }),
-        ]);
-        const revenue = (orders.data || [])
-          .filter((o) => o.paymentStatus === "paid")
-          .reduce((sum, o) => sum + (o.total || 0), 0);
-
+        const res = await analyticsApi.platform();
+        const d = res.data ?? res;
         setStats({
-          categories: cats.data?.length ?? 0,
-          vendors: vendors.data?.length ?? 0,
-          products: products.meta?.total ?? products.data?.length ?? 0,
-          orders: orders.meta?.total ?? orders.data?.length ?? 0,
-          revenue,
+          categories: d.categories?.total ?? 0,
+          vendors: d.vendors?.byStatus?.approved ?? 0,
+          products: d.products?.byStatus?.approved ?? 0,
+          orders: d.orders?.total ?? 0,
+          revenue: d.revenue?.total ?? 0,
         });
-        setRecent(orders.data ?? []);
+        setRecent(d.recentOrders ?? []);
+      } catch {
+        // silently ignore — stale data is fine
       } finally {
         setLoading(false);
       }

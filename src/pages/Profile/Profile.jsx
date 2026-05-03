@@ -1,30 +1,40 @@
 import { useEffect } from "react";
 import { Tabs, Typography } from "antd";
 import {
-  UserOutlined, ShoppingOutlined, LockOutlined, ShopOutlined,
+  UserOutlined, ShoppingOutlined, LockOutlined, ShopOutlined, DashboardOutlined,
 } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
 import ProfileInfoTab from "./ProfileInfoTab";
 import OrderHistoryTab from "./OrderHistoryTab";
 import ChangePasswordTab from "./ChangePasswordTab";
 import VendorRequestTab from "./VendorRequestTab";
+import DashboardTab from "./DashboardTab";
 
 const { Title, Paragraph } = Typography;
 
-const TAB_KEYS = ["profile", "orders", "password", "vendor"];
+const TAB_KEYS = ["dashboard", "profile", "orders", "password", "vendor"];
 
 const Profile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get("tab");
-  const activeKey = TAB_KEYS.includes(tab) ? tab : "profile";
+  const activeKey = TAB_KEYS.includes(tab) ? tab : "dashboard";
 
   useEffect(() => {
     if (!TAB_KEYS.includes(tab)) {
-      setSearchParams({ tab: "profile" }, { replace: true });
+      setSearchParams({ tab: "dashboard" }, { replace: true });
     }
   }, [tab, setSearchParams]);
 
   const items = [
+    {
+      key: "dashboard",
+      label: (
+        <span>
+          <DashboardOutlined /> Dashboard
+        </span>
+      ),
+      children: <DashboardTab />,
+    },
     {
       key: "profile",
       label: (

@@ -1,238 +1,325 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
-  IoIosArrowUp,
-  IoIosArrowDown,
-  IoIosArrowBack,
-  IoIosArrowForward,
+  IoIosArrowUp, IoIosArrowDown, IoIosArrowBack, IoIosArrowForward,
 } from "react-icons/io";
-import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from "react-icons/fa";
-import { FiShare2 } from "react-icons/fi";
+import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp, FaStar, FaRegStar } from "react-icons/fa";
 import { TiArrowForwardOutline } from "react-icons/ti";
-import SocialShare from "../../utils/SocialShare";
-import { BsShare } from "react-icons/bs";
 import { FiThumbsUp } from "react-icons/fi";
-import { FaRegStar } from "react-icons/fa";
 import { CiCircleQuestion } from "react-icons/ci";
-import { FaStar } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa";
-
+import { productApi, cartApi, reviewApi, questionApi, wishlistApi } from "../../api/endpoints";
+import { useAuth } from "../../context/AuthContext";
+import SocialShare from "../../utils/SocialShare";
 import "./PhoneDetails.css";
 
-const PhoneDetails = () => {
-  const [mainImage, setMainImage] = useState(
-    "https://assets.gadgetandgear.com/upload/media/172432272608179.jpeg"
-  ); // Default main image
-  const [zoomImage, setZoomImage] = useState(null); // State to store zoomed image on hover
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 }); // State to store mouse position for zoom
-  const [visibleThumbnails, setVisibleThumbnails] = useState(0); // Track which set of thumbnails is visible
-  const [thumbnailsToShow, setThumbnailsToShow] = useState(4);
-  const [showShareModal, setShowShareModal] = useState(false);
+const StarRating = ({ value, max = 5 }) => (
+  <span className="flex gap-0.5">
+    {Array.from({ length: max }, (_, i) =>
+      i < Math.round(value)
+        ? <FaStar key={i} className="text-yellow-400 text-sm" />
+        : <FaRegStar key={i} className="text-gray-300 text-sm" />
+    )}
+  </span>
+);
+
+const money = (n) => `৳${Number(n ?? 0).toLocaleString()}`;
+
+export default function PhoneDetails() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [product, setProduct] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [similar, setSimilar] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // image gallery
+  const [mainImage, setMainImage] = useState("");
+  const [zoomImage, setZoomImage] = useState(null);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [thumbOffset, setThumbOffset] = useState(0);
+  const thumbsToShow = 4;
+
+  // variant / purchase
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [resolvedVariant, setResolvedVariant] = useState(null);
+  const [qty, setQty] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [emiMonths, setEmiMonths] = useState(null);
+  const [isGift, setIsGift] = useState(false);
+  const [giftMsg, setGiftMsg] = useState("");
+  const [showGiftModal, setShowGiftModal] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const [inWishlist, setInWishlist] = useState(false);
+
+  // tabs
   const [activeTab, setActiveTab] = useState("specification");
 
-  // State to manage EMI checkbox and payment method
-  const [isEmiChecked, setIsEmiChecked] = useState(false);
-  const [isGiftChecked, setIsGiftChecked] = useState(false);
-  const [showGiftModal, setShowGiftModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("cash");
+  // reviews
+  const [reviews, setReviews] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState(null);
+  const [myReview, setMyReview] = useState(null);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
 
+  // questions
+  const [questions, setQuestions] = useState([]);
+  const [qForm, setQForm] = useState("");
+  const [qLoading, setQLoading] = useState(false);
 
-  // Adjust thumbnailsToShow based on screen width
+  // ── Load product ──────────────────────────────────────────────────
   useEffect(() => {
-    const handleResize = () => {
-      setThumbnailsToShow(window.innerWidth < 768 ? 3 : 4); // Show 3 on mobile, 4 on desktop
-    };
+    if (!slug) return;
+    setLoading(true);
+    productApi.getBySlug(slug)
+      .then((res) => {
+        const p = res.data;
+        setProduct(p);
+        setVariants(p.variants ?? []);
+        setMainImage(p.thumbnail);
+        // pre-select first value for each variant option
+        const defaults = {};
+        (p.variantOptions ?? []).forEach((opt) => {
+          if (opt.values?.length) defaults[opt.key] = opt.values[0];
+        });
+        setSelectedOptions(defaults);
+        return Promise.all([
+          productApi.similar(p._id, 8).catch(() => ({ data: [] })),
+          reviewApi.listByProduct(p._id).catch(() => ({ data: [], meta: {} })),
+          user
+            ? reviewApi.myReviewForProduct(p._id).catch(() => ({ data: null }))
+            : Promise.resolve({ data: null }),
+          questionApi.listByProduct(p._id).catch(() => ({ data: [] })),
+        ]);
+      })
+      .then(([sim, rev, myRev, qs]) => {
+        setSimilar(sim.data ?? []);
+        setReviews(rev.data ?? []);
+        setReviewSummary(rev.meta ?? null);
+        setMyReview(myRev.data ?? null);
+        setQuestions(qs.data ?? []);
+      })
+      .catch(() => toast.error("Product not found"))
+      .finally(() => setLoading(false));
+  }, [slug, user]);
 
-    handleResize(); // Initialize on component mount
-    window.addEventListener("resize", handleResize); // Update on window resize
-
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
-  }, []);
-
-  const handleEmiToggle = () => {
-    setIsEmiChecked(!isEmiChecked);
-    if (!isEmiChecked) {
-      setPaymentMethod("emi");
-    } else {
-      setPaymentMethod("cash");
+  // ── Resolve variant from selected options ─────────────────────────
+  useEffect(() => {
+    if (!variants.length || !product?.hasVariants) {
+      setResolvedVariant(variants[0] ?? null);
+      return;
     }
-  };
+    const match = variants.find((v) =>
+      Object.entries(selectedOptions).every(
+        ([k, val]) => v.options?.[k] === val || (v.options instanceof Map && v.options.get(k) === val)
+      )
+    );
+    setResolvedVariant(match ?? null);
+  }, [selectedOptions, variants, product]);
 
-  const handleGiftToggle = () => {
-    setIsGiftChecked(!isGiftChecked);
-    setShowGiftModal(!isGiftChecked);
-  };
+  // ── Image helpers ─────────────────────────────────────────────────
+  const allImages = product
+    ? [product.thumbnail, ...(product.images ?? []).filter((i) => i !== product.thumbnail)]
+    : [];
 
-  const handlePaymentMethodChange = (method) => {
-    setPaymentMethod(method);
-    setIsEmiChecked(method === "emi");
-  };
-
-  const closeModal = () => {
-    setShowGiftModal(false);
-  };
-
-  const handleTabClick = (tabName) => {
-    setActiveTab(tabName);
-  };
-
-  const thumbnails = [
-    "https://assets.gadgetandgear.com/upload/media/172432272608179.jpeg",
-    "https://assets.gadgetandgear.com/upload/media/1724322716829420.jpeg",
-    "https://assets.gadgetandgear.com/upload/media/1724322718571469.jpeg",
-    "https://assets.gadgetandgear.com/upload/media/172432271857987.jpeg",
-    "https://assets.gadgetandgear.com/upload/media/1724322718589070.jpeg",
-    "https://assets.gadgetandgear.com/upload/media/1724322718582471.jpeg",
-  ];
-
-  // Handle arrow click to show next set of thumbnails
-  const handleArrowClick = (direction) => {
-    if (direction === "up" && visibleThumbnails > 0) {
-      setVisibleThumbnails(visibleThumbnails - 1);
-    } else if (
-      direction === "down" &&
-      visibleThumbnails < thumbnails.length - 3
-    ) {
-      setVisibleThumbnails(visibleThumbnails + 1);
-    }
-  };
-
-  // Handle mouse movement over the main image to calculate zoom position
   const handleMouseMove = (e) => {
-    const { left, top, width, height } = e.target.getBoundingClientRect();
-    const x = ((e.pageX - left) / width) * 100;
-    const y = ((e.pageY - top) / height) * 100;
-    setZoomPosition({ x, y });
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    setZoomPos({ x: ((e.pageX - left) / width) * 100, y: ((e.pageY - top) / height) * 100 });
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      // Use native share API if available
-      navigator
-        .share({
-          title: "HONOR X6b",
-          text: "Check out this awesome phone: HONOR X6b",
-          url: window.location.href,
-        })
-        .then(() => console.log("Shared successfully"))
-        .catch((error) => console.error("Error sharing:", error));
-    } else {
-      // Fallback for unsupported browsers: Copy the link to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
+  // ── Cart / wishlist ───────────────────────────────────────────────
+  const handleAddToCart = async () => {
+    if (!user) return navigate("/login");
+    if (!resolvedVariant) return toast.error("Please select all options");
+    const available = (resolvedVariant.stock ?? 0) - (resolvedVariant.reservedStock ?? 0);
+    if (available < 1) return toast.error("Out of stock");
+    setCartLoading(true);
+    try {
+      await cartApi.addItem({ product: product._id, variant: resolvedVariant._id, quantity: qty });
+      toast.success("Added to cart!");
+    } catch (err) {
+      toast.error(err.message || "Could not add to cart");
+    } finally {
+      setCartLoading(false);
     }
   };
 
-  const shareUrl = "https://gadgetandgear.com/product/honor-x6b";
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    alert("Link copied to clipboard!");
+  const handleBuyNow = async () => {
+    await handleAddToCart();
+    navigate("/cart");
   };
+
+  const handleWishlist = async () => {
+    if (!user) return navigate("/login");
+    try {
+      if (inWishlist) {
+        await wishlistApi.remove(product._id);
+        setInWishlist(false);
+        toast.info("Removed from wishlist");
+      } else {
+        await wishlistApi.add(product._id);
+        setInWishlist(true);
+        toast.success("Added to wishlist!");
+      }
+    } catch (err) {
+      toast.error(err.message || "Wishlist error");
+    }
+  };
+
+  // ── Reviews ───────────────────────────────────────────────────────
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!user) return navigate("/login");
+    setReviewLoading(true);
+    try {
+      if (myReview) {
+        const res = await reviewApi.update(myReview._id, reviewForm);
+        setMyReview(res.data);
+      } else {
+        const res = await reviewApi.create({ product: product._id, ...reviewForm });
+        setMyReview(res.data);
+        setReviews((prev) => [res.data, ...prev]);
+      }
+      toast.success("Review saved!");
+      setShowReviewForm(false);
+    } catch (err) {
+      toast.error(err.message || "Could not save review");
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  // ── Questions ─────────────────────────────────────────────────────
+  const handleAskQuestion = async (e) => {
+    e.preventDefault();
+    if (!user) return navigate("/login");
+    if (!qForm.trim()) return;
+    setQLoading(true);
+    try {
+      const res = await questionApi.create({ product: product._id, question: qForm });
+      setQuestions((prev) => [res.data, ...prev]);
+      setQForm("");
+      toast.success("Question submitted!");
+    } catch (err) {
+      toast.error(err.message || "Could not submit question");
+    } finally {
+      setQLoading(false);
+    }
+  };
+
+  // ── EMI calc ──────────────────────────────────────────────────────
+  const price = resolvedVariant?.price ?? product?.basePrice ?? 0;
+  const comparePrice = resolvedVariant?.compareAtPrice ?? product?.compareAtPrice;
+  const discount = comparePrice ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
+  const emiOption = product?.emiOptions?.find((o) => o.months === emiMonths);
+  const emiMonthly = emiOption
+    ? Math.ceil((price * (1 + emiOption.monthlyRate * emiOption.months)) / emiOption.months)
+    : null;
+  const available = resolvedVariant
+    ? (resolvedVariant.stock ?? 0) - (resolvedVariant.reservedStock ?? 0)
+    : 0;
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-pulse">
+          <div className="lg:col-span-2 h-96 bg-gray-100 rounded-lg" />
+          <div className="space-y-4">
+            {[...Array(6)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded" />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="max-w-7xl mx-auto p-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-700 mb-4">Product not found</h2>
+        <Link to="/" className="text-primary underline">Back to home</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-4">
       {/* Breadcrumbs */}
-      <nav className="text-sm text-gray-600 mb-4">
-        <ol className="list-reset flex">
-          <li>
-            <a href="#" className="text-orange-600">
-              Home
-            </a>
-          </li>
-          <li>
-            <span className="mx-2">/</span>
-          </li>
-          <li>
-            <a href="#" className="text-orange-600">
-              Phones
-            </a>
-          </li>
-          <li>
-            <span className="mx-2">/</span>
-          </li>
-          <li>
-            <a href="#" className="text-orange-600">
-              HONOR
-            </a>
-          </li>
-          <li>
-            <span className="mx-2">/</span>
-          </li>
-          <li>HONOR X6b</li>
-        </ol>
+      <nav className="text-sm text-gray-500 mb-4 flex gap-1 flex-wrap">
+        <Link to="/" className="text-primary hover:underline">Home</Link>
+        <span>/</span>
+        {product.category?.name && (
+          <>
+            <Link to={`/phones?category=${product.category._id}`} className="text-primary hover:underline">
+              {product.category.name}
+            </Link>
+            <span>/</span>
+          </>
+        )}
+        <span className="text-gray-700">{product.name}</span>
       </nav>
 
-      {/* Main Content */}
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Image Gallery */}
-        <div className="lg:col-span-2 md:col-span-2 col-span-1">
-          <div className="flex lg:flex-row md:flex-row flex-col-reverse space-x-4">
-            {/* Thumbnail Images */}
-            <div className="lg:w-1/6 md:w-1/6 w-[25%] flex lg:flex-col md:flex-col flex-row lg:gap-0 md:gap-0 gap-3 items-center lg:justify-center md:justify-center justify-between">
-              {/* Up arrow */}
+        {/* ── Image Gallery ── */}
+        <div className="lg:col-span-2">
+          <div className="flex lg:flex-row flex-col-reverse gap-3">
+            {/* Thumbnails */}
+            <div className="flex lg:flex-col flex-row gap-2 items-center">
               <button
-                onClick={() => handleArrowClick("up")}
-                className="text-gray-500 mb-2"
-                disabled={visibleThumbnails === 0} // Disable when at the top
+                onClick={() => setThumbOffset((o) => Math.max(0, o - 1))}
+                disabled={thumbOffset === 0}
+                className="text-gray-400 disabled:opacity-30"
               >
-                {/** Show different icons for mobile and desktop */}
-                {window.innerWidth < 768 ? (
-                  <IoIosArrowBack size={24} /> // Back arrow for mobile
-                ) : (
-                  <IoIosArrowUp size={24} /> // Up arrow for desktop
-                )}
+                {window.innerWidth < 768 ? <IoIosArrowBack size={20} /> : <IoIosArrowUp size={20} />}
               </button>
-
-              {/* Visible thumbnails */}
-              {thumbnails
-                .slice(visibleThumbnails, visibleThumbnails + thumbnailsToShow)
-                .map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    className="lg:w-3/4 md:w-3/4 lg:h-1/6 md:h-1/6 lg:mt-0 md:mt-0 mt-4 object-cover border cursor-pointer mb-2"
-                    alt={`thumbnail-${index}`}
-                    onClick={() => setMainImage(img)} // Change the main image on click
-                  />
-                ))}
-
-              {/* Down arrow */}
+              {allImages.slice(thumbOffset, thumbOffset + thumbsToShow).map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt=""
+                  onClick={() => setMainImage(img)}
+                  className={`w-14 h-14 object-cover border-2 cursor-pointer rounded ${mainImage === img ? "border-primary" : "border-gray-200"}`}
+                />
+              ))}
               <button
-                onClick={() => handleArrowClick("down")}
-                className="text-gray-500 mt-2"
-                disabled={visibleThumbnails === thumbnails.length - 4} // Disable when at the bottom
+                onClick={() => setThumbOffset((o) => Math.min(allImages.length - thumbsToShow, o + 1))}
+                disabled={thumbOffset >= allImages.length - thumbsToShow}
+                className="text-gray-400 disabled:opacity-30"
               >
-                {/** Show different icons for mobile and desktop */}
-                {window.innerWidth < 768 ? (
-                  <IoIosArrowForward size={24} /> // Forward arrow for mobile
-                ) : (
-                  <IoIosArrowDown size={24} /> // Down arrow for desktop
-                )}
+                {window.innerWidth < 768 ? <IoIosArrowForward size={20} /> : <IoIosArrowDown size={20} />}
               </button>
             </div>
 
-            {/* Main Image */}
-            <div className="lg:w-[75%] md:w-[75%] relative">
+            {/* Main image + zoom */}
+            <div className="relative flex-1">
               <img
                 src={mainImage}
-                className="w-full h-full object-cover"
-                alt="Main product"
-                onMouseEnter={() => setZoomImage(mainImage)} // Show zoomed image on hover
-                onMouseMove={handleMouseMove} // Update zoom position on mouse move
-                onMouseLeave={() => setZoomImage(null)} // Hide zoomed image when hover stops
+                alt={product.name}
+                className="w-full h-80 object-contain border rounded-lg"
+                onMouseEnter={() => setZoomImage(mainImage)}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setZoomImage(null)}
               />
-
-              {/* Zoomed Image */}
+              {discount > 0 && (
+                <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                  -{discount}%
+                </span>
+              )}
+              {product.isOnlineExclusive && (
+                <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                  Online Only
+                </span>
+              )}
               {zoomImage && (
-                <div className="absolute left-full top-0 ml-4 w-96 h-96 border overflow-hidden lg:block md:block hidden">
+                <div className="absolute left-full top-0 ml-4 w-80 h-80 border overflow-hidden z-20 hidden lg:block rounded-lg shadow-xl">
                   <img
                     src={zoomImage}
                     className="w-full h-full object-cover"
-                    style={{
-                      transform: `translate(-${zoomPosition.x}%, -${zoomPosition.y}%) scale(2.5)`, // Zoom in and adjust position
-                      transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                    }}
-                    alt="Zoomed product"
+                    style={{ transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`, transform: "scale(2.5)" }}
+                    alt=""
                   />
                 </div>
               )}
@@ -240,982 +327,422 @@ const PhoneDetails = () => {
           </div>
         </div>
 
-        {/* Product Info & Options */}
-        <div className="lg:-mx-8 space-y-8">
-          {/* Product Info */}
-          <div className="">
-            <h1 className="text-md font-medium mt-2 mb-6 ps-1">HONOR</h1>
-            <div className="flex items-center ">
-              <h1 className="text-2xl font-bold">HONOR X6b</h1>
-              <button
-                className="text-gray-600 flex items-center space-x-1 hover:text-black transition duration-300 ms-4"
-                onClick={() =>
-                  document.getElementById("my_modal_2").showModal()
-                }
-              >
-                <TiArrowForwardOutline size={16} />
-
-                <span className="underline text-xs">Share</span>
-              </button>
-              <dialog id="my_modal_2" className="modal">
-                <div className="modal-box bg-white">
-                  <h3 className="font-semibold text-sm  italic">
-                    Share this link via
-                  </h3>
-                  <p className="mt-3 ">
-                    <SocialShare></SocialShare>
-                  </p>
-                </div>
-                <form method="dialog" className="modal-backdrop">
-                  <button>close</button>
-                </form>
-              </dialog>
-            </div>
-            <p className="text-gray-500 mb-2">No Review Yet</p>
-            <p className="text-2xl font-semibold text-orange-500">Tk. 14,999</p>
-
-            <div className="mt-4">
-              <label className="text-gray-600">Color:</label>
-              <div className="flex space-x-2 mt-1">
-                <div className="w-8 h-8 bg-black rounded-full border"></div>
-                <div className="w-8 h-8 bg-green-500 rounded-full border"></div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center">
-                <span className="w-20">ROM:</span>
-                <span className="text-gray-500">128GB</span>
-              </div>
-              <div className="flex items-center">
-                <span className="w-20">RAM:</span>
-                <span className="text-gray-500">6GB</span>
-              </div>
-            </div>
-
-            <div className="flex mt-4">
-              <span className="text-sm">Warranty:</span>
-              <span className="text-primary text-xs font-semibold ms-2">
-                12 Months (Please preserve your box to claim warranty)
-              </span>
-            </div>
-          </div>
-
-          {/* Pricing & Purchase Options */}
-          {/* <div>
-            <div className="flex items-center space-x-4">
-
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" name="emi" 
-                className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                />
-                <span className="text-sm">EMI</span>
-
-                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none ">
-                <FaCheck />
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" name="ggGift"
-                className="peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none" 
-                />
-                <span className="text-sm">Z&M Gift</span>
-
-                <span className="absolute hidden peer-checked:block text-white font-bold text-xm pointer-events-none">
-                <FaCheck />
-                </span>
-              </label>
-            </div>
-
-            <div className="flex space-x-4 mt-4">
-              <div className="border border-orange-500 p-4 rounded-lg flex flex-col items-start space-y-1">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="cash"
-                  checked
-                  className="mb-2 peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                />
-                <span className="text-orange-500 font-bold text-md">
-                  Tk. 14,999
-                </span>
-
-                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none">
-                <FaCheck />
-                </span>
-
-                <span className="text-gray-500 text-sm">
-                  Cash Discount Price
-                </span>
-                <span className="text-gray-400 text-xs">
-                  Online / Cash Payment
-                </span>
-              </div>
-
-              <div className="border border-gray-300 p-4 rounded-lg flex flex-col items-start space-y-1">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="emi"
-                  className="mb-2 peer w-4 h-4 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                />
-                <span className="text-orange-500 font-bold text-sm">
-                  Start From 5,000/month
-                </span>
-
-                <span className="absolute hidden peer-checked:block text-white font-bold text-xs pointer-events-none ">
-                <FaCheck />
-                </span>
-
-                <span className="text-gray-500 text-sm">
-                  0% EMI Price: Tk. 14,999
-                </span>
-                <span className="text-gray-400 text-xs">Up to 3 Months</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 space-x-4 mt-6">
-              <button className="bg-gray-200 py-2 px-4 rounded-lg">
-                Add To Cart
-              </button>
-              <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">
-                Buy Now
-              </button>
-            </div>
-          </div>  */}
-
+        {/* ── Product Info & Purchase ── */}
+        <div className="space-y-5 lg:-mx-4">
           <div>
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center space-x-2 relative">
-                <input
-                  type="checkbox"
-                  name="emi"
-                  checked={isEmiChecked}
-                  onChange={handleEmiToggle}
-                  className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                />
-                <span className="text-sm">EMI</span>
-
-                <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-                  ✓
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-2 relative">
-                <input
-                  type="checkbox"
-                  name="ggGift"
-                  checked={isGiftChecked}
-                  onChange={handleGiftToggle}
-                  className="peer w-6 h-6 rounded-sm border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                />
-                <span className="text-sm">Z&M Gift</span>
-                <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-                  ✓
-                </span>
-              </label>
-            </div>
-
-            <div className="flex space-x-4 mt-4">
-              <div
-                className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
-                  paymentMethod === "cash"
-                    ? "border-orange-500"
-                    : "border-gray-300"
-                }`}
+            <p className="text-sm text-gray-400 font-medium uppercase tracking-wide">{product.brand}</p>
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-xl font-bold text-gray-900 mt-1">{product.name}</h1>
+              <button
+                onClick={() => document.getElementById("share-modal").showModal()}
+                className="text-gray-500 hover:text-primary flex items-center gap-1 text-xs shrink-0 mt-2"
               >
-                <label className="relative flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cash"
-                    checked={paymentMethod === "cash"}
-                    onChange={() => handlePaymentMethodChange("cash")}
-                    className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                  />
-                  <span className="text-md text-orange-500 font-bold">
-                    Tk. 14,999
-                  </span>
-
-                  <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-                    ✓
-                  </span>
-                </label>
-                <span className="text-gray-500 text-sm">
-                  Cash Discount Price
-                </span>
-                <span className="text-gray-400 text-xs">
-                  Online / Cash Payment
-                </span>
-              </div>
-
-              <div
-                className={`border p-4 rounded-lg flex flex-col items-start space-y-1 ${
-                  paymentMethod === "emi"
-                    ? "border-orange-500"
-                    : "border-gray-300"
-                }`}
-              >
-                <label className="relative flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="emi"
-                    checked={paymentMethod === "emi"}
-                    onChange={() => handlePaymentMethodChange("emi")}
-                    className="peer w-6 h-6 rounded-full border border-gray-300 bg-white checked:bg-orange-500 checked:border-transparent focus:outline-none appearance-none"
-                  />
-                  <span className="text-sm text-orange-500 font-bold">
-                    Start From 5,000/month
-                  </span>
-
-                  <span className="absolute inset-0 items-center justify-center hidden peer-checked:block text-white font-bold text-sm pointer-events-none">
-                    ✓
-                  </span>
-                </label>
-                <span className="text-gray-500 text-sm">
-                  0% EMI Price: Tk. 14,999
-                </span>
-                <span className="text-gray-400 text-xs">Up to 3 Months</span>
-              </div>
+                <TiArrowForwardOutline size={16} /> Share
+              </button>
             </div>
-
-            {showGiftModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white p-6 rounded-lg w-1/2 max-w-lg space-y-4">
-                  <h2 className="text-lg font-bold">Gift From Z&M</h2>
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input type="radio" name="gift" />
-                      <img
-                        className="w-12 rounded-3xl"
-                        src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
-                        alt="Meko C35 PWS"
-                      />
-                      <span>Meko C35 PWS x 1</span>
-                    </label>
-                  </div>
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input type="radio" name="gift" />
-                      <img
-                        className="w-12 rounded-3xl"
-                        src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
-                        alt="MEKO N3 Sports Wireless Neckband"
-                      />
-                      <span>MEKO N3 Sports Wireless Neckband x 1</span>
-                    </label>
-                  </div>
-
-                  <button
-                    className="bg-orange-500 text-white px-4 py-2 rounded-lg"
-                    onClick={closeModal}
-                  >
-                    Close
-                  </button>
-                </div>
+            {product.averageRating > 0 && (
+              <div className="flex items-center gap-2 mt-1">
+                <StarRating value={product.averageRating} />
+                <span className="text-sm text-gray-500">({product.reviewCount} reviews)</span>
               </div>
             )}
+          </div>
 
-            <div className="grid grid-cols-2 space-x-4 mt-6">
-              {!isEmiChecked && (
-                <button className="bg-gray-200 py-2 px-4 rounded-lg">
-                  Add To Cart
-                </button>
-              )}
-              <button className="bg-orange-500 text-white py-2 px-4 rounded-lg">
-                Buy Now
-              </button>
+          {/* Price */}
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-primary">{money(price)}</span>
+            {comparePrice && (
+              <span className="text-base text-gray-400 line-through">{money(comparePrice)}</span>
+            )}
+            {discount > 0 && (
+              <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded">
+                Save {discount}%
+              </span>
+            )}
+          </div>
+
+          {/* Stock */}
+          <p className={`text-sm font-medium ${available > 0 ? "text-green-600" : "text-red-500"}`}>
+            {available > 0 ? `In Stock (${available} left)` : "Out of Stock"}
+          </p>
+
+          {/* Variant Options */}
+          {(product.variantOptions ?? []).map((opt) => (
+            <div key={opt.key}>
+              <p className="text-sm font-semibold text-gray-700 mb-1 capitalize">
+                {opt.label}: <span className="text-primary">{selectedOptions[opt.key]}</span>
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {opt.values.map((val) => {
+                  const matches = variants.filter((v) =>
+                    Object.entries({ ...selectedOptions, [opt.key]: val }).every(
+                      ([k, v2]) => (v.options?.[k] ?? (v.options instanceof Map && v.options.get(k))) === v2
+                    )
+                  );
+                  const inStock = matches.some((v) => (v.stock ?? 0) - (v.reservedStock ?? 0) > 0);
+                  return (
+                    <button
+                      key={val}
+                      onClick={() => setSelectedOptions((o) => ({ ...o, [opt.key]: val }))}
+                      className={`px-3 py-1 text-sm border rounded-full transition
+                        ${selectedOptions[opt.key] === val
+                          ? "border-primary bg-orange-50 text-primary font-semibold"
+                          : "border-gray-300 text-gray-600 hover:border-primary"
+                        }
+                        ${!inStock ? "opacity-40 line-through" : ""}
+                      `}
+                    >
+                      {val}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          {/* Qty */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600">Qty:</span>
+            <div className="flex items-center border rounded-md overflow-hidden">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="px-3 py-1 hover:bg-gray-100 text-lg font-bold border-r"
+              >−</button>
+              <span className="px-4 py-1 font-semibold">{qty}</span>
+              <button
+                onClick={() => setQty((q) => Math.min(available, q + 1))}
+                disabled={qty >= available}
+                className="px-3 py-1 hover:bg-gray-100 text-lg font-bold border-l disabled:opacity-30"
+              >+</button>
             </div>
           </div>
+
+          {/* EMI */}
+          {(product.emiOptions ?? []).length > 0 && (
+            <div className="border rounded-lg p-3 bg-gray-50">
+              <p className="text-sm font-semibold text-gray-700 mb-2">EMI Options</p>
+              <div className="flex flex-wrap gap-2">
+                {product.emiOptions.map((opt) => (
+                  <button
+                    key={opt.months}
+                    onClick={() => { setEmiMonths(emiMonths === opt.months ? null : opt.months); setPaymentMethod("stripe"); }}
+                    className={`text-xs px-3 py-1.5 border rounded-full transition ${emiMonths === opt.months ? "border-primary bg-orange-50 text-primary font-semibold" : "border-gray-300 text-gray-600 hover:border-primary"}`}
+                  >
+                    {opt.months}m
+                  </button>
+                ))}
+              </div>
+              {emiMonthly && (
+                <p className="text-sm text-primary font-semibold mt-2">
+                  ≈ {money(emiMonthly)}/month for {emiMonths} months
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Gift */}
+          {product.isGift && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isGift}
+                onChange={(e) => { setIsGift(e.target.checked); setShowGiftModal(e.target.checked); }}
+                className="w-4 h-4 accent-orange-500"
+              />
+              <span className="text-sm text-gray-700">Add Gift Wrapping</span>
+            </label>
+          )}
+
+          {/* Payment method */}
+          <div className="flex gap-3">
+            {["cod", "stripe"].map((m) => (
+              <button
+                key={m}
+                onClick={() => setPaymentMethod(m)}
+                className={`flex-1 py-2 px-3 border rounded-lg text-sm font-medium transition ${paymentMethod === m ? "border-primary bg-orange-50 text-primary" : "border-gray-300 text-gray-600 hover:border-primary"}`}
+              >
+                {m === "cod" ? "Cash on Delivery" : "Online Payment"}
+              </button>
+            ))}
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={handleAddToCart}
+              disabled={cartLoading || available < 1}
+              className="flex-1 bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg hover:bg-gray-300 transition disabled:opacity-50"
+            >
+              {cartLoading ? "Adding…" : "Add to Cart"}
+            </button>
+            <button
+              onClick={handleBuyNow}
+              disabled={cartLoading || available < 1}
+              className="flex-1 bg-primary text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition disabled:opacity-50"
+            >
+              Buy Now
+            </button>
+          </div>
+
+          <button
+            onClick={handleWishlist}
+            className={`w-full text-sm py-2 border rounded-lg transition ${inWishlist ? "border-red-400 text-red-500 bg-red-50" : "border-gray-300 text-gray-600 hover:border-primary hover:text-primary"}`}
+          >
+            {inWishlist ? "♥ In Wishlist" : "♡ Add to Wishlist"}
+          </button>
+
+          {product.warranty && (
+            <p className="text-xs text-gray-500 flex gap-1 items-center">
+              <span className="text-green-500">✓</span> Warranty: {product.warranty}
+            </p>
+          )}
         </div>
 
-        {/* Gift Options */}
-        <div className="border p-4 rounded-lg space-y-4">
-          <h2 className="text-lg font-bold">Gift From Z&M</h2>
+        {/* ── Sidebar: Similar & Related ── */}
+        <div className="space-y-6">
           <div>
-            <label className="flex items-center space-x-2">
-              <input type="radio" name="gift" />
-              <img
-                className="w-12 rounded-3xl"
-                src="https://assets.gadgetandgear.com/upload/media/1705386929898370.jpeg"
-                alt=""
-              />
-              <span>Meko C35 PWS x 1</span>
-            </label>
-          </div>
-          <div>
-            <label className="flex items-center space-x-2">
-              <input type="radio" name="gift" />
-              <img
-                className="w-12 rounded-3xl"
-                src="https://assets.gadgetandgear.com/upload/media/1723463341930242.jpeg"
-                alt=""
-              />
-              <span>MEKO N3 Sports Wireless Neckband x 1</span>
-            </label>
+            <h2 className="text-lg font-semibold mb-3">Similar Products</h2>
+            <div className="space-y-3">
+              {similar.length === 0 && <p className="text-sm text-gray-400">No similar products</p>}
+              {similar.map((p) => (
+                <Link key={p._id} to={`/products/${p.slug}`} className="flex gap-3 items-center p-2 border rounded-lg hover:border-primary hover:shadow-sm transition">
+                  <img src={p.thumbnail} alt={p.name} className="w-14 h-14 object-contain rounded border" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 line-clamp-2">{p.name}</p>
+                    <p className="text-sm font-bold text-primary">{money(p.basePrice)}</p>
+                    {p.averageRating > 0 && <StarRating value={p.averageRating} />}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-bold">Share this link via</h2>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="text-gray-500"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex space-x-4 mt-4">
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600"
-              >
-                <FaFacebook size={28} />
-              </a>
-              <a
-                href={`https://twitter.com/share?url=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400"
-              >
-                <FaTwitter size={28} />
-              </a>
-              <a
-                href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-700"
-              >
-                <FaLinkedin size={28} />
-              </a>
-              <a
-                href={`https://api.whatsapp.com/send?text=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-500"
-              >
-                <FaWhatsapp size={28} />
-              </a>
-            </div>
-            <div className="mt-6">
-              <p className="text-sm">Or copy link</p>
-              <div className="flex items-center mt-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={shareUrl}
-                  className="border border-gray-300 p-2 rounded-md w-full"
-                />
-                <button
-                  onClick={handleCopyLink}
-                  className="bg-gray-200 text-sm py-2 px-4 ml-2 rounded-lg"
-                >
-                  Copy
-                </button>
-              </div>
+      <dialog id="share-modal" className="modal">
+        <div className="modal-box bg-white">
+          <h3 className="font-semibold text-sm mb-3">Share this product</h3>
+          <SocialShare />
+          <div className="flex items-center gap-2 mt-4">
+            <input readOnly value={window.location.href} className="input input-bordered input-sm flex-1 bg-white text-xs" />
+            <button
+              onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
+              className="btn btn-sm"
+            >Copy</button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop"><button>close</button></form>
+      </dialog>
+
+      {/* Gift Modal */}
+      {showGiftModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
+            <h2 className="text-lg font-bold">Gift Wrapping</h2>
+            <textarea
+              value={giftMsg}
+              onChange={(e) => setGiftMsg(e.target.value)}
+              placeholder="Add a gift message (optional)"
+              className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:border-primary resize-none bg-white"
+              rows={3}
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setShowGiftModal(false)} className="flex-1 bg-primary text-white py-2 rounded-lg font-medium">Confirm</button>
+              <button onClick={() => { setIsGift(false); setShowGiftModal(false); }} className="flex-1 border py-2 rounded-lg text-gray-600">Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      <hr className="my-8 mb-16" />
+      <hr className="my-10" />
 
-      <div className="grid lg:grid-cols-8 md:grid-cols-8 grid-cols-6 gap-5">
-        <div className="col-span-6">
-          <div className="tabs-container">
-            <ul className="flex overflow-x-auto whitespace-nowrap no-scrollbar">
-              <li
-                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
-                  activeTab === "specification"
-                    ? "text-orange-500 border-b-2 border-orange-500"
-                    : "text-black hover:text-orange-500"
-                }`}
-                onClick={() => handleTabClick("specification")}
+      {/* ── Tabs: Spec / Description / Reviews / Q&A ── */}
+      <div className="grid lg:grid-cols-4 gap-8">
+        <div className="lg:col-span-3">
+          <div className="flex overflow-x-auto gap-1 border-b mb-6">
+            {[
+              { key: "specification", label: "Specification" },
+              { key: "description", label: "Description" },
+              { key: "reviews", label: `Reviews (${product.reviewCount ?? 0})` },
+              { key: "questions", label: `Q&A (${product.questionCount ?? 0})` },
+            ].map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={`px-4 py-2 text-sm font-semibold whitespace-nowrap border-b-2 transition ${activeTab === t.key ? "border-primary text-primary" : "border-transparent text-gray-600 hover:text-primary"}`}
               >
-                Specification
-              </li>
-              <li
-                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
-                  activeTab === "description"
-                    ? "text-orange-500 border-b-2 border-orange-500"
-                    : "text-black hover:text-orange-500"
-                }`}
-                onClick={() => handleTabClick("description")}
-              >
-                <a href="#desc">Description</a>
-              </li>
-              <li
-                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
-                  activeTab === "reviews"
-                    ? "text-orange-500 border-b-2 border-orange-500"
-                    : "text-black hover:text-orange-500"
-                }`}
-                onClick={() => handleTabClick("reviews")}
-              >
-                <a href="#rev">Reviews (0)</a>
-              </li>
-              <li
-                className={`text-md font-semibold lg:px-4 md:px-4 px-2 py-2 cursor-pointer ${
-                  activeTab === "questions"
-                    ? "text-orange-500 border-b-2 border-orange-500"
-                    : "text-black hover:text-orange-500"
-                }`}
-                onClick={() => handleTabClick("questions")}
-              >
-                <a href="#ques">Questions (0)</a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold text-orange-500">
-              Specification
-            </h2>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">Battery</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">
-                  Connectivity and Location
-                </p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">
-                  Cellular Network
-                </p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">Rear Camera</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">Memory</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">System</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">Processor</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-            <div>
-              <div className="bg-orange-100 text-orange-500 rounded-md mt-4">
-                <p className="text-md font-semibold py-2 px-4">Display</p>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Sensors</h4>
-                <h3 className="col-span-4">
-                  Fingerprint Sensor, Gravity Sensor, Ambient Light Sensor,
-                  Proximity Sensor
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Bluetooth</h4>
-                <h3 className="col-span-4">
-                  BT5.1, Supported BLE,SBC,AAC,LDAC,aptX,aptX HD
-                </h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Hotspot</h4>
-                <h3 className="col-span-4">Supported</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Frequency</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-              <div className="grid grid-cols-6 py-3 px-4 border-b text-gray-700">
-                <h4 className="col-span-2">Wi-Fi Protocols</h4>
-                <h3 className="col-span-4">2.4GHz and 5GHz</h3>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6" id="desc">
-            <h2 className="text-xl font-semibold text-orange-500">
-              Description
-            </h2>
-            <hr className="mt-2 text-gray-900 border" />
-            <div>
-              <h2 className="my-2 text-2xl font-bold">HONOR X6B</h2>
-              <p>
-                The HONOR X6B is a feature-packed smartphone designed for users
-                who demand style, performance, and reliability. This unlocked
-                Android device combines a sleek design with powerful
-                specifications, ensuring a seamless and enjoyable mobile
-                experience.
-              </p>
-              <h2 className="my-2 text-2xl font-bold">
-                Key Features of HONOR X6B
-              </h2>
-              <p>
-                The Honor X6B comes with features that make the Smartphone more
-                attractive to the customers. Here’s the details feature of HONOR
-                X6B:
-              </p>
-              <h2 className="my-2 text-xl font-bold">
-                6.56-Inch 90Hz Display:
-              </h2>
-              <p>
-                Dive into a smoother and more immersive viewing experience with
-                the 6.56-inch FullView display. The 90Hz refresh rate ensures
-                that everything from scrolling to gaming is incredibly fluid,
-                while the vibrant colors and sharp resolution make videos and
-                photos come to life.
-              </p>
-              <h2 className="my-2 text-xl font-bold">Storage:</h2>
-              <p>
-                With 6GB of RAM, the HONOR X6B handles multitasking with ease,
-                letting you switch between apps without lag. The 128GB of
-                internal storage offers ample space to store your favorite apps,
-                high-resolution photos, and videos. Expandable storage options
-                give you the flexibility to add more as needed.
-              </p>
-              <h2 className="my-2 text-xl font-bold">Long-Lasting Battery:</h2>
-              <p>
-                Power through your day without worrying about frequent charging.
-                The 5200mAh battery provides all-day power, perfect for heavy
-                users who rely on their phone for work, entertainment, and
-                staying connected. With intelligent power management, the
-                battery optimizes usage to ensure you get the most out of every
-                charge.
-              </p>
-              <h2 className="my-2 text-xl font-bold">Triple Camera System:</h2>
-              <p>
-                Capture every moment in stunning detail with the 50MP triple
-                camera system. The main camera delivers sharp, high-quality
-                images, while the additional lenses offer versatility with
-                wide-angle and macro capabilities. Whether you’re shooting
-                landscapes, portraits, or close-ups, the HONOR X6B ensures every
-                shot is picture-perfect.
-              </p>
-              <h2 className="my-2 text-xl font-bold">
-                Android Operating System:
-              </h2>
-              <p>
-                Enjoy the latest Android experience with a user-friendly
-                interface, access to millions of apps on the Google Play Store,
-                and regular updates to keep your device secure and running
-                smoothly.
-              </p>
-              <h2 className="my-2 text-xl font-bold">1-Years Warranty:</h2>
-              <p>
-                This device is protected with a 1-years warranty, providing
-                coverage for manufacturing defects and ensuring your investment
-                is safeguarded.
-              </p>
-              <h2 className="my-2 text-2xl font-bold">
-                Reasons to Buy the HONOR X6B
-              </h2>
-              <p>
-                The HONOR X6B is the ideal choice for users seeking a versatile,
-                high-performance smartphone that delivers exceptional value.
-                Whether you’re a tech enthusiast, a photography lover, or
-                someone who needs a reliable phone for everyday use, the HONOR
-                X6B has you covered.
-              </p>
-              <h2 className="my-2 text-2xl font-bold">
-                Get your Honor X6B Smartphone from Gadget & Gear
-              </h2>
-              <p>
-                You can find this feature-packed smartphone available at Gadget
-                and Gear, your trusted retailer for the latest tech devices.
-                Known for offering authentic products with reliable service,
-                Gadget and Gear ensures a seamless buying experience, whether
-                you’re shopping online or in-store. Get your HONOR X6B today
-              </p>
-              <h2 className="my-2 text-xl font-semibold text-orange-500">
-                What is the price of HONOR X6b in Bangladesh?
-              </h2>
-              <hr className="my-2 text-gray-900 border" />
-              <p>
-                The latest price of HONOR X6b in Bangladesh is BDT 14999. You
-                can buy the HONOR X6b at best price from our website or visit
-                any of our store .
-              </p>
-            </div>
-          </div>
-          <div className="mt-6" id="rev">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-orange-500">Reviews</h2>
-              <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
-                Write a Review
+                {t.label}
               </button>
-            </div>
-            <hr className="mt-2 text-gray-900 border" />
-            <div className="flex flex-col items-center justify-center my-16">
-              {/* Thumbs Up Icon with Stars */}
-              <FiThumbsUp className="text-5xl text-black mb-2" />
-              <div className="flex space-x-1 mb-4">
-                <span className="text-xl text-gray-700">
-                  <FaRegStar />
-                </span>
-                <span className="text-xl text-gray-700">
-                  <FaRegStar />
-                </span>
-                <span className="text-xl text-gray-700">
-                  <FaRegStar />
-                </span>
-              </div>
-
-              {/* No Review Text */}
-              <p className="text-xl  text-black mb-2">No Review Found</p>
-
-              {/* Write a Review Button */}
-              <button className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md hover:bg-orange-200 transition duration-300">
-                Write a Review
-              </button>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-6" id="ques">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-orange-500">
-                Questions
-              </h2>
-              <button className="text-md  bg-orange-100 bg-opacity-70 px-3 py-1 text-orange-500">
-                Ask a Question
-              </button>
+          {/* Specification */}
+          {activeTab === "specification" && (
+            <div>
+              {product.attributes && Object.entries(
+                product.attributes instanceof Map
+                  ? Object.fromEntries(product.attributes)
+                  : product.attributes
+              ).length > 0 ? (
+                Object.entries(
+                  product.attributes instanceof Map
+                    ? Object.fromEntries(product.attributes)
+                    : product.attributes
+                ).map(([key, val]) => (
+                  <div key={key} className="grid grid-cols-3 py-2.5 px-4 border-b text-sm">
+                    <span className="text-gray-500 capitalize">{key}</span>
+                    <span className="col-span-2 font-medium text-gray-800">{String(val)}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400">No specifications listed.</p>
+              )}
+              {product.warranty && (
+                <div className="grid grid-cols-3 py-2.5 px-4 border-b text-sm">
+                  <span className="text-gray-500">Warranty</span>
+                  <span className="col-span-2 font-medium">{product.warranty}</span>
+                </div>
+              )}
             </div>
-            <hr className="mt-2 text-gray-900 border" />
-            <div className="flex flex-col items-center justify-center my-16">
-              {/* Thumbs Up Icon with Stars */}
-              <CiCircleQuestion className="text-6xl text-black mb-2" />
+          )}
 
-              {/* No Review Text */}
-              <p className="text-xl text-black mb-2">No Question Found</p>
+          {/* Description */}
+          {activeTab === "description" && (
+            <div className="prose max-w-none text-gray-700 text-sm leading-relaxed">
+              {product.description
+                ? product.description.split("\n").map((p, i) => <p key={i}>{p}</p>)
+                : <p>No description available.</p>}
+            </div>
+          )}
 
-              {/* Write a Review Button */}
-              <button className="bg-orange-100 text-orange-600 px-4 py-2 rounded-md hover:bg-orange-200 transition duration-300">
-                Ask a Question
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="lg:col-span-2 md:col-span-2 col-span-6">
-          <div>
-            <h2 className="text-2xl font-semibold">Related Products</h2>
-            <div className="mt-6">
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
+          {/* Reviews */}
+          {activeTab === "reviews" && (
+            <div className="space-y-6">
+              {/* Rating summary */}
+              {product.averageRating > 0 && (
+                <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl border">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">{product.averageRating.toFixed(1)}</p>
+                    <StarRating value={product.averageRating} />
+                    <p className="text-xs text-gray-400 mt-1">{product.reviewCount} reviews</p>
+                  </div>
                 </div>
+              )}
+
+              {/* Write / edit review */}
+              <div>
+                <button
+                  onClick={() => { if (!user) navigate("/login"); else setShowReviewForm((s) => !s); }}
+                  className="bg-orange-100 text-primary px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-200 transition"
+                >
+                  {myReview ? "Edit My Review" : "Write a Review"}
+                </button>
               </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
+              {showReviewForm && (
+                <form onSubmit={handleSubmitReview} className="border rounded-xl p-4 space-y-3 bg-gray-50">
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-gray-600">Rating:</span>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button type="button" key={s} onClick={() => setReviewForm((f) => ({ ...f, rating: s }))}>
+                        {s <= reviewForm.rating ? <FaStar className="text-yellow-400" /> : <FaRegStar className="text-gray-300" />}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={reviewForm.comment}
+                    onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
+                    placeholder="Write your review…"
+                    className="w-full border rounded-lg p-3 text-sm bg-white focus:outline-none focus:border-primary resize-none"
+                    rows={3}
+                    required
+                  />
+                  <div className="flex gap-2">
+                    <button type="submit" disabled={reviewLoading} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
+                      {reviewLoading ? "Saving…" : "Submit"}
+                    </button>
+                    <button type="button" onClick={() => setShowReviewForm(false)} className="border px-4 py-2 rounded-lg text-sm text-gray-600">Cancel</button>
+                  </div>
+                </form>
+              )}
+
+              {/* Review list */}
+              {reviews.length === 0 ? (
+                <div className="flex flex-col items-center py-12 gap-3 text-gray-400">
+                  <FiThumbsUp className="text-5xl" />
+                  <p>No reviews yet — be the first!</p>
                 </div>
-              </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold">Similar Products</h2>
-            <div className="mt-6">
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/media/1719983159812679.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">vivo Y28</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 19,999</h4>
-                  <p className="text-sm">
-                    <div className="flex space-x-2 mb-4 items-center">
-                      <span className="text-md text-yellow-400">
-                        <FaStar />
-                      </span>
-                      <span className="text-md text-yellow-400">
-                        <FaStar />
-                      </span>
-                      <span className="text-md text-yellow-400">
-                        <FaStar />
-                      </span>
-                      <span className="text-md text-yellow-400">
-                        <FaStar />
-                      </span>
-                      <span className="text-md text-yellow-400">
-                        <FaStar />
-                      </span>
-                      <span className="font-medium">(5.0)</span>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((r) => (
+                    <div key={r._id} className="border rounded-xl p-4 bg-white">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold text-sm text-gray-800">{r.user?.name ?? "Anonymous"}</p>
+                          <StarRating value={r.rating} />
+                        </div>
+                        <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-sm text-gray-700 mt-2">{r.comment}</p>
                     </div>
-                  </p>
+                  ))}
                 </div>
-              </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center p-2 border">
-                <img
-                  className="w-24 h-24"
-                  src="https://assets.gadgetandgear.com/upload/product/20231105_1699173058_456356.jpeg"
-                  alt=""
-                />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-medium">HONOR X5 Plus</h3>
-                  <h4 className="font-bold text-orange-500">Tk. 12,999</h4>
-                  <p className="text-sm">No Review Yet</p>
-                </div>
-              </div>
+              )}
             </div>
-          </div>
+          )}
+
+          {/* Q&A */}
+          {activeTab === "questions" && (
+            <div className="space-y-6">
+              <form onSubmit={handleAskQuestion} className="flex gap-2">
+                <input
+                  value={qForm}
+                  onChange={(e) => setQForm(e.target.value)}
+                  placeholder="Ask a question about this product…"
+                  className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-primary"
+                />
+                <button type="submit" disabled={qLoading} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
+                  {qLoading ? "…" : "Ask"}
+                </button>
+              </form>
+              {questions.length === 0 ? (
+                <div className="flex flex-col items-center py-12 gap-3 text-gray-400">
+                  <CiCircleQuestion className="text-6xl" />
+                  <p>No questions yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {questions.map((q) => (
+                    <div key={q._id} className="border rounded-xl p-4 bg-white">
+                      <p className="font-medium text-sm text-gray-800">Q: {q.question}</p>
+                      {q.answer && (
+                        <p className="text-sm text-primary mt-2 pl-3 border-l-2 border-primary">A: {q.answer}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {q.user?.name} · {new Date(q.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar repeat for desktop */}
+        <div className="hidden lg:block space-y-4">
+          <h2 className="text-lg font-semibold">Top Picks</h2>
+          {similar.slice(0, 4).map((p) => (
+            <Link key={p._id} to={`/products/${p.slug}`} className="flex gap-3 items-center p-2 border rounded-lg hover:border-primary transition">
+              <img src={p.thumbnail} alt={p.name} className="w-12 h-12 object-contain rounded border" />
+              <div>
+                <p className="text-xs font-medium line-clamp-2">{p.name}</p>
+                <p className="text-xs font-bold text-primary">{money(p.basePrice)}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
   );
-};
-
-export default PhoneDetails;
+}

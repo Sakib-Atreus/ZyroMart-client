@@ -8,7 +8,7 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { productApi, orderApi, vendorApi } from "../../api/endpoints";
+import { analyticsApi, vendorApi, orderApi } from "../../api/endpoints";
 
 const { Title, Paragraph } = Typography;
 
@@ -43,28 +43,27 @@ const Dashboard = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const [vendorRes, approved, pending, rejected, orders] = await Promise.all([
+        const [vendorRes, analyticsRes, orders] = await Promise.all([
           vendorApi.me(),
-          productApi.vendorMe({ status: "approved", limit: 1 }),
-          productApi.vendorMe({ status: "pending", limit: 1 }),
-          productApi.vendorMe({ status: "rejected", limit: 1 }),
+          analyticsApi.vendor(),
           orderApi.vendorMine({ sort: "-createdAt", limit: 10 }),
         ]);
-
-        const orderRows = orders.data || [];
-        const revenue = orderRows
-          .filter((o) => o.paymentStatus === "paid")
-          .reduce((sum, o) => sum + (o.total || 0), 0);
-
-        setVendor(vendorRes.data);
+        const d = analyticsRes.data ?? analyticsRes;
+        const ordersTotal = Object.values(d.orders?.byStatus ?? {}).reduce(
+          (s, n) => s + n,
+          0,
+        );
+        setVendor(vendorRes.data ?? vendorRes);
         setStats({
-          productsApproved: approved.meta?.total ?? 0,
-          productsPending: pending.meta?.total ?? 0,
-          productsRejected: rejected.meta?.total ?? 0,
-          ordersCount: orders.meta?.total ?? orderRows.length,
-          revenue,
+          productsApproved: d.products?.byStatus?.approved ?? 0,
+          productsPending: d.products?.byStatus?.pending ?? 0,
+          productsRejected: d.products?.byStatus?.rejected ?? 0,
+          ordersCount: ordersTotal,
+          revenue: d.revenue?.total ?? 0,
         });
-        setRecentOrders(orderRows);
+        setRecentOrders(orders.data ?? []);
+      } catch {
+        // silently ignore
       } finally {
         setLoading(false);
       }

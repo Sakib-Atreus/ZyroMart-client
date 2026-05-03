@@ -113,12 +113,12 @@ export const userDashboardApi = {
 
 export const chatApi = {
   // Vendor
-  sendMessage: (body) => unwrap(api.post("/chat/messages", { body })),
+  sendMessage: (body) => unwrap(api.post("/chat/messages", body)),
   myConversation: () => unwrap(api.get("/chat/me")),
   // Admin
   listConversations: () => unwrap(api.get("/chat")),
   adminSend: (conversationId, body) =>
-    unwrap(api.post(`/chat/${conversationId}/messages`, { body })),
+    unwrap(api.post(`/chat/${conversationId}/messages`, body)),
   // Shared
   getMessages: (conversationId, params) =>
     unwrap(api.get(`/chat/${conversationId}/messages`, { params })),

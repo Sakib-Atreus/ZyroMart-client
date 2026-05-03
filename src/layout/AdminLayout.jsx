@@ -11,6 +11,7 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -23,6 +24,7 @@ const menuItems = [
   { key: "/admin/vendors", icon: <ShopOutlined />, label: <Link to="/admin/vendors">Vendors</Link> },
   { key: "/admin/products", icon: <ShoppingOutlined />, label: <Link to="/admin/products">Products</Link> },
   { key: "/admin/orders", icon: <ShoppingCartOutlined />, label: <Link to="/admin/orders">Orders</Link> },
+  { key: "/admin/chat", icon: <MessageOutlined />, label: <Link to="/admin/chat">Vendor Chat</Link> },
 ];
 
 const AdminLayout = () => {
