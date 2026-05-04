@@ -1,299 +1,448 @@
-import React, { useState } from "react";
-import { Breadcrumb } from "antd";
-import { Link } from "react-router-dom";
-import "rc-slider/assets/index.css";
-import Slider from "rc-slider";
-import { Cascader, Input, Select, Space } from "antd";
-import "./Phones.css";
+import { useEffect, useState, useCallback } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  Breadcrumb,
+  Pagination,
+  Select,
+  Slider,
+  Checkbox,
+  Drawer,
+  Button,
+  Empty,
+  Spin,
+  Badge,
+  Tag,
+  Input,
+} from "antd";
+import { FilterOutlined, SearchOutlined, CloseOutlined } from "@ant-design/icons";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { productApi, categoryApi } from "../../api/endpoints";
+import { toast } from "react-toastify";
 
-const { Option } = Select;
+const SORT_OPTIONS = [
+  { value: "-createdAt", label: "New Arrivals" },
+  { value: "basePrice", label: "Price: Low to High" },
+  { value: "-basePrice", label: "Price: High to Low" },
+  { value: "-averageRating", label: "Top Rated" },
+  { value: "-totalSold", label: "Best Selling" },
+];
+
+const POPULAR_BRANDS = [
+  "Samsung", "Apple", "Google", "Dell", "Sony", "Xiaomi",
+  "OnePlus", "Oppo", "Huawei", "Realme", "Vivo", "Nokia",
+];
+
+const Stars = ({ value }) => (
+  <span className="flex gap-0.5">
+    {Array.from({ length: 5 }, (_, i) => {
+      if (i + 1 <= Math.floor(value)) return <FaStar key={i} className="text-yellow-400 text-xs" />;
+      if (i < value) return <FaStarHalfAlt key={i} className="text-yellow-400 text-xs" />;
+      return <FaRegStar key={i} className="text-gray-300 text-xs" />;
+    })}
+  </span>
+);
+
+const ProductCard = ({ product }) => {
+  const discount = product.compareAtPrice && product.compareAtPrice > product.basePrice
+    ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
+    : 0;
+
+  return (
+    <div className="bg-white rounded-lg border hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
+      <Link to={`/products/${product.slug}`} className="relative block">
+        <img
+          src={product.thumbnail}
+          alt={product.name}
+          className="w-full h-44 object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+          onError={(e) => { e.target.src = "https://placehold.co/300x300?text=No+Image"; }}
+        />
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {discount > 0 && (
+            <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+              -{discount}%
+            </span>
+          )}
+          {product.isOnlineExclusive && (
+            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded">
+              Online Only
+            </span>
+          )}
+        </div>
+      </Link>
+      <div className="p-3 flex flex-col flex-1">
+        <p className="text-xs text-gray-400 mb-1">{product.brand}</p>
+        <Link to={`/products/${product.slug}`}>
+          <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-orange-600 transition-colors mb-2">
+            {product.name}
+          </h3>
+        </Link>
+        {product.averageRating > 0 && (
+          <div className="flex items-center gap-1 mb-2">
+            <Stars value={product.averageRating} />
+            <span className="text-xs text-gray-400">({product.reviewCount})</span>
+          </div>
+        )}
+        <div className="flex items-baseline gap-2 mt-auto mb-3">
+          <span className="text-orange-600 font-bold text-base">
+            ৳{product.basePrice?.toLocaleString()}
+          </span>
+          {product.compareAtPrice && (
+            <span className="text-xs text-gray-400 line-through">
+              ৳{product.compareAtPrice?.toLocaleString()}
+            </span>
+          )}
+        </div>
+        <Link
+          to={`/products/${product.slug}`}
+          className="block text-center bg-orange-600 text-white px-3 py-2 rounded text-sm font-semibold hover:bg-orange-700 transition"
+        >
+          View Details
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+const ProductSkeleton = () => (
+  <div className="bg-white rounded-lg border overflow-hidden animate-pulse">
+    <div className="h-44 bg-gray-200" />
+    <div className="p-3 space-y-2">
+      <div className="h-3 bg-gray-200 rounded w-1/3" />
+      <div className="h-4 bg-gray-200 rounded" />
+      <div className="h-4 bg-gray-200 rounded w-2/3" />
+      <div className="h-3 bg-gray-200 rounded w-1/2" />
+      <div className="h-8 bg-gray-200 rounded mt-2" />
+    </div>
+  </div>
+);
 
 const Phones = () => {
-  const [isFilterVisible, setFilterVisible] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // local price state (only applied on slider change-complete)
+  const [priceRange, setPriceRange] = useState([0, 300000]);
+
+  const category = searchParams.get("category") || "";
+  const brand = searchParams.get("brand") || "";
+  const sort = searchParams.get("sort") || "-createdAt";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const searchTerm = searchParams.get("searchTerm") || "";
+  const isOnlineExclusive = searchParams.get("isOnlineExclusive") || "";
+  const page = Number(searchParams.get("page") || 1);
+
+  // Sync slider from URL on mount
+  useEffect(() => {
+    setPriceRange([
+      minPrice ? Number(minPrice) : 0,
+      maxPrice ? Number(maxPrice) : 300000,
+    ]);
+  }, []);
+
+  useEffect(() => {
+    categoryApi.list()
+      .then((res) => setCategories(res.data ?? res ?? []))
+      .catch(() => {});
+  }, []);
+
+  const fetchProducts = useCallback(() => {
+    setLoading(true);
+    const params = { page, limit: 12, sort };
+    if (category) params.category = category;
+    if (brand) params.brand = brand;
+    if (minPrice) params.minPrice = minPrice;
+    if (maxPrice) params.maxPrice = maxPrice;
+    if (searchTerm) params.searchTerm = searchTerm;
+    if (isOnlineExclusive) params.isOnlineExclusive = true;
+
+    productApi.list(params)
+      .then((res) => {
+        setProducts(res.data ?? []);
+        setMeta(res.meta ?? { total: 0, page: 1, totalPages: 1 });
+      })
+      .catch(() => { setProducts([]); toast.error("Failed to load products"); })
+      .finally(() => setLoading(false));
+  }, [category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, page]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const setParam = (key, value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) { next.set(key, value); } else { next.delete(key); }
+    next.delete("page");
+    setSearchParams(next);
+  };
+
+  const clearAllFilters = () => {
+    setPriceRange([0, 300000]);
+    setSearchParams({});
+  };
+
+  const activeCategoryName = categories.find((c) => c._id === category)?.name || "";
+  const hasFilters = category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive;
+
+  const breadcrumbItems = [
+    { title: <Link to="/" className="font-semibold">Home</Link> },
+    ...(activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">{activeCategoryName}</span> }] : []),
+    ...(!activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">All Products</span> }] : []),
+  ];
+
+  const Filters = () => (
+    <div className="space-y-6">
+      {/* Categories */}
+      <div>
+        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Categories</h3>
+        <div className="space-y-1">
+          <button
+            onClick={() => setParam("category", "")}
+            className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${!category ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+          >
+            All Products
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat._id}
+              onClick={() => setParam("category", cat._id)}
+              className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${category === cat._id ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Price Range</h3>
+        <Slider
+          range
+          min={0}
+          max={300000}
+          value={priceRange}
+          onChange={setPriceRange}
+          onChangeComplete={([min, max]) => {
+            const next = new URLSearchParams(searchParams);
+            if (min > 0) { next.set("minPrice", min); } else { next.delete("minPrice"); }
+            if (max < 300000) { next.set("maxPrice", max); } else { next.delete("maxPrice"); }
+            next.delete("page");
+            setSearchParams(next);
+          }}
+          tooltip={{ formatter: (v) => `৳${v.toLocaleString()}` }}
+        />
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>৳{priceRange[0].toLocaleString()}</span>
+          <span>৳{priceRange[1].toLocaleString()}</span>
+        </div>
+      </div>
+
+      {/* Brands */}
+      <div>
+        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Brand</h3>
+        <div className="space-y-1.5">
+          {POPULAR_BRANDS.map((b) => (
+            <label key={b} className="flex items-center gap-2 cursor-pointer group">
+              <Checkbox
+                checked={brand === b}
+                onChange={(e) => setParam("brand", e.target.checked ? b : "")}
+              />
+              <span className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">{b}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Online Exclusive */}
+      <div>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <Checkbox
+            checked={isOnlineExclusive === "true"}
+            onChange={(e) => setParam("isOnlineExclusive", e.target.checked ? "true" : "")}
+          />
+          <span className="text-sm text-gray-600 font-medium">Online Exclusive Only</span>
+        </label>
+      </div>
+
+      {hasFilters && (
+        <button
+          onClick={clearAllFilters}
+          className="w-full text-center text-sm text-red-500 hover:text-red-700 font-medium py-2 border border-red-200 rounded hover:bg-red-50 transition"
+        >
+          Clear All Filters
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 my-8">
-      <Breadcrumb
-        className="my-6"
-        separator=">"
-        items={[
-          {
-            title: (
-              <Link to="/" className="text-md font-semibold">
-                Home
-              </Link>
-            ),
-          },
-          {
-            title: (
-              <p to="/" className="text-md font-semibold text-primary">
-                Phones
-              </p>
-            ),
-          },
-        ]}
-      />
-      <div className="lg:flex md:flex grid grid-cols-4 gap-2 text-sm font-normal my-8">
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Samsung
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Huawei
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Xiaomi
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          OnePlus
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Oppo
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Motorola
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Vivo
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Realme
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Wacom
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Nokia
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Nothing
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          iPhone
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Tecno
-        </Link>
-        <Link
-          to="/"
-          className=" text-[#292D32] border border-[#c6c7c9] px-3 py-1 rounded-full"
-        >
-          Honor
-        </Link>
+      <Breadcrumb className="mb-6" separator=">" items={breadcrumbItems} />
+
+      {/* Brand quick-filter pills */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {POPULAR_BRANDS.map((b) => (
+          <button
+            key={b}
+            onClick={() => setParam("brand", brand === b ? "" : b)}
+            className={`px-3 py-1 rounded-full text-sm border transition-all ${
+              brand === b
+                ? "bg-orange-600 text-white border-orange-600"
+                : "text-gray-600 border-gray-300 hover:border-orange-400 hover:text-orange-600"
+            }`}
+          >
+            {b}
+          </button>
+        ))}
       </div>
 
-      {/* Phones Page Content */}
-      <div className="flex flex-col md:flex-row border-t border-gray-300">
-        {/* Sidebar */}
-        <div
-          className={`w-[85%] md:w-1/5 p-4 border-r border-gray-300 lg:pe-8 lg:pt-8 md:pe-8 md:pt-8 ${
-            isFilterVisible
-              ? "block fixed top-0 left-0 z-50 bg-white h-full"
-              : "hidden md:block"
-          }`}
-        >
-          {/* Close Button for Mobile */}
-          <div className="flex justify-between items-center md:hidden mb-2">
-            <h2 className="text-lg font-semibold text-primary opacity-70">
-              Filters
-            </h2>
-            <button
-              onClick={() => setFilterVisible(false)}
-              className="text-gray-500 hover:text-gray-800"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Sort by Option in Sidebar (Mobile Only) */}
-          <div className="mb-6 md:hidden">
-            <h2 className="text-lg font-semibold mb-2">Sort by</h2>
-            <Select
-              placeholder="Sort by"
-              className="custom-select shadow border border-gray-100 rounded-md"
-              dropdownClassName="custom-dropdown"
-              style={{ width: "100%" }}
-              dropdownStyle={{ width: "100%" }}
-              bordered={false}
-            >
-              <Option value="new-arrivals">New Arrivals</Option>
-              <Option value="price-low-high">Price Low to High</Option>
-              <Option value="price-high-low">Price High to Low</Option>
-            </Select>
-          </div>
-
-          {/* Price Filter */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">Price</h2>
-            <Slider
-              range
-              defaultValue={[7999, 299999]}
-              min={7999}
-              max={299999}
-              className="custom-slider"
-            />
-            <div className="flex justify-between text-sm mt-2">
-              <span>Min: 7,999</span>
-              <span>Max: 2,99,999</span>
-            </div>
-          </div>
-
-          {/* Other Filters */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">Color</h2>
-            <div className="mt-2">
-              <label className="inline-flex items-center">
-                <input type="checkbox" className="form-checkbox" />
-                <span className="ml-2">Red</span>
-              </label>
-            </div>
-          </div>
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">RAM</h2>
-            <div className="mt-2">
-              <label className="inline-flex items-center">
-                <input type="checkbox" className="form-checkbox" />
-                <span className="ml-2">4 GB</span>
-              </label>
-            </div>
+      <div className="flex gap-6">
+        {/* Sidebar — desktop */}
+        <div className="hidden md:block w-56 flex-shrink-0">
+          <div className="bg-white rounded-xl border p-4 sticky top-4">
+            <Filters />
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="w-full md:w-4/5 mt-4 lg:ps-8 lg:pt-8 md:ps-8 md:pt-8">
-          <div className="flex justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold">Phones</h2>
-              <h3 className="text-sm">201 items found in Phones</h3>
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          {/* Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-white rounded-xl border px-4 py-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Button
+                icon={<FilterOutlined />}
+                className="md:hidden"
+                onClick={() => setDrawerOpen(true)}
+              >
+                Filters
+                {hasFilters && <Badge count={[category, brand, minPrice, isOnlineExclusive].filter(Boolean).length} className="ml-1" />}
+              </Button>
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder="Search products…"
+                value={searchTerm}
+                onChange={(e) => setParam("searchTerm", e.target.value)}
+                className="max-w-xs"
+                allowClear
+              />
             </div>
-            {/* Sort by is moved to Sidebar on Mobile */}
-            <div className="text-sm text-left hidden md:block lg:block">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 whitespace-nowrap">
+                {loading ? "Loading…" : `${meta.total} product${meta.total !== 1 ? "s" : ""}`}
+              </span>
               <Select
-                placeholder="Sort by"
-                className="custom-select"
-                dropdownClassName="custom-dropdown"
-                style={{ width: 200 }}
-                dropdownStyle={{ width: 200 }}
-                bordered={false}
-              >
-                <Option value="new-arrivals">New Arrivals</Option>
-                <Option value="price-low-high">Price Low to High</Option>
-                <Option value="price-high-low">Price High to Low</Option>
-              </Select>
-            </div>
-            {/* Filter and Sort Button for Mobile */}
-            <div className="lg:hidden md:hidden flex justify-between items-center">
-              <button
-                onClick={() => setFilterVisible(true)}
-                className="bg-primary text-white px-4 py-2 rounded-md"
-              >
-                Filter
-              </button>
+                value={sort}
+                onChange={(v) => setParam("sort", v)}
+                style={{ width: 190 }}
+                options={SORT_OPTIONS}
+              />
             </div>
           </div>
 
-          {/* Product Grid */}
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 text-center">
-            {/* Product Card */}
-            <Link to="/phones/new">
-              <div className="shadow-xl bg-white pb-2">
-                <img
-                  src="https://dvf83rt16ac4w.cloudfront.net/upload/product/20220405_1649146951_699542.png"
-                  alt="Product Image"
-                />
-                <img
-                  src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191204_1575461019_541440.png"
-                  alt="brand icon"
-                  className="w-14 h-8 mx-auto"
-                />
-                <h3 className="text-md font-semibold">Redmi Note 11S</h3>
-                <p className="text-orange-600 font-bold my-2">Tk. 27,999</p>
-                <p className="text-sm text-gray-500">No Review Yet</p>
-              </div>
-            </Link>
-            <div className="shadow-xl bg-white pb-2">
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1719983159812679.jpeg"
-                alt="Product Image"
-              />
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191202_1575290973_740323.jpeg"
-                alt="brand icon"
-                className="w-14 h-8 mx-auto"
-              />
-              <h3 className="text-md font-semibold">Vivo Y28</h3>
-              <p className="text-orange-600 font-bold my-2">Tk. 20,999</p>
-              <p className="text-sm text-gray-500">No Review Yet</p>
+          {/* Active filters */}
+          {hasFilters && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {activeCategoryName && (
+                <Tag closable onClose={() => setParam("category", "")} color="orange">
+                  Category: {activeCategoryName}
+                </Tag>
+              )}
+              {brand && (
+                <Tag closable onClose={() => setParam("brand", "")} color="blue">
+                  Brand: {brand}
+                </Tag>
+              )}
+              {(minPrice || maxPrice) && (
+                <Tag
+                  closable
+                  onClose={() => {
+                    setPriceRange([0, 300000]);
+                    const next = new URLSearchParams(searchParams);
+                    next.delete("minPrice"); next.delete("maxPrice");
+                    setSearchParams(next);
+                  }}
+                  color="green"
+                >
+                  Price: ৳{(minPrice || 0).toLocaleString()} – ৳{(maxPrice || 300000).toLocaleString()}
+                </Tag>
+              )}
+              {isOnlineExclusive && (
+                <Tag closable onClose={() => setParam("isOnlineExclusive", "")} color="purple">
+                  Online Exclusive
+                </Tag>
+              )}
             </div>
-            <div className="shadow-xl bg-white pb-2">
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1717237546618684.jpeg"
-                alt="Product Image"
-              />
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20191202_1575290973_740323.jpeg"
-                alt="brand icon"
-                className="w-14 h-8 mx-auto"
-              />
-              <h3 className="text-md font-semibold">Vivo Y18</h3>
-              <p className="text-orange-600 font-bold my-2">Tk. 14,999</p>
-              <p className="text-sm text-gray-500">No Review Yet</p>
+          )}
+
+          {/* Products grid */}
+          {loading ? (
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4">
+              {Array.from({ length: 12 }).map((_, i) => <ProductSkeleton key={i} />)}
             </div>
-            <div className="shadow-xl bg-white pb-2">
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/media/1717660403496377.jpeg"
-                alt="Product Image"
+          ) : products.length === 0 ? (
+            <div className="bg-white rounded-xl border py-20">
+              <Empty
+                description={
+                  <div className="text-center">
+                    <p className="text-gray-500 mb-3">No products found</p>
+                    {hasFilters && (
+                      <button onClick={clearAllFilters} className="text-orange-600 hover:underline text-sm">
+                        Clear filters
+                      </button>
+                    )}
+                  </div>
+                }
               />
-              <img
-                src="https://dvf83rt16ac4w.cloudfront.net/upload/brand/20180405_1522919778_830681.png"
-                alt="brand icon"
-                className="w-14 h-8 mx-auto"
-              />
-              <h3 className="text-md font-semibold">Galaxy M14 4G</h3>
-              <p className="text-orange-600 font-bold my-2">Tk. 17,999</p>
-              <p className="text-sm text-gray-500">No Review Yet</p>
             </div>
-            {/* Repeat similar product cards */}
-          </div>
+          ) : (
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4">
+              {products.map((p) => <ProductCard key={p._id} product={p} />)}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && meta.total > 12 && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                current={page}
+                total={meta.total}
+                pageSize={12}
+                onChange={(p) => {
+                  const next = new URLSearchParams(searchParams);
+                  next.set("page", p);
+                  setSearchParams(next);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                showSizeChanger={false}
+                showTotal={(total) => `Total ${total} products`}
+              />
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Mobile filter drawer */}
+      <Drawer
+        title="Filters"
+        placement="left"
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        width={280}
+        extra={
+          hasFilters && (
+            <button onClick={() => { clearAllFilters(); setDrawerOpen(false); }} className="text-red-500 text-sm">
+              Clear All
+            </button>
+          )
+        }
+      >
+        <Filters />
+      </Drawer>
     </div>
   );
 };
