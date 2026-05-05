@@ -7,11 +7,11 @@ import DynamicBreadcrumb from "../utils/Breadcrumb";
 const Main = () => {
     return (
         <div className="max-w-full mx-auto bg-[#F9F9F7] text-black">
-            <Navbar/>
+            <Navbar />
             <DynamicBreadcrumb />
-            <Outlet/>
-            <Footer/>
-            <MobileNavbar/>
+            <Outlet />
+            <Footer />
+            <MobileNavbar />
         </div>
     );
 };

@@ -17,6 +17,7 @@ export const userApi = {
 
 export const categoryApi = {
   list: () => unwrap(api.get("/categories")),
+  featured: () => unwrap(api.get("/categories/featured")),
   get: (slug) => unwrap(api.get(`/categories/${slug}`)),
   create: (body) => unwrap(api.post("/categories", body)),
   update: (id, body) => unwrap(api.patch(`/categories/${id}`, body)),

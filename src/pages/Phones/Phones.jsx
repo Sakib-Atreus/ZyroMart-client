@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Breadcrumb,
@@ -127,6 +127,21 @@ const Phones = () => {
   // local price state (only applied on slider change-complete)
   const [priceRange, setPriceRange] = useState([0, 300000]);
 
+  // local search input — debounced before being written to the URL
+  const [searchInput, setSearchInput] = useState(searchParams.get("searchTerm") || "");
+  const debounceRef = useRef(null);
+
+  const handleSearchInput = (value) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const next = new URLSearchParams(searchParams);
+      if (value.trim()) { next.set("searchTerm", value.trim()); } else { next.delete("searchTerm"); }
+      next.delete("page");
+      setSearchParams(next, { replace: true });
+    }, 500);
+  };
+
   const category = searchParams.get("category") || "";
   const brand = searchParams.get("brand") || "";
   const sort = searchParams.get("sort") || "-createdAt";
@@ -182,6 +197,7 @@ const Phones = () => {
 
   const clearAllFilters = () => {
     setPriceRange([0, 300000]);
+    setSearchInput("");
     setSearchParams({});
   };
 
@@ -325,8 +341,8 @@ const Phones = () => {
               <Input
                 prefix={<SearchOutlined className="text-gray-400" />}
                 placeholder="Search products…"
-                value={searchTerm}
-                onChange={(e) => setParam("searchTerm", e.target.value)}
+                value={searchInput}
+                onChange={(e) => handleSearchInput(e.target.value)}
                 className="max-w-xs"
                 allowClear
               />

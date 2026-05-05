@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Empty, Skeleton, Typography, message } from "antd";
+import { Button, Empty, Skeleton, Typography, message } from "antd";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import { wishlistApi, cartApi } from "../../api/endpoints";
+import { wishlistApi } from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
 
 const { Title, Text } = Typography;
@@ -18,12 +18,11 @@ const Wishlist = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(null);
-  const [addingToCart, setAddingToCart] = useState(null);
 
   useEffect(() => {
     wishlistApi
       .get()
-      .then((res) => setItems(res.data?.items ?? res.items ?? []))
+      .then((res) => setItems(res.data?.products ?? res.products ?? []))
       .catch(() => message.error("Failed to load wishlist"))
       .finally(() => setLoading(false));
   }, []);
@@ -32,31 +31,12 @@ const Wishlist = () => {
     setRemoving(productId);
     try {
       await wishlistApi.remove(productId);
-      setItems((prev) => prev.filter((i) => (i.product?._id ?? i.product) !== productId));
+      setItems((prev) => prev.filter((i) => i._id !== productId));
       message.success("Removed from wishlist");
     } catch (err) {
       message.error(err.message || "Failed to remove item");
     } finally {
       setRemoving(null);
-    }
-  };
-
-  const handleAddToCart = async (item) => {
-    const productId = item.product?._id ?? item.product;
-    const variants = item.product?.variants;
-    if (!variants || variants.length === 0) {
-      message.warning("No variants available for this product");
-      return;
-    }
-    const firstVariant = variants[0];
-    setAddingToCart(productId);
-    try {
-      await cartApi.addItem({ variantId: firstVariant._id, quantity: 1 });
-      message.success("Added to cart");
-    } catch (err) {
-      message.error(err.message || "Failed to add to cart");
-    } finally {
-      setAddingToCart(null);
     }
   };
 
@@ -131,13 +111,9 @@ const Wishlist = () => {
           </Empty>
         ) : (
           <div className="space-y-6">
-            {items.map((item) => {
-              const product = item.product ?? {};
-              const productId = product._id ?? item.product;
-              const price =
-                product.price ??
-                product.variants?.[0]?.price ??
-                0;
+            {items.map((product) => {
+              const productId = product._id;
+              const price = product.basePrice ?? product.compareAtPrice ?? 0;
               const thumbnail =
                 product.thumbnail ??
                 product.images?.[0] ??
@@ -175,9 +151,7 @@ const Wishlist = () => {
                         size="small"
                         icon={<ShoppingCartOutlined />}
                         className="border border-primary text-primary hover:bg-primary hover:text-white"
-                        loading={addingToCart === productId}
-                        onClick={() => handleAddToCart(item)}
-                        disabled={!product.variants?.length}
+                        onClick={() => navigate(`/products/${slug}`)}
                       >
                         Add To Cart
                       </Button>
