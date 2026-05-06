@@ -5,6 +5,7 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { wishlistApi } from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
+import { useCartWishlist } from "../../context/CartWishlistContext";
 
 const { Title, Text } = Typography;
 
@@ -13,6 +14,7 @@ const money = (n, ccy = "BDT") =>
 
 const Wishlist = () => {
   const { user } = useAuth();
+  const { syncWishlistCount } = useCartWishlist();
   const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
@@ -22,7 +24,11 @@ const Wishlist = () => {
   useEffect(() => {
     wishlistApi
       .get()
-      .then((res) => setItems(res.data?.products ?? res.products ?? []))
+      .then((res) => {
+        const products = res.data?.products ?? res.products ?? [];
+        setItems(products);
+        syncWishlistCount(products.length);
+      })
       .catch(() => message.error("Failed to load wishlist"))
       .finally(() => setLoading(false));
   }, []);
@@ -31,7 +37,11 @@ const Wishlist = () => {
     setRemoving(productId);
     try {
       await wishlistApi.remove(productId);
-      setItems((prev) => prev.filter((i) => i._id !== productId));
+      setItems((prev) => {
+        const next = prev.filter((i) => i._id !== productId);
+        syncWishlistCount(next.length);
+        return next;
+      });
       message.success("Removed from wishlist");
     } catch (err) {
       message.error(err.message || "Failed to remove item");
@@ -54,7 +64,7 @@ const Wishlist = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex gap-8">
       {/* Left Sidebar */}
-      <div className="w-1/4 max-h-max bg-white border rounded-lg shadow-md p-4 pb-8 hidden lg:block md:block">
+      <div className="w-56 lg:w-64 max-h-max bg-white border rounded-lg shadow-md p-4 pb-8 hidden md:block flex-shrink-0">
         <div className="flex items-center justify-center flex-col space-y-2 mb-8 text-center">
           <img
             className="w-16 h-16 rounded-full"

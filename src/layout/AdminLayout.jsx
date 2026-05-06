@@ -125,7 +125,7 @@ const AdminLayout = () => {
           </div>
         </Header>
 
-        <Content style={{ margin: 24, padding: 24, background: colorBgContainer, borderRadius: 8, minHeight: 280 }}>
+        <Content style={{ padding: 24, background: "#f8fafc", minHeight: 280, overflow: "auto" }}>
           <Outlet />
         </Content>
       </Layout>

@@ -4,18 +4,24 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { cartApi } from "../../api/endpoints";
 import { toast } from "react-toastify";
+import { useCartWishlist } from "../../context/CartWishlistContext";
 
 const Cart = () => {
   const [cart, setCart] = useState({ items: [], subtotal: 0, itemCount: 0 });
   const [loading, setLoading] = useState(true);
+  const { syncCartCount } = useCartWishlist();
+
+  const applyCart = (data) => {
+    setCart(data ?? { items: [], subtotal: 0, itemCount: 0 });
+    syncCartCount(data?.itemCount ?? data?.items?.length ?? 0);
+  };
 
   const fetchCart = async () => {
     try {
       const res = await cartApi.get();
-      setCart(res.data ?? { items: [], subtotal: 0, itemCount: 0 });
+      applyCart(res.data);
     } catch {
-      // unauthenticated — show empty cart
-      setCart({ items: [], subtotal: 0, itemCount: 0 });
+      applyCart(null);
     } finally {
       setLoading(false);
     }
@@ -28,7 +34,7 @@ const Cart = () => {
     if (newQty < 1) return;
     try {
       const res = await cartApi.updateItem(variantId, { quantity: newQty });
-      setCart(res.data);
+      applyCart(res.data);
     } catch (err) {
       toast.error(err.message || "Could not update quantity");
     }
@@ -37,7 +43,7 @@ const Cart = () => {
   const handleRemove = async (variantId) => {
     try {
       const res = await cartApi.removeItem(variantId);
-      setCart(res.data);
+      applyCart(res.data);
     } catch (err) {
       toast.error(err.message || "Could not remove item");
     }
@@ -46,7 +52,7 @@ const Cart = () => {
   const handleClear = async () => {
     try {
       const res = await cartApi.clear();
-      setCart(res.data);
+      applyCart(res.data);
     } catch (err) {
       toast.error(err.message || "Could not clear cart");
     }

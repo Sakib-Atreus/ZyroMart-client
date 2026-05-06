@@ -48,7 +48,7 @@ const Checkout = () => {
   }, []);
 
   const items = cart?.items ?? [];
-  const subtotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  const subtotal = cart?.subtotal ?? items.reduce((s, i) => s + (i.lineTotal ?? (i.variant?.price ?? 0) * i.quantity), 0);
   const shippingFee = subtotal > 3000 ? 0 : 80;
   const tax = Math.round(subtotal * 0.05);
   const total = subtotal + shippingFee + tax;
@@ -323,7 +323,7 @@ const Checkout = () => {
                         Qty: {item.quantity}
                       </Text>
                       <Text style={{ fontWeight: 500 }}>
-                        {money(item.unitPrice * item.quantity)}
+                        {money(item.lineTotal ?? (item.variant?.price ?? 0) * item.quantity)}
                       </Text>
                     </div>
                   </div>

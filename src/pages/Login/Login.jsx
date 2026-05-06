@@ -98,7 +98,7 @@ const Login = () => {
     <div className="w-full mx-auto flex justify-center items-center bg-cover bg-center bg-no-repeat relative">
       <div className="bg-video bg-content flex justify-items-center items-center w-full h-full absolute inset-0 bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-        <div className="bg-white rounded-xl shadow-lg w-72 lg:w-[28%] md:w-[64%] mx-auto z-10 backdrop-blur-sm pt-8 pb-2 lg:p-12 flex flex-col col-span-1">
+        <div className="bg-white rounded-xl shadow-lg w-[92%] max-w-sm sm:max-w-md md:w-[64%] lg:w-[28%] mx-auto z-10 backdrop-blur-sm pt-8 pb-2 lg:p-12 flex flex-col col-span-1">
           <div className="tabs w-[70%] mx-auto grid grid-cols-2 justify-center bg-gray-100 rounded-full mb-4">
             <button
               className={`tab border-none text-lg font-medium rounded-full ${

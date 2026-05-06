@@ -12,6 +12,7 @@ import { CgProfile } from "react-icons/cg";
 import { Button, Drawer } from "antd";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
+import { useCartWishlist } from "../../context/CartWishlistContext";
 import { categoryApi, cartApi } from "../../api/endpoints";
 
 const { Search } = Input;
@@ -184,6 +185,7 @@ const CategoryItem = ({ category, subCats }) => {
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { cartCount, wishlistCount, syncCartCount } = useCartWishlist();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [childMap, setChildMap] = useState({});
@@ -201,12 +203,13 @@ const Navbar = () => {
       const data = res.data ?? {};
       setCartItems(data.items ?? []);
       setCartSubtotal(data.subtotal ?? 0);
+      syncCartCount(data.itemCount ?? data.items?.length ?? 0);
     } catch {
       setCartItems([]);
     } finally {
       setCartLoading(false);
     }
-  }, [user]);
+  }, [user, syncCartCount]);
 
   const openCart = () => {
     setCartOpen(true);
@@ -319,14 +322,16 @@ const Navbar = () => {
             <FaLocationDot className="text-xl" /> <p>Store Locator</p>
           </Link>
           <Link to="/wishlist" className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-orange-600 h-10">
-            <Badge count={0}>
-              <FaHeart className="text-white" />
+            <Badge count={wishlistCount} style={{ fontSize: 13, height: 17, minWidth: 17, lineHeight: '17px' }}>
+              <FaHeart style={{ fontSize: '1.5rem' }} className="text-white" />
             </Badge>
           </Link>
 
           {/* Cart Drawer */}
           <button onClick={openCart} className="btn btn-sm bg-[#FFE6C71A] text-white text-2xl hover:bg-orange-600 h-10">
-            <ShoppingCartOutlined />
+            <Badge count={cartCount} style={{ fontSize: 13, height: 17, minWidth: 17, lineHeight: '17px' }}>
+              <ShoppingCartOutlined style={{ fontSize: '1.5rem' }} className="text-white" />
+            </Badge>
           </button>
           <Drawer title="My Cart" onClose={() => setCartOpen(false)} open={cartOpen}>
             {cartLoading ? (
@@ -343,10 +348,10 @@ const Navbar = () => {
                     <div key={variant._id ?? item._id} className="flex items-center justify-between p-2 bg-white border rounded-lg shadow-sm">
                       <div className="flex items-center gap-3">
                         <img
-                          src={product.thumbnail || ""}
+                          src={product.thumbnail || variant.images?.[0] || "https://placehold.co/56x56?text=?"}
                           alt={product.name}
                           className="w-14 h-14 object-cover rounded"
-                          onError={(e) => { e.target.style.display = "none"; }}
+                          onError={(e) => { e.target.src = "https://placehold.co/56x56?text=?"; }}
                         />
                         <div>
                           <p className="font-semibold text-sm line-clamp-2">{product.name}</p>

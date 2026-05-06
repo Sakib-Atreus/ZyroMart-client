@@ -3,6 +3,7 @@ import Navbar from "../shared/Navbar/Navbar";
 import Footer from "../shared/Footer/Footer";
 import MobileNavbar from "../shared/Navbar/MobileNavbar";
 import DynamicBreadcrumb from "../utils/Breadcrumb";
+import ChatWidget from "../components/ChatWidget/ChatWidget";
 
 const Main = () => {
     return (
@@ -12,6 +13,7 @@ const Main = () => {
             <Outlet />
             <Footer />
             <MobileNavbar />
+            <ChatWidget />
         </div>
     );
 };

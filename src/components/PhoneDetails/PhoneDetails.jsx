@@ -9,6 +9,7 @@ import { TiArrowForwardOutline } from "react-icons/ti";
 import { FiShoppingCart, FiHeart, FiCheck, FiPackage, FiTruck, FiRefreshCw, FiShield } from "react-icons/fi";
 import { productApi, cartApi, reviewApi, questionApi, wishlistApi } from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
+import { useCartWishlist } from "../../context/CartWishlistContext";
 import "./PhoneDetails.css";
 
 // ─── Color map for swatches ───────────────────────────────────────────────────
@@ -71,6 +72,7 @@ export default function PhoneDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshCart, refreshWishlist } = useCartWishlist();
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -229,6 +231,7 @@ export default function PhoneDetails() {
     try {
       await cartApi.addItem({ product: product._id, variant: resolvedVariant._id, quantity: qty });
       toast.success("Added to cart!");
+      refreshCart();
     } catch (err) {
       toast.error(err.message || "Could not add to cart");
     } finally {
@@ -243,6 +246,7 @@ export default function PhoneDetails() {
     setCartLoading(true);
     try {
       await cartApi.addItem({ product: product._id, variant: resolvedVariant._id, quantity: qty });
+      refreshCart();
       navigate("/checkout");
     } catch (err) {
       toast.error(err.message || "Could not add to cart");
@@ -263,6 +267,7 @@ export default function PhoneDetails() {
         setInWishlist(true);
         toast.success("Added to wishlist!");
       }
+      refreshWishlist();
     } catch (err) {
       toast.error(err.message || "Wishlist error");
     }
@@ -364,10 +369,10 @@ export default function PhoneDetails() {
       </nav>
 
       {/* ── TOP SECTION ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-8">
 
         {/* ── Image Gallery ── */}
-        <div className="lg:col-span-5">
+        <div className="md:col-span-1 lg:col-span-5">
           <div className="flex gap-3">
             {/* Vertical thumbnails */}
             <div className="flex flex-col gap-2 items-center">
@@ -494,7 +499,7 @@ export default function PhoneDetails() {
         </div>
 
         {/* ── Product Info ── */}
-        <div className="lg:col-span-4 space-y-4">
+        <div className="md:col-span-1 lg:col-span-4 space-y-4">
           {/* Brand + Name */}
           <div>
             <Link
@@ -702,7 +707,8 @@ export default function PhoneDetails() {
         </div>
 
         {/* ── Right Sidebar ── */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="md:col-span-2 lg:col-span-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
           {/* Delivery info card */}
           <div className="border border-gray-200 rounded-xl overflow-hidden">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
@@ -765,6 +771,7 @@ export default function PhoneDetails() {
               </div>
             </div>
           ))}
+          </div>{/* end inner sidebar grid */}
         </div>
       </div>
 
@@ -1012,7 +1019,7 @@ export default function PhoneDetails() {
           <h2 className="text-base font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">
             Related Products
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3">
             {similar.length === 0 ? (
               <p className="text-xs text-gray-400">No related products</p>
             ) : (
