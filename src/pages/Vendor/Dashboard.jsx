@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Alert, Card, Col, Row, Skeleton, Tag, Table, Avatar } from "antd";
+import { Alert, Card, Col, Row, Skeleton, Tag, Table, Avatar, Grid } from "antd";
+
+const { useBreakpoint } = Grid;
 import {
   ShoppingOutlined, ShoppingCartOutlined, DollarOutlined,
   WarningOutlined, ClockCircleOutlined, CheckCircleOutlined, RiseOutlined,
@@ -70,6 +72,7 @@ const SectionTitle = ({ children }) => (
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [vendor, setVendor] = useState(null);
+  const screens = useBreakpoint();
   const [stats, setStats] = useState(null);
   const [topProducts, setTopProducts] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -124,14 +127,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "0 0 40px" }}>
+    <div style={{ background: "#f8fafc", minHeight: "100vh", paddingBottom: 40 }}>
       {/* ── Hero header ── */}
       <div style={{
         background: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)",
-        borderRadius: "0 0 24px 24px",
-        padding: "28px 28px 36px",
-        margin: "-20px -20px 0",
-        marginBottom: -20,
+        borderRadius: 16,
+        padding: screens.md ? "24px 24px 32px" : "16px 16px 24px",
+        marginBottom: 20,
       }}>
         <p style={{ color: "#6ee7b7", fontSize: 12, marginBottom: 4 }}>Seller Portal</p>
         <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: 0 }}>
@@ -149,9 +151,9 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div style={{ padding: "0 20px" }}>
+      <div>
         {vendor && vendor.status !== "approved" && (
-          <div style={{ marginTop: 36, marginBottom: 8 }}>
+          <div style={{ marginBottom: 8 }}>
             <Alert type="warning" showIcon
               message="Your shop is not currently approved"
               description={
@@ -164,7 +166,7 @@ const Dashboard = () => {
         )}
 
         {/* ── KPI Row ── */}
-        <Row gutter={[14, 14]} style={{ marginTop: 34, marginBottom: 16 }}>
+        <Row gutter={[14, 14]} style={{ marginTop: 0, marginBottom: 16 }}>
           <Col xs={24} sm={12} xl={6}>
             <StatCard loading={loading} icon={<RiseOutlined />} label="Total Revenue" color="#f97316"
               value={money(revenue)} sub="Paid orders" />
@@ -186,8 +188,9 @@ const Dashboard = () => {
         {/* ── Charts ── */}
         <Row gutter={[14, 14]} style={{ marginBottom: 16 }}>
           {/* Products by Status */}
-          <Col xs={24} md={12} xl={8}>
-            <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+          <Col xs={24} md={12} xl={8} style={{ display: "flex", flexDirection: "column" }}>
+            <Card bordered={false}
+              style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)", height: "100%" }}
               styles={{ body: { padding: 22 } }}>
               <SectionTitle>Products by Status</SectionTitle>
               {loading ? <Skeleton active /> : productsByStatus.length === 0 ? (
@@ -208,8 +211,9 @@ const Dashboard = () => {
           </Col>
 
           {/* Orders by Status */}
-          <Col xs={24} md={12} xl={8}>
-            <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+          <Col xs={24} md={12} xl={8} style={{ display: "flex", flexDirection: "column" }}>
+            <Card bordered={false}
+              style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)", height: "100%" }}
               styles={{ body: { padding: 22 } }}>
               <SectionTitle>Orders by Status</SectionTitle>
               {loading ? <Skeleton active /> : ordersByStatus.length === 0 ? (
@@ -231,30 +235,102 @@ const Dashboard = () => {
           </Col>
 
           {/* Top Products */}
-          <Col xs={24} xl={8}>
-            <Card bordered={false} title={<span style={{ fontWeight: 700, fontSize: 14 }}>Top Products</span>}
-              style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
-              styles={{ body: { padding: "16px 22px 22px" } }}>
-              {loading ? <Skeleton active /> : topProducts.length === 0 ? (
-                <p style={{ color: "#9ca3af", textAlign: "center", padding: "32px 0" }}>No data yet</p>
+          <Col xs={24} xl={8} style={{ display: "flex", flexDirection: "column" }}>
+            <Card bordered={false}
+              title={
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontWeight: 700, fontSize: 14 }}>Top Products</span>
+                  {topProducts.length > 0 && (
+                    <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 400 }}>
+                      {topProducts.length} items
+                    </span>
+                  )}
+                </div>
+              }
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+              styles={{
+                body: {
+                  padding: "12px 16px 16px",
+                  flex: 1,
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                },
+              }}>
+              {loading ? (
+                <Skeleton active />
+              ) : topProducts.length === 0 ? (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ color: "#9ca3af", fontSize: 13 }}>No data yet</p>
+                </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  paddingRight: 2,
+                }}>
                   {topProducts.map((p, i) => {
                     const max = topProducts[0]?.totalSold || 1;
                     return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <Avatar src={p.thumbnail} size={38} shape="square"
-                          style={{ borderRadius: 8, border: "1px solid #f0f0f0", flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                            <div style={{ flex: 1, height: 4, borderRadius: 99, background: "#f1f5f9" }}>
-                              <div style={{ width: `${((p.totalSold || 0) / max) * 100}%`, height: "100%", borderRadius: 99, background: PALETTE[i % PALETTE.length] }} />
-                            </div>
-                            <span style={{ fontSize: 10, color: "#6b7280", flexShrink: 0 }}>{p.totalSold || 0} sold</span>
-                          </div>
-                          <Tag color={STATUS_COLOR[p.status] || "default"} style={{ borderRadius: 20, fontSize: 10, marginTop: 3 }}>{p.status}</Tag>
+                      <div key={i} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "8px 6px",
+                        borderRadius: 10,
+                        background: i % 2 === 0 ? "#fafafa" : "#fff",
+                        transition: "background 0.15s",
+                      }}>
+                        {/* Rank badge */}
+                        <div style={{
+                          width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                          background: i === 0 ? "#f97316" : i === 1 ? "#8b5cf6" : i === 2 ? "#3b82f6" : "#e5e7eb",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: i < 3 ? "#fff" : "#6b7280", fontSize: 11, fontWeight: 700,
+                        }}>
+                          {i + 1}
                         </div>
+
+                        {/* Thumbnail */}
+                        <Avatar src={p.thumbnail} size={36} shape="square"
+                          style={{ borderRadius: 7, border: "1px solid #f0f0f0", flexShrink: 0, background: "#f9fafb" }} />
+
+                        {/* Info */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{
+                            fontSize: 12, fontWeight: 600, color: "#111827",
+                            margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          }}>{p.name}</p>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
+                            <div style={{ flex: 1, height: 4, borderRadius: 99, background: "#f1f5f9" }}>
+                              <div style={{
+                                width: `${((p.totalSold || 0) / max) * 100}%`,
+                                height: "100%", borderRadius: 99,
+                                background: PALETTE[i % PALETTE.length],
+                                transition: "width 0.4s ease",
+                              }} />
+                            </div>
+                            <span style={{ fontSize: 10, color: "#6b7280", flexShrink: 0, minWidth: 44, textAlign: "right" }}>
+                              {p.totalSold || 0} sold
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status tag */}
+                        <Tag
+                          color={STATUS_COLOR[p.status] || "default"}
+                          style={{ borderRadius: 20, fontSize: 10, margin: 0, flexShrink: 0 }}>
+                          {p.status}
+                        </Tag>
                       </div>
                     );
                   })}

@@ -148,24 +148,16 @@ const DashboardTab = () => {
       </div>
 
       {/* ── KPI Cards ── */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={12} sm={6}>
-          <StatCard icon={<ShoppingOutlined />} label="Total Orders" color="#3b82f6"
-            value={totalOrders} sub="All time" />
-        </Col>
-        <Col xs={12} sm={6}>
-          <StatCard icon={<DollarOutlined />} label="Total Spend" color="#f97316"
-            value={money(totalSpend)} sub="Paid orders" />
-        </Col>
-        <Col xs={12} sm={6}>
-          <StatCard icon={<HeartOutlined />} label="Wishlist" color="#ec4899"
-            value={data?.wishlistCount ?? 0} sub="Saved items" />
-        </Col>
-        <Col xs={12} sm={6}>
-          <StatCard icon={<ShoppingCartOutlined />} label="Cart Items" color="#10b981"
-            value={data?.cartItemCount ?? 0} sub="Ready to buy" />
-        </Col>
-      </Row>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <StatCard icon={<ShoppingOutlined />} label="Total Orders" color="#3b82f6"
+          value={totalOrders} sub="All time" />
+        <StatCard icon={<DollarOutlined />} label="Total Spend" color="#f97316"
+          value={money(totalSpend)} sub="Paid orders" />
+        <StatCard icon={<HeartOutlined />} label="Wishlist" color="#ec4899"
+          value={data?.wishlistCount ?? 0} sub="Saved items" />
+        <StatCard icon={<ShoppingCartOutlined />} label="Cart Items" color="#10b981"
+          value={data?.cartItemCount ?? 0} sub="Ready to buy" />
+      </div>
 
       {/* ── Charts ── */}
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>

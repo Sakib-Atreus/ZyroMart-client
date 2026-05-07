@@ -140,7 +140,7 @@ const OrderHistoryTab = () => {
         title={`Order ${viewing?.orderNumber}`}
         onCancel={() => setViewing(null)}
         footer={null}
-        width={720}
+        width="min(720px, 95vw)"
       >
         {viewing && (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>

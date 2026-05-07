@@ -148,7 +148,7 @@ const MyProducts = () => {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0 }}>My Products</Title>
           <p style={{ color: "#8c8c8c", margin: 0 }}>
@@ -173,21 +173,23 @@ const MyProducts = () => {
       <Card
         title={
           <Space wrap>
-            <Segmented
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { label: "All", value: "all" },
-                { label: "Pending", value: "pending" },
-                { label: "Approved", value: "approved" },
-                { label: "Rejected", value: "rejected" },
-                { label: "Archived", value: "archived" },
-              ]}
-            />
+            <div style={{ overflowX: "auto", paddingBottom: 2 }}>
+              <Segmented
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: "All", value: "all" },
+                  { label: "Pending", value: "pending" },
+                  { label: "Approved", value: "approved" },
+                  { label: "Rejected", value: "rejected" },
+                  { label: "Archived", value: "archived" },
+                ]}
+              />
+            </div>
             <Input.Search
               placeholder="Search name / brand / tag"
               allowClear
-              style={{ width: 260 }}
+              style={{ width: 260, maxWidth: "100%" }}
               onSearch={(v) => {
                 setMeta((m) => ({ ...m, page: 1 }));
                 setSearch(v);

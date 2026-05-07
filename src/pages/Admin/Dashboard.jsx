@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Row, Table, Tag, Skeleton, Avatar } from "antd";
+import { Card, Col, Row, Table, Tag, Skeleton, Avatar, Grid } from "antd";
+
+const { useBreakpoint } = Grid;
 import {
   ShoppingOutlined, ShopOutlined, AppstoreOutlined,
   ShoppingCartOutlined, RiseOutlined, TeamOutlined, TrophyOutlined,
@@ -82,6 +84,7 @@ const SectionTitle = ({ children }) => (
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [d, setD] = useState(null);
+  const screens = useBreakpoint();
 
   useEffect(() => {
     analyticsApi.platform()
@@ -108,24 +111,23 @@ const Dashboard = () => {
   ];
 
   return (
-    <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "0 0 40px" }}>
+    <div style={{ background: "#f8fafc", minHeight: "100vh", paddingBottom: 40 }}>
       {/* ── Hero header ── */}
       <div style={{
         background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)",
-        borderRadius: "0 0 24px 24px",
-        padding: "32px 32px 40px",
-        margin: "-24px -24px 0",
-        marginBottom: -24,
+        borderRadius: 16,
+        padding: screens.md ? "28px 28px 36px" : "20px 16px 28px",
+        marginBottom: 24,
       }}>
         <p style={{ color: "#a5b4fc", fontSize: 13, marginBottom: 4 }}>Admin Portal</p>
-        <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 800, margin: 0 }}>Platform Overview</h1>
+        <h1 style={{ color: "#fff", fontSize: screens.md ? 28 : 22, fontWeight: 800, margin: 0 }}>Platform Overview</h1>
         <p style={{ color: "#c7d2fe", fontSize: 14, marginTop: 6 }}>Real-time snapshot of ZyroMart activity</p>
       </div>
 
-      <div style={{ padding: "0 24px" }}>
+      <div>
 
         {/* ── KPI Cards ── */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24, marginTop: 40 }}>
+        <Row gutter={[16, 16]} style={{ marginBottom: 24, marginTop: 0 }}>
           <Col xs={24} sm={12} xl={6}>
             <StatCard loading={loading} icon={<RiseOutlined />} label="Total Revenue" color="#f97316"
               value={money(revenue)} sub={`${d?.revenue?.paidOrders ?? 0} paid orders`} />
@@ -244,14 +246,18 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        {/* ── Top Vendors ── */}
+        {/* ── Top Vendors & Top Products ── */}
         <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col xs={24} lg={12}>
-            <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
-              styles={{ body: { padding: 24 } }}>
+          {/* Top Vendors */}
+          <Col xs={24} lg={12} style={{ display: "flex", flexDirection: "column" }}>
+            <Card bordered={false}
+              style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)", height: "100%", display: "flex", flexDirection: "column" }}
+              styles={{ body: { padding: 24, flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" } }}>
               <SectionTitle>Top Vendors by Revenue</SectionTitle>
               {loading ? <Skeleton active /> : topVendors.length === 0 ? (
-                <p style={{ color: "#9ca3af", textAlign: "center", padding: "24px 0" }}>No data yet</p>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ color: "#9ca3af" }}>No data yet</p>
+                </div>
               ) : (
                 <>
                   <ResponsiveContainer width="100%" height={200}>
@@ -263,17 +269,38 @@ const Dashboard = () => {
                       <Bar dataKey="revenue" name="Revenue" radius={[6, 6, 0, 0]} fill="#f97316" />
                     </BarChart>
                   </ResponsiveContainer>
-                  <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{
+                    flex: 1,
+                    overflowY: "auto",
+                    marginTop: 16,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    paddingRight: 2,
+                  }}>
                     {topVendors.map((v, i) => {
                       const max = topVendors[0]?.totalRevenue || 1;
                       return (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ width: 22, height: 22, borderRadius: 6, background: PALETTE[i % PALETTE.length], display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                          <span style={{ flex: 1, fontSize: 13, color: "#374151", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{v.shopName || "Unknown"}</span>
+                        <div key={i} style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "6px 6px", borderRadius: 8,
+                          background: i % 2 === 0 ? "#fafafa" : "#fff",
+                        }}>
+                          <span style={{
+                            width: 22, height: 22, borderRadius: 6,
+                            background: i === 0 ? "#f97316" : i === 1 ? "#8b5cf6" : i === 2 ? "#3b82f6" : PALETTE[i % PALETTE.length],
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#fff", fontSize: 11, fontWeight: 700, flexShrink: 0,
+                          }}>{i + 1}</span>
+                          <span style={{ flex: 1, fontSize: 13, color: "#374151", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {v.shopName || "Unknown"}
+                          </span>
                           <div style={{ width: 80, height: 6, borderRadius: 99, background: "#f1f5f9", flexShrink: 0 }}>
                             <div style={{ width: `${(v.totalRevenue / max) * 100}%`, height: "100%", borderRadius: 99, background: PALETTE[i % PALETTE.length] }} />
                           </div>
-                          <span style={{ fontSize: 12, color: "#f97316", fontWeight: 600, width: 90, textAlign: "right", flexShrink: 0 }}>{money(v.totalRevenue)}</span>
+                          <span style={{ fontSize: 12, color: "#f97316", fontWeight: 600, width: 90, textAlign: "right", flexShrink: 0 }}>
+                            {money(v.totalRevenue)}
+                          </span>
                         </div>
                       );
                     })}
@@ -284,30 +311,89 @@ const Dashboard = () => {
           </Col>
 
           {/* ── Top Products ── */}
-          <Col xs={24} lg={12}>
-            <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
-              styles={{ body: { padding: 24 } }}>
-              <SectionTitle>Top Products by Sales</SectionTitle>
-              {loading ? <Skeleton active /> : topProducts.length === 0 ? (
-                <p style={{ color: "#9ca3af", textAlign: "center", padding: "24px 0" }}>No data yet</p>
+          <Col xs={24} lg={12} style={{ display: "flex", flexDirection: "column" }}>
+            <Card bordered={false}
+              title={
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontWeight: 700 }}>Top Products by Sales</span>
+                  {topProducts.length > 0 && (
+                    <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 400 }}>{topProducts.length} items</span>
+                  )}
+                </div>
+              }
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+              styles={{
+                body: {
+                  padding: "12px 16px 16px",
+                  flex: 1,
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                },
+              }}>
+              {loading ? (
+                <Skeleton active />
+              ) : topProducts.length === 0 ? (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ color: "#9ca3af" }}>No data yet</p>
+                </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  paddingRight: 2,
+                }}>
                   {topProducts.map((p, i) => {
                     const max = topProducts[0]?.totalSold || 1;
                     return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div key={i} style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        padding: "8px 6px", borderRadius: 10,
+                        background: i % 2 === 0 ? "#fafafa" : "#fff",
+                      }}>
+                        {/* Rank badge */}
+                        <div style={{
+                          width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                          background: i === 0 ? "#f97316" : i === 1 ? "#8b5cf6" : i === 2 ? "#3b82f6" : "#e5e7eb",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: i < 3 ? "#fff" : "#6b7280", fontSize: 11, fontWeight: 700,
+                        }}>{i + 1}</div>
+
                         <Avatar src={p.thumbnail} size={40} shape="square"
                           style={{ borderRadius: 8, border: "1px solid #f0f0f0", background: "#f9fafb", flexShrink: 0 }} />
+
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
+                          <p style={{
+                            fontSize: 13, fontWeight: 600, color: "#111827",
+                            margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          }}>{p.name}</p>
                           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
                             <div style={{ flex: 1, height: 5, borderRadius: 99, background: "#f1f5f9" }}>
-                              <div style={{ width: `${((p.totalSold || 0) / max) * 100}%`, height: "100%", borderRadius: 99, background: PALETTE[i % PALETTE.length] }} />
+                              <div style={{
+                                width: `${((p.totalSold || 0) / max) * 100}%`,
+                                height: "100%", borderRadius: 99,
+                                background: PALETTE[i % PALETTE.length],
+                                transition: "width 0.4s ease",
+                              }} />
                             </div>
-                            <span style={{ fontSize: 11, color: "#6b7280", flexShrink: 0 }}>{p.totalSold || 0} sold</span>
+                            <span style={{ fontSize: 11, color: "#6b7280", flexShrink: 0, minWidth: 44, textAlign: "right" }}>
+                              {p.totalSold || 0} sold
+                            </span>
                           </div>
                         </div>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#f97316", flexShrink: 0 }}>{money(p.basePrice)}</span>
+
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#f97316", flexShrink: 0 }}>
+                          {money(p.basePrice)}
+                        </span>
                       </div>
                     );
                   })}

@@ -192,7 +192,7 @@ const Vendors = () => {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0 }}>Vendors</Title>
           <p style={{ color: "#8c8c8c", margin: 0 }}>
@@ -237,21 +237,23 @@ const Vendors = () => {
       <Card
         title={
           <Space wrap>
-            <Segmented
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { label: <span>All <Badge count={totalCount} color="#bfbfbf" offset={[4, -2]} /></span>, value: "all" },
-                { label: `Pending (${counts.pending || 0})`, value: "pending" },
-                { label: `Approved (${counts.approved || 0})`, value: "approved" },
-                { label: `Rejected (${counts.rejected || 0})`, value: "rejected" },
-                { label: `Suspended (${counts.suspended || 0})`, value: "suspended" },
-              ]}
-            />
+            <div style={{ overflowX: "auto", paddingBottom: 2 }}>
+              <Segmented
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: <span>All <Badge count={totalCount} color="#bfbfbf" offset={[4, -2]} /></span>, value: "all" },
+                  { label: `Pending (${counts.pending || 0})`, value: "pending" },
+                  { label: `Approved (${counts.approved || 0})`, value: "approved" },
+                  { label: `Rejected (${counts.rejected || 0})`, value: "rejected" },
+                  { label: `Suspended (${counts.suspended || 0})`, value: "suspended" },
+                ]}
+              />
+            </div>
             <Input.Search
               placeholder="Search by shop, email, or slug"
               allowClear
-              style={{ width: 280 }}
+              style={{ width: 280, maxWidth: "100%" }}
               onSearch={setSearchTerm}
             />
           </Space>
@@ -302,7 +304,7 @@ const Vendors = () => {
         onCancel={() => setCreateModal(false)}
         onOk={() => createForm.submit()}
         okText="Create"
-        width={720}
+        width="min(720px, 95vw)"
         destroyOnClose
       >
         <Form form={createForm} layout="vertical" onFinish={handleCreate}>

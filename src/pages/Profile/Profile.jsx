@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { Tabs, Typography } from "antd";
+import { Tabs, Typography, Grid } from "antd";
 import {
   UserOutlined, ShoppingOutlined, LockOutlined, ShopOutlined, DashboardOutlined,
 } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
+
+const { useBreakpoint } = Grid;
 import ProfileInfoTab from "./ProfileInfoTab";
 import OrderHistoryTab from "./OrderHistoryTab";
 import ChangePasswordTab from "./ChangePasswordTab";
@@ -16,6 +18,7 @@ const TAB_KEYS = ["dashboard", "profile", "orders", "password", "vendor"];
 
 const Profile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const screens = useBreakpoint();
   const tab = searchParams.get("tab");
   const activeKey = TAB_KEYS.includes(tab) ? tab : "dashboard";
 
@@ -74,7 +77,7 @@ const Profile = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 16px" }}>
       <Title level={2} style={{ marginBottom: 4 }}>My Account</Title>
       <Paragraph type="secondary" style={{ marginBottom: 24 }}>
         Manage your profile, orders, security, and vendor application.
@@ -84,9 +87,9 @@ const Profile = () => {
         activeKey={activeKey}
         onChange={(key) => setSearchParams({ tab: key })}
         items={items}
-        size="large"
-        tabPosition="left"
-        style={{ minHeight: 500, background: "#fff", padding: 16, borderRadius: 8 }}
+        size={screens.md ? "large" : "middle"}
+        tabPosition={screens.lg ? "left" : "top"}
+        style={{ minHeight: 500, background: "#fff", padding: screens.lg ? 16 : "12px 8px", borderRadius: 8 }}
       />
     </div>
   );

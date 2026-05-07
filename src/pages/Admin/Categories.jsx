@@ -138,7 +138,7 @@ const Categories = () => {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0 }}>Categories</Title>
           <p style={{ color: "#8c8c8c", margin: 0 }}>
@@ -167,7 +167,7 @@ const Categories = () => {
         onCancel={() => setModalOpen(false)}
         onOk={() => form.submit()}
         okText="Save"
-        width={800}
+        width="min(800px, 95vw)"
         destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>

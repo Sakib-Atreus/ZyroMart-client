@@ -22,17 +22,20 @@ const statusColor = {
 const money = (n, ccy = "BDT") =>
   new Intl.NumberFormat(undefined, { style: "currency", currency: ccy }).format(n ?? 0);
 
-// Valid status transitions from current -> next (server-enforced, mirrored here for UX)
+// Status transitions vendors are allowed to make on their orders
 const nextStatusOptions = (current) => {
   switch (current) {
     case "paid":
       return [
         { value: "processing", label: "Processing" },
+        { value: "shipped", label: "Shipped" },
+        { value: "delivered", label: "Delivered" },
         { value: "cancelled", label: "Cancelled" },
       ];
     case "processing":
       return [
         { value: "shipped", label: "Shipped" },
+        { value: "delivered", label: "Delivered" },
         { value: "cancelled", label: "Cancelled" },
       ];
     case "shipped":
@@ -139,18 +142,20 @@ const Orders = () => {
 
       <Card
         title={
-          <Segmented
-            value={statusFilter}
-            onChange={setStatusFilter}
-            options={[
-              { label: "All", value: "all" },
-              { label: "Paid", value: "paid" },
-              { label: "Processing", value: "processing" },
-              { label: "Shipped", value: "shipped" },
-              { label: "Delivered", value: "delivered" },
-              { label: "Cancelled", value: "cancelled" },
-            ]}
-          />
+          <div style={{ overflowX: "auto", paddingBottom: 2 }}>
+            <Segmented
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: "All", value: "all" },
+                { label: "Paid", value: "paid" },
+                { label: "Processing", value: "processing" },
+                { label: "Shipped", value: "shipped" },
+                { label: "Delivered", value: "delivered" },
+                { label: "Cancelled", value: "cancelled" },
+              ]}
+            />
+          </div>
         }
       >
         <Table
@@ -173,7 +178,7 @@ const Orders = () => {
         title={`Order ${viewing?.orderNumber}`}
         onCancel={() => setViewing(null)}
         footer={null}
-        width={720}
+        width="min(720px, 95vw)"
       >
         {viewing && (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>

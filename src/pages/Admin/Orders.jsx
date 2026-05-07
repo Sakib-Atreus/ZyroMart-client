@@ -120,19 +120,21 @@ const Orders = () => {
 
       <Card
         title={
-          <Segmented
-            value={statusFilter}
-            onChange={setStatusFilter}
-            options={[
-              { label: "All", value: "all" },
-              { label: "Pending", value: "pending" },
-              { label: "Paid", value: "paid" },
-              { label: "Processing", value: "processing" },
-              { label: "Shipped", value: "shipped" },
-              { label: "Delivered", value: "delivered" },
-              { label: "Cancelled", value: "cancelled" },
-            ]}
-          />
+          <div style={{ overflowX: "auto", paddingBottom: 2 }}>
+            <Segmented
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: "All", value: "all" },
+                { label: "Pending", value: "pending" },
+                { label: "Paid", value: "paid" },
+                { label: "Processing", value: "processing" },
+                { label: "Shipped", value: "shipped" },
+                { label: "Delivered", value: "delivered" },
+                { label: "Cancelled", value: "cancelled" },
+              ]}
+            />
+          </div>
         }
       >
         <Table
@@ -155,7 +157,7 @@ const Orders = () => {
         title={`Order ${viewing?.orderNumber}`}
         onCancel={() => setViewing(null)}
         footer={null}
-        width={720}
+        width="min(720px, 95vw)"
       >
         {viewing && (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
