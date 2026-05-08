@@ -514,7 +514,7 @@ export default function PhoneDetails() {
               <div className="flex items-center gap-2 mt-2">
                 <StarRating value={product.averageRating} />
                 <span className="text-sm font-semibold text-gray-700">{product.averageRating.toFixed(1)}</span>
-                <span className="text-sm text-gray-400">({product.reviewCount} reviews)</span>
+                <span className="text-sm text-gray-400">({reviews.length} reviews)</span>
                 {product.totalSold > 0 && (
                   <span className="text-xs text-gray-400 ml-1">{product.totalSold.toLocaleString()}+ sold</span>
                 )}
@@ -783,7 +783,7 @@ export default function PhoneDetails() {
             {[
               { key: "specification", label: "Specification" },
               { key: "description", label: "Description" },
-              { key: "reviews", label: `Reviews (${product.reviewCount ?? 0})` },
+              { key: "reviews", label: `Reviews (${reviews.length})` },
               { key: "questions", label: `Q&A (${product.questionCount ?? 0})` },
             ].map((t) => (
               <button
@@ -876,7 +876,14 @@ export default function PhoneDetails() {
               )}
 
               {/* Write review */}
-              {user && (
+              {!user ? (
+                <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                  <span className="text-sm text-gray-600">Want to share your experience?</span>
+                  <Link to="/login" className="text-sm font-semibold text-primary border border-primary px-4 py-1.5 rounded-lg hover:bg-orange-100 transition">
+                    Login to Write a Review
+                  </Link>
+                </div>
+              ) : (
                 <div>
                   {!showReviewForm ? (
                     <button
@@ -936,7 +943,9 @@ export default function PhoneDetails() {
 
               {/* Review list */}
               {reviews.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">No reviews yet. Be the first!</p>
+                <p className="text-sm text-gray-400 text-center py-8">
+                  {user ? "No reviews yet. Be the first!" : "No reviews yet."}
+                </p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((r) => (
@@ -981,14 +990,18 @@ export default function PhoneDetails() {
                   </button>
                 </form>
               ) : (
-                <p className="text-sm text-gray-500">
-                  <Link to="/login" className="text-primary font-semibold hover:underline">Log in</Link>
-                  {" "}to ask a question
-                </p>
+                <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                  <span className="text-sm text-gray-600">Have a question about this product?</span>
+                  <Link to="/login" className="text-sm font-semibold text-primary border border-primary px-4 py-1.5 rounded-lg hover:bg-orange-100 transition">
+                    Login to Ask a Question
+                  </Link>
+                </div>
               )}
 
               {questions.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">No questions yet. Ask away!</p>
+                <p className="text-sm text-gray-400 text-center py-8">
+                  {user ? "No questions yet. Ask away!" : "No questions yet."}
+                </p>
               ) : (
                 <div className="space-y-4">
                   {questions.map((q) => (

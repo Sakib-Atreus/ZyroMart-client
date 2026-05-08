@@ -13,6 +13,7 @@ import {
   Badge,
   Tag,
   Input,
+  InputNumber,
 } from "antd";
 import { FilterOutlined, SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -204,13 +205,21 @@ const Phones = () => {
   const activeCategoryName = categories.find((c) => c._id === category)?.name || "";
   const hasFilters = category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive;
 
+  const applyPriceRange = ([min, max]) => {
+    const next = new URLSearchParams(searchParams);
+    if (min > 0) { next.set("minPrice", min); } else { next.delete("minPrice"); }
+    if (max < 300000) { next.set("maxPrice", max); } else { next.delete("maxPrice"); }
+    next.delete("page");
+    setSearchParams(next);
+  };
+
   const breadcrumbItems = [
     { title: <Link to="/" className="font-semibold">Home</Link> },
     ...(activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">{activeCategoryName}</span> }] : []),
     ...(!activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">All Products</span> }] : []),
   ];
 
-  const Filters = () => (
+  const filterContent = (
     <div className="space-y-6">
       {/* Categories */}
       <div>
@@ -243,18 +252,36 @@ const Phones = () => {
           max={300000}
           value={priceRange}
           onChange={setPriceRange}
-          onChangeComplete={([min, max]) => {
-            const next = new URLSearchParams(searchParams);
-            if (min > 0) { next.set("minPrice", min); } else { next.delete("minPrice"); }
-            if (max < 300000) { next.set("maxPrice", max); } else { next.delete("maxPrice"); }
-            next.delete("page");
-            setSearchParams(next);
-          }}
+          onChangeComplete={applyPriceRange}
           tooltip={{ formatter: (v) => `৳${v.toLocaleString()}` }}
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>৳{priceRange[0].toLocaleString()}</span>
-          <span>৳{priceRange[1].toLocaleString()}</span>
+        <div className="flex gap-2 mt-2">
+          <InputNumber
+            min={0}
+            max={priceRange[1]}
+            value={priceRange[0]}
+            onChange={(val) => val !== null && setPriceRange([val, priceRange[1]])}
+            onBlur={() => applyPriceRange(priceRange)}
+            onPressEnter={() => applyPriceRange(priceRange)}
+            formatter={(v) => `৳${v}`}
+            parser={(v) => v.replace(/৳/g, '')}
+            size="small"
+            className="w-full"
+            placeholder="Min"
+          />
+          <InputNumber
+            min={priceRange[0]}
+            max={300000}
+            value={priceRange[1]}
+            onChange={(val) => val !== null && setPriceRange([priceRange[0], val])}
+            onBlur={() => applyPriceRange(priceRange)}
+            onPressEnter={() => applyPriceRange(priceRange)}
+            formatter={(v) => `৳${v}`}
+            parser={(v) => v.replace(/৳/g, '')}
+            size="small"
+            className="w-full"
+            placeholder="Max"
+          />
         </div>
       </div>
 
@@ -321,7 +348,7 @@ const Phones = () => {
         {/* Sidebar — desktop */}
         <div className="hidden md:block w-56 flex-shrink-0">
           <div className="bg-white rounded-xl border p-4 sticky top-4">
-            <Filters />
+            {filterContent}
           </div>
         </div>
 
@@ -457,7 +484,7 @@ const Phones = () => {
           )
         }
       >
-        <Filters />
+        {filterContent}
       </Drawer>
     </div>
   );
