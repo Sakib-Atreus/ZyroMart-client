@@ -346,67 +346,67 @@ export default function PhoneDetails() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
       {/* Breadcrumb */}
-      <nav className="text-xs text-gray-400 mb-3 flex gap-1 flex-wrap items-center">
-        <Link to="/" className="hover:text-primary">Home</Link>
-        <span>/</span>
+      <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-6 flex-wrap">
+        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         {product.category?.name && (
           <>
-            <Link to={`/phones?category=${product.category._id}`} className="hover:text-primary capitalize">
-              {product.category.name}
-            </Link>
-            <span>/</span>
+            <span className="text-gray-300">›</span>
+            <Link to={`/phones?category=${product.category._id}`} className="hover:text-primary transition-colors capitalize">{product.category.name}</Link>
           </>
         )}
         {product.brand && (
           <>
-            <Link to={`/phones?brand=${product.brand}`} className="hover:text-primary">{product.brand}</Link>
-            <span>/</span>
+            <span className="text-gray-300">›</span>
+            <Link to={`/phones?brand=${product.brand}`} className="hover:text-primary transition-colors">{product.brand}</Link>
           </>
         )}
-        <span className="text-gray-600 line-clamp-1">{product.name}</span>
+        <span className="text-gray-300">›</span>
+        <span className="text-gray-800 font-medium line-clamp-1">{product.name}</span>
       </nav>
 
       {/* ── TOP SECTION ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6 mb-8 sm:mb-10">
 
         {/* ── Image Gallery ── */}
         <div className="md:col-span-1 lg:col-span-5">
           <div className="flex gap-3">
-            {/* Vertical thumbnails */}
-            <div className="flex flex-col gap-2 items-center">
+            {/* Vertical thumbnails — tablet/desktop only */}
+            <div className="hidden md:flex flex-col gap-2 items-center">
               <button
                 onClick={() => setThumbOffset((o) => Math.max(0, o - 1))}
                 disabled={thumbOffset === 0}
-                className="p-1 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-25"
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 disabled:opacity-25 transition"
               >
-                <IoIosArrowUp size={18} />
+                <IoIosArrowUp size={16} />
               </button>
               {allImages.slice(thumbOffset, thumbOffset + THUMBS).map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setMainImage(img)}
-                  className={`w-14 h-14 rounded-lg border-2 overflow-hidden flex-shrink-0 transition-all ${
-                    mainImage === img ? "border-primary shadow-md scale-105" : "border-gray-200 hover:border-gray-400"
+                  className={`w-16 h-16 rounded-xl border-2 overflow-hidden flex-shrink-0 transition-all ${
+                    mainImage === img
+                      ? "border-primary shadow-md ring-2 ring-primary/20"
+                      : "border-gray-200 hover:border-gray-400"
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-contain p-1 bg-white" />
+                  <img src={img} alt="" className="w-full h-full object-contain p-1.5 bg-white" />
                 </button>
               ))}
               <button
                 onClick={() => setThumbOffset((o) => Math.min(allImages.length - THUMBS, o + 1))}
                 disabled={thumbOffset >= allImages.length - THUMBS}
-                className="p-1 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-25"
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 disabled:opacity-25 transition"
               >
-                <IoIosArrowDown size={18} />
+                <IoIosArrowDown size={16} />
               </button>
             </div>
 
             {/* Main image */}
             <div className="flex-1 relative">
               <div
-                className="relative border rounded-xl bg-white overflow-hidden cursor-crosshair"
+                className="relative rounded-2xl bg-white border border-gray-200 overflow-hidden cursor-crosshair shadow-sm"
                 style={{ paddingBottom: "100%" }}
                 onMouseEnter={() => setZoomImage(mainImage)}
                 onMouseMove={(e) => {
@@ -415,33 +415,24 @@ export default function PhoneDetails() {
                 }}
                 onMouseLeave={() => setZoomImage(null)}
               >
-                <img
-                  src={mainImage}
-                  alt={product.name}
-                  className="absolute inset-0 w-full h-full object-contain p-4"
-                />
+                <img src={mainImage} alt={product.name} className="absolute inset-0 w-full h-full object-contain p-6" />
                 {discount > 0 && (
-                  <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
                     -{discount}%
                   </span>
                 )}
                 {product.isOnlineExclusive && (
-                  <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                    Online Exclusive
+                  <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow">
+                    Online Only
                   </span>
                 )}
               </div>
-
-              {/* Zoom preview */}
               {zoomImage && (
-                <div className="absolute left-full top-0 ml-4 w-80 h-80 border-2 border-primary rounded-xl overflow-hidden z-30 shadow-2xl bg-white hidden lg:block">
+                <div className="absolute left-full top-0 ml-4 w-80 h-80 border-2 border-primary rounded-2xl overflow-hidden z-30 shadow-2xl bg-white hidden lg:block">
                   <img
                     src={zoomImage}
                     className="w-full h-full object-contain"
-                    style={{
-                      transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                      transform: "scale(2.5)",
-                    }}
+                    style={{ transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`, transform: "scale(2.5)" }}
                     alt=""
                   />
                 </div>
@@ -450,47 +441,33 @@ export default function PhoneDetails() {
           </div>
 
           {/* Mobile thumbnail strip */}
-          <div className="flex gap-2 mt-3 overflow-x-auto lg:hidden">
+          <div className="flex gap-2 mt-3 overflow-x-auto md:hidden pb-1">
             {allImages.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setMainImage(img)}
-                className={`w-14 h-14 flex-shrink-0 rounded-lg border-2 overflow-hidden ${mainImage === img ? "border-primary" : "border-gray-200"}`}
+                className={`w-16 h-16 flex-shrink-0 rounded-xl border-2 overflow-hidden transition-all ${mainImage === img ? "border-primary shadow-sm" : "border-gray-200"}`}
               >
-                <img src={img} alt="" className="w-full h-full object-contain p-1 bg-white" />
+                <img src={img} alt="" className="w-full h-full object-contain p-1.5 bg-white" />
               </button>
             ))}
           </div>
 
           {/* Share row */}
-          <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-            <button
-              onClick={() => setShowShare(!showShare)}
-              className="flex items-center gap-1 hover:text-primary transition"
-            >
-              <TiArrowForwardOutline size={18} /> Share
+          <div className="mt-4 flex items-center gap-4">
+            <button onClick={() => setShowShare(!showShare)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary transition-colors font-medium">
+              <TiArrowForwardOutline size={17} /> Share
             </button>
             {showShare && (
               <div className="flex items-center gap-3">
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="text-blue-600 hover:scale-110 transition"
-                >
+                <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:scale-110 transition-transform">
                   <FaFacebook size={20} />
                 </a>
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(product.name + " " + window.location.href)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="text-green-600 hover:scale-110 transition"
-                >
+                <a href={`https://wa.me/?text=${encodeURIComponent(product.name + " " + window.location.href)}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:scale-110 transition-transform">
                   <FaWhatsapp size={20} />
                 </a>
-                <button
-                  onClick={handleCopyLink}
-                  className={`flex items-center gap-1 text-xs ${copied ? "text-green-600" : "text-gray-500 hover:text-primary"}`}
-                >
-                  {copied ? <FiCheck size={14} /> : <FaLink size={14} />}
+                <button onClick={handleCopyLink} className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition ${copied ? "text-green-600 border-green-300 bg-green-50" : "text-gray-500 border-gray-200 hover:border-primary hover:text-primary"}`}>
+                  {copied ? <FiCheck size={13} /> : <FaLink size={13} />}
                   {copied ? "Copied!" : "Copy link"}
                 </button>
               </div>
@@ -499,67 +476,68 @@ export default function PhoneDetails() {
         </div>
 
         {/* ── Product Info ── */}
-        <div className="md:col-span-1 lg:col-span-4 space-y-4">
-          {/* Brand + Name */}
+        <div className="md:col-span-1 lg:col-span-4 space-y-5">
+          {/* Brand badge + name */}
           <div>
-            <Link
-              to={`/phones?brand=${product.brand}`}
-              className="inline-block text-xs font-semibold text-primary uppercase tracking-widest mb-1 hover:underline"
-            >
+            <Link to={`/phones?brand=${product.brand}`} className="inline-flex items-center bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2 hover:bg-primary/20 transition">
               {product.brand}
             </Link>
-            <h1 className="text-xl font-bold text-gray-900 leading-tight">{product.name}</h1>
-
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-snug">{product.name}</h1>
             {product.averageRating > 0 && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <StarRating value={product.averageRating} />
-                <span className="text-sm font-semibold text-gray-700">{product.averageRating.toFixed(1)}</span>
-                <span className="text-sm text-gray-400">({reviews.length} reviews)</span>
+                <span className="text-sm font-bold text-gray-700">{product.averageRating.toFixed(1)}</span>
+                <button onClick={() => setActiveTab("reviews")} className="text-sm text-primary hover:underline">
+                  ({reviews.length} reviews)
+                </button>
                 {product.totalSold > 0 && (
-                  <span className="text-xs text-gray-400 ml-1">{product.totalSold.toLocaleString()}+ sold</span>
+                  <>
+                    <span className="text-gray-300">·</span>
+                    <span className="text-sm text-gray-400">{product.totalSold.toLocaleString()}+ sold</span>
+                  </>
                 )}
               </div>
             )}
           </div>
 
-          {/* Price */}
-          <div className="flex items-end gap-3 flex-wrap">
-            <span className="text-3xl font-bold text-primary">{money(price)}</span>
-            {comparePrice && comparePrice > price && (
-              <span className="text-base text-gray-400 line-through">{money(comparePrice)}</span>
-            )}
-            {discount > 0 && (
-              <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">
-                {discount}% OFF
-              </span>
+          {/* Price block */}
+          <div className="bg-orange-50 rounded-xl px-4 py-3 border border-orange-100">
+            <div className="flex items-baseline gap-2.5 flex-wrap">
+              <span className="text-xl font-bold text-primary tracking-tight">{money(price)}</span>
+              {comparePrice && comparePrice > price && (
+                <span className="text-sm text-gray-400 line-through">{money(comparePrice)}</span>
+              )}
+              {discount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {discount}% OFF
+                </span>
+              )}
+            </div>
+            {emiMonthly && (
+              <p className="text-xs text-gray-500 mt-1">
+                or <span className="font-bold text-primary">{money(emiMonthly)}/mo</span>
+                <span className="ml-1">for {emiMonths} months</span>
+              </p>
             )}
           </div>
 
-          {/* EMI */}
+          {/* EMI options */}
           {(product.emiOptions ?? []).length > 0 && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <p className="text-xs font-semibold text-gray-700 mb-2">💳 EMI Available</p>
-              <div className="flex flex-wrap gap-2">
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1.5">💳 EMI Options</p>
+              <div className="flex flex-wrap gap-1.5">
                 {product.emiOptions.map((opt) => (
                   <button
                     key={opt.months}
                     onClick={() => setEmiMonths(emiMonths === opt.months ? null : opt.months)}
-                    className={`text-xs px-3 py-1.5 border rounded-full font-medium transition ${
-                      emiMonths === opt.months
-                        ? "border-primary bg-primary text-white"
-                        : "border-orange-300 text-orange-700 hover:border-primary"
+                    className={`text-xs px-2.5 py-1 border rounded-full font-semibold transition-all ${
+                      emiMonths === opt.months ? "border-primary bg-primary text-white shadow-sm" : "border-gray-300 text-gray-500 hover:border-primary hover:text-primary"
                     }`}
                   >
                     {opt.months} months
                   </button>
                 ))}
               </div>
-              {emiMonthly && (
-                <p className="text-sm font-bold text-primary mt-2">
-                  ≈ {money(emiMonthly)} / month
-                  <span className="text-xs font-normal text-gray-500 ml-1">for {emiMonths} months</span>
-                </p>
-              )}
             </div>
           )}
 
@@ -568,9 +546,8 @@ export default function PhoneDetails() {
             const isColor = opt.key.toLowerCase() === "color";
             return (
               <div key={opt.key}>
-                <p className="text-sm font-semibold text-gray-700 mb-2">
-                  {opt.label}:
-                  <span className="text-primary font-semibold ml-1">{selectedOptions[opt.key]}</span>
+                <p className="text-sm font-semibold text-gray-700 mb-2.5">
+                  {opt.label}: <span className="text-primary">{selectedOptions[opt.key]}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {opt.values.map((val) => {
@@ -581,43 +558,26 @@ export default function PhoneDetails() {
                     });
                     const hasStock = matchingVariants.some((v) => (v.stock ?? 0) - (v.reservedStock ?? 0) > 0);
                     const isSelected = selectedOptions[opt.key] === val;
-
                     if (isColor) {
                       const hex = getSwatchColor(val);
                       const light = isLightColor(hex);
                       return (
                         <button
-                          key={val}
-                          title={val}
+                          key={val} title={val}
                           onClick={() => handleOptionSelect(opt.key, val)}
-                          className={`relative w-8 h-8 rounded-full border-2 transition-all ${
-                            isSelected ? "border-primary scale-110 shadow-md" : "border-transparent hover:scale-105"
-                          } ${!hasStock ? "opacity-40" : ""}`}
+                          className={`relative w-9 h-9 rounded-full border-2 transition-all ${isSelected ? "border-primary scale-110 shadow-lg ring-2 ring-primary/20" : "border-transparent hover:scale-105 hover:shadow-md"} ${!hasStock ? "opacity-40" : ""}`}
                           style={{ background: hex }}
                         >
-                          {isSelected && (
-                            <span className={`absolute inset-0 flex items-center justify-center text-xs font-bold ${light ? "text-gray-800" : "text-white"}`}>
-                              ✓
-                            </span>
-                          )}
-                          {!hasStock && (
-                            <span className="absolute inset-0 flex items-center justify-center">
-                              <span className="block w-full h-px bg-gray-400 rotate-45 absolute" />
-                            </span>
-                          )}
+                          {isSelected && <span className={`absolute inset-0 flex items-center justify-center text-xs font-bold ${light ? "text-gray-800" : "text-white"}`}>✓</span>}
+                          {!hasStock && <span className="absolute inset-0 flex items-center justify-center"><span className="block w-full h-px bg-gray-400 rotate-45 absolute" /></span>}
                         </button>
                       );
                     }
-
                     return (
                       <button
                         key={val}
                         onClick={() => handleOptionSelect(opt.key, val)}
-                        className={`px-3 py-1.5 text-xs border rounded-lg font-medium transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary text-white shadow-sm"
-                            : "border-gray-300 text-gray-700 hover:border-primary hover:text-primary"
-                        } ${!hasStock ? "opacity-40 line-through" : ""}`}
+                        className={`px-3.5 py-1.5 text-xs border rounded-lg font-semibold transition-all ${isSelected ? "border-primary bg-primary text-white shadow-sm" : "border-gray-300 text-gray-600 hover:border-primary hover:text-primary"} ${!hasStock ? "opacity-40 line-through" : ""}`}
                       >
                         {val}
                       </button>
@@ -630,102 +590,87 @@ export default function PhoneDetails() {
 
           {/* Stock status */}
           {resolvedVariant ? (
-            <p className={`text-sm font-semibold flex items-center gap-1 ${available > 0 ? "text-green-600" : "text-red-500"}`}>
-              {available > 0 ? (
-                <><FiCheck size={14} /> In Stock{available <= 10 && ` — Only ${available} left!`}</>
-              ) : (
-                "Out of Stock"
-              )}
-            </p>
+            <div className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full ${available > 0 ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+              {available > 0 ? <><FiCheck size={14} /> In Stock{available <= 10 && <span className="font-normal ml-1">— Only {available} left!</span>}</> : "Out of Stock"}
+            </div>
           ) : product.hasVariants ? (
-            <p className="text-xs text-amber-600">Select all options to check availability</p>
+            <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full inline-block">Select options to check availability</p>
           ) : null}
 
-          {/* Qty */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 font-medium">Qty:</span>
-            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 text-xl font-bold border-r border-gray-300"
-              >−</button>
-              <span className="w-12 text-center font-semibold text-gray-800">{qty}</span>
-              <button
-                onClick={() => setQty((q) => Math.min(available || 99, q + 1))}
-                disabled={qty >= available && available > 0}
-                className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 text-xl font-bold border-l border-gray-300 disabled:opacity-30"
-              >+</button>
+          {/* Qty + CTA */}
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600 font-semibold">Quantity</span>
+              <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 text-xl font-bold border-r border-gray-300 transition">−</button>
+                <span className="w-12 text-center font-bold text-gray-800">{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(available || 99, q + 1))} disabled={qty >= available && available > 0} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 text-xl font-bold border-l border-gray-300 disabled:opacity-30 transition">+</button>
+              </div>
             </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAddToCart}
+                disabled={cartLoading || available < 1}
+                className="flex-1 flex items-center justify-center gap-2 bg-white text-primary border-2 border-primary font-bold py-3.5 rounded-xl hover:bg-orange-50 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <FiShoppingCart size={18} />
+                {cartLoading ? "Adding…" : "Add to Cart"}
+              </button>
+              <button
+                onClick={handleBuyNow}
+                disabled={cartLoading || available < 1}
+                className="flex-1 flex items-center justify-center bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-md shadow-primary/25"
+              >
+                Buy Now
+              </button>
+            </div>
+            <button
+              onClick={handleWishlist}
+              className={`w-full flex items-center justify-center gap-2 text-sm py-2.5 border-2 rounded-xl font-semibold transition-all ${inWishlist ? "border-red-400 text-red-500 bg-red-50 hover:bg-red-100" : "border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-400 hover:bg-red-50"}`}
+            >
+              <FiHeart size={16} className={inWishlist ? "fill-red-400" : ""} />
+              {inWishlist ? "Saved to Wishlist" : "Add to Wishlist"}
+            </button>
           </div>
 
-          {/* CTA buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleAddToCart}
-              disabled={cartLoading || available < 1}
-              className="flex-1 flex items-center justify-center gap-2 bg-white text-primary border-2 border-primary font-bold py-3 rounded-xl hover:bg-orange-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <FiShoppingCart size={18} />
-              {cartLoading ? "Adding…" : "Add to Cart"}
-            </button>
-            <button
-              onClick={handleBuyNow}
-              disabled={cartLoading || available < 1}
-              className="flex-1 flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Buy Now
-            </button>
-          </div>
-
-          {/* Wishlist */}
-          <button
-            onClick={handleWishlist}
-            className={`w-full flex items-center justify-center gap-2 text-sm py-2.5 border-2 rounded-xl font-semibold transition ${
-              inWishlist
-                ? "border-red-400 text-red-500 bg-red-50 hover:bg-red-100"
-                : "border-gray-300 text-gray-600 hover:border-red-300 hover:text-red-400"
-            }`}
-          >
-            <FiHeart size={16} className={inWishlist ? "fill-red-400" : ""} />
-            {inWishlist ? "Saved in Wishlist" : "Add to Wishlist"}
-          </button>
-
-          {/* Key highlights */}
+          {/* Short description */}
           {product.shortDescription && (
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="border-t border-gray-100 pt-4">
               <p className="text-sm text-gray-600 leading-relaxed">{product.shortDescription}</p>
             </div>
           )}
 
-          {/* Warranty */}
+          {/* Warranty badge */}
           {product.warranty && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <FiShield size={15} className="text-green-500 flex-shrink-0" />
-              {product.warranty}
+            <div className="inline-flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+              <FiShield size={15} className="text-green-600 flex-shrink-0" />
+              <span className="font-medium">{product.warranty}</span>
             </div>
           )}
         </div>
 
         {/* ── Right Sidebar ── */}
         <div className="md:col-span-2 lg:col-span-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
           {/* Delivery info card */}
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-              <p className="text-sm font-semibold text-gray-800">Delivery & Service</p>
+              <p className="text-sm font-bold text-gray-800">Delivery & Services</p>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 bg-white">
               {[
-                { icon: FiTruck, label: "Standard Delivery", sub: "3-5 business days · FREE over ৳3000" },
-                { icon: FiPackage, label: "Express Delivery", sub: "1-2 business days · ৳150" },
+                { icon: FiTruck, label: "Standard Delivery", sub: "3–5 business days · FREE over ৳3000" },
+                { icon: FiPackage, label: "Express Delivery", sub: "1–2 business days · ৳150" },
                 { icon: FiRefreshCw, label: "7-Day Returns", sub: "Hassle-free return policy" },
                 { icon: FiShield, label: "Official Warranty", sub: product.warranty || "Manufacturer warranty included" },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex gap-3 px-4 py-3 items-start">
-                  <Icon size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Icon size={15} className="text-primary" />
+                  </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-800">{label}</p>
-                    <p className="text-xs text-gray-400 leading-snug">{sub}</p>
+                    <p className="text-xs font-bold text-gray-800">{label}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 leading-snug">{sub}</p>
                   </div>
                 </div>
               ))}
@@ -734,18 +679,18 @@ export default function PhoneDetails() {
 
           {/* Seller card */}
           {product.vendor && (
-            <div className="border border-gray-200 rounded-xl p-4 space-y-3">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Sold by</p>
+            <div className="border border-gray-200 rounded-2xl p-4 bg-white shadow-sm space-y-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Sold by</p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-extrabold text-lg flex-shrink-0">
                   {(product.vendor.shopName ?? "V").charAt(0)}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">{product.vendor.shopName}</p>
+                  <p className="text-sm font-bold text-gray-800">{product.vendor.shopName}</p>
                   {product.vendor.rating > 0 && (
                     <div className="flex items-center gap-1 mt-0.5">
                       <StarRating value={product.vendor.rating} />
-                      <span className="text-xs text-gray-500">{product.vendor.rating.toFixed(1)}</span>
+                      <span className="text-xs text-gray-500 font-medium">{product.vendor.rating.toFixed(1)}</span>
                     </div>
                   )}
                 </div>
@@ -755,15 +700,15 @@ export default function PhoneDetails() {
 
           {/* Key specs quick-view */}
           {Object.entries(specGroups).slice(0, 1).map(([group, specs]) => (
-            <div key={group} className="border border-gray-200 rounded-xl overflow-hidden">
-              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{group}</p>
+            <div key={group} className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{group}</p>
               </div>
-              <div className="divide-y divide-gray-100">
-                {specs.slice(0, 5).map(({ label, value, unit }) => (
-                  <div key={label} className="flex justify-between px-4 py-2 text-xs">
-                    <span className="text-gray-500">{label}</span>
-                    <span className="text-gray-800 font-medium text-right max-w-[55%] leading-snug">
+              <div className="divide-y divide-gray-100 bg-white">
+                {specs.slice(0, 5).map(({ label, value, unit }, idx) => (
+                  <div key={label} className={`flex justify-between px-4 py-2.5 text-xs ${idx % 2 === 1 ? "bg-gray-50/60" : ""}`}>
+                    <span className="text-gray-500 font-medium">{label}</span>
+                    <span className="text-gray-800 font-semibold text-right max-w-[55%] leading-snug">
                       {String(value)}{unit ? ` ${unit}` : ""}
                     </span>
                   </div>
@@ -776,23 +721,21 @@ export default function PhoneDetails() {
       </div>
 
       {/* ── TABS SECTION ── */}
-      <div className="grid lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3">
-          {/* Tab nav */}
-          <div className="flex overflow-x-auto gap-0 border-b mb-6">
+      <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="lg:col-span-3 min-w-0 overflow-hidden">
+          {/* Tab nav — pill style */}
+          <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 overflow-x-auto">
             {[
-              { key: "specification", label: "Specification" },
+              { key: "specification", label: "Spec" },
               { key: "description", label: "Description" },
               { key: "reviews", label: `Reviews (${reviews.length})` },
-              { key: "questions", label: `Q&A (${product.questionCount ?? 0})` },
+              { key: "questions", label: `Q&A (${questions.length})` },
             ].map((t) => (
               <button
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
-                className={`px-5 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
-                  activeTab === t.key
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-800"
+                className={`flex-1 min-w-max px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
+                  activeTab === t.key ? "bg-white text-primary shadow-sm" : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {t.label}
@@ -802,22 +745,20 @@ export default function PhoneDetails() {
 
           {/* ── Specification tab ── */}
           {activeTab === "specification" && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {Object.keys(specGroups).length === 0 ? (
-                <p className="text-sm text-gray-400">No specifications available.</p>
+                <p className="text-sm text-gray-400 text-center py-12">No specifications available.</p>
               ) : (
                 Object.entries(specGroups).map(([group, specs]) => (
-                  <div key={group} className="border border-gray-200 rounded-xl overflow-hidden">
-                    <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
+                  <div key={group} className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="bg-gray-50 px-5 py-3.5 border-b border-gray-200">
                       <h3 className="text-sm font-bold text-gray-700">{group}</h3>
                     </div>
-                    <div className="divide-y divide-gray-100">
-                      {specs.map(({ key, label, value, unit }) => (
-                        <div key={key} className="grid grid-cols-5 px-5 py-3 text-sm hover:bg-gray-50 transition">
-                          <span className="col-span-2 text-gray-500 font-medium">{label}</span>
-                          <span className="col-span-3 text-gray-800">
-                            {String(value)}{unit ? ` ${unit}` : ""}
-                          </span>
+                    <div className="divide-y divide-gray-100 bg-white">
+                      {specs.map(({ key, label, value, unit }, idx) => (
+                        <div key={key} className={`flex flex-col sm:grid sm:grid-cols-5 px-4 sm:px-5 py-3 gap-0.5 sm:gap-0 ${idx % 2 === 1 ? "bg-gray-50/50" : ""}`}>
+                          <span className="sm:col-span-2 text-gray-500 font-medium text-xs sm:text-sm">{label}</span>
+                          <span className="sm:col-span-3 text-gray-800 font-medium text-xs sm:text-sm break-words min-w-0">{String(value)}{unit ? ` ${unit}` : ""}</span>
                         </div>
                       ))}
                     </div>
@@ -829,17 +770,18 @@ export default function PhoneDetails() {
 
           {/* ── Description tab ── */}
           {activeTab === "description" && (
-            <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-3">
-              {product.description
-                ? product.description.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-sm leading-7 text-gray-600">{para}</p>
-                  ))
-                : <p className="text-sm text-gray-400">No description available.</p>}
-
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div className="space-y-4">
+                {product.description
+                  ? product.description.split("\n\n").map((para, i) => (
+                      <p key={i} className="text-sm leading-7 text-gray-600">{para}</p>
+                    ))
+                  : <p className="text-sm text-gray-400">No description available.</p>}
+              </div>
               {product.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+                <div className="flex flex-wrap gap-2 pt-5 mt-5 border-t border-gray-100">
                   {product.tags.map((tag) => (
-                    <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">#{tag}</span>
+                    <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium">#{tag}</span>
                   ))}
                 </div>
               )}
@@ -849,33 +791,30 @@ export default function PhoneDetails() {
           {/* ── Reviews tab ── */}
           {activeTab === "reviews" && (
             <div className="space-y-6">
-              {/* Rating summary */}
               {reviews.length > 0 && (
-                <div className="flex flex-col sm:flex-row gap-8 p-5 bg-gray-50 rounded-xl border border-gray-200">
-                  <div className="text-center flex-shrink-0">
-                    <div className="text-5xl font-bold text-primary">{product.averageRating.toFixed(1)}</div>
-                    <StarRating value={product.averageRating} size="lg" />
-                    <p className="text-xs text-gray-400 mt-1">{reviews.length} reviews</p>
-                  </div>
-                  <div className="flex-1 space-y-1.5">
-                    {ratingBreakdown.map(({ star, count }) => (
-                      <div key={star} className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-600 w-4 text-right">{star}</span>
-                        <FaStar size={10} className="text-yellow-400" />
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full bg-yellow-400 rounded-full transition-all"
-                            style={{ width: reviews.length ? `${(count / reviews.length) * 100}%` : "0%" }}
-                          />
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row gap-8">
+                    <div className="text-center flex-shrink-0">
+                      <div className="text-6xl font-extrabold text-primary tracking-tight">{product.averageRating.toFixed(1)}</div>
+                      <StarRating value={product.averageRating} size="lg" />
+                      <p className="text-xs text-gray-400 mt-1.5">{reviews.length} reviews</p>
+                    </div>
+                    <div className="flex-1 space-y-2 justify-center flex flex-col">
+                      {ratingBreakdown.map(({ star, count }) => (
+                        <div key={star} className="flex items-center gap-2.5 text-xs">
+                          <span className="text-gray-600 font-medium w-3">{star}</span>
+                          <FaStar size={11} className="text-yellow-400 flex-shrink-0" />
+                          <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div className="h-full bg-yellow-400 rounded-full transition-all" style={{ width: reviews.length ? `${(count / reviews.length) * 100}%` : "0%" }} />
+                          </div>
+                          <span className="text-gray-400 w-5 text-right">{count}</span>
                         </div>
-                        <span className="text-gray-400 w-6">{count}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Write review */}
               {!user ? (
                 <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-xl">
                   <span className="text-sm text-gray-600">Want to share your experience?</span>
@@ -886,83 +825,63 @@ export default function PhoneDetails() {
               ) : (
                 <div>
                   {!showReviewForm ? (
-                    <button
-                      onClick={() => setShowReviewForm(true)}
-                      className="text-sm text-primary font-semibold border border-primary px-4 py-2 rounded-lg hover:bg-orange-50 transition"
-                    >
+                    <button onClick={() => setShowReviewForm(true)} className="text-sm text-primary font-bold border-2 border-primary px-5 py-2.5 rounded-xl hover:bg-orange-50 transition-all">
                       {myReview ? "Edit your review" : "Write a Review"}
                     </button>
                   ) : (
-                    <form onSubmit={handleSubmitReview} className="border border-gray-200 rounded-xl p-5 space-y-4 bg-white">
-                      <h3 className="font-semibold text-gray-800">{myReview ? "Update Review" : "Write a Review"}</h3>
-                      <div>
-                        <p className="text-sm text-gray-600 mb-2">Rating</p>
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <button
-                              key={s}
-                              type="button"
-                              onClick={() => setReviewForm((f) => ({ ...f, rating: s }))}
-                              className="text-2xl transition-transform hover:scale-110"
-                            >
-                              {s <= reviewForm.rating
-                                ? <FaStar className="text-yellow-400" />
-                                : <FaRegStar className="text-gray-300" />}
-                            </button>
-                          ))}
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+                      <h3 className="font-bold text-gray-800 text-base">{myReview ? "Update Review" : "Write a Review"}</h3>
+                      <form onSubmit={handleSubmitReview} className="space-y-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600 mb-2">Your Rating</p>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <button key={s} type="button" onClick={() => setReviewForm((f) => ({ ...f, rating: s }))} className="text-3xl transition-transform hover:scale-125">
+                                {s <= reviewForm.rating ? <FaStar className="text-yellow-400" /> : <FaRegStar className="text-gray-300" />}
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      <textarea
-                        value={reviewForm.comment}
-                        onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
-                        placeholder="Share your experience with this product…"
-                        className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-primary transition bg-white"
-                        rows={4}
-                        required
-                      />
-                      <div className="flex gap-3">
-                        <button
-                          type="submit"
-                          disabled={reviewLoading}
-                          className="bg-primary text-white px-5 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition disabled:opacity-60"
-                        >
-                          {reviewLoading ? "Saving…" : "Submit Review"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowReviewForm(false)}
-                          className="border border-gray-300 text-gray-600 px-5 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
+                        <textarea
+                          value={reviewForm.comment}
+                          onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
+                          placeholder="Share your experience with this product…"
+                          className="w-full border border-gray-200 rounded-xl p-4 text-sm resize-none focus:outline-none focus:border-primary transition bg-gray-50"
+                          rows={4} required
+                        />
+                        <div className="flex gap-3">
+                          <button type="submit" disabled={reviewLoading} className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition disabled:opacity-60 shadow-sm">
+                            {reviewLoading ? "Saving…" : "Submit Review"}
+                          </button>
+                          <button type="button" onClick={() => setShowReviewForm(false)} className="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition">
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   )}
                 </div>
               )}
 
-              {/* Review list */}
               {reviews.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">
-                  {user ? "No reviews yet. Be the first!" : "No reviews yet."}
-                </p>
+                <p className="text-sm text-gray-400 text-center py-12">{user ? "No reviews yet. Be the first!" : "No reviews yet."}</p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((r) => (
-                    <div key={r._id} className="border border-gray-200 rounded-xl p-5 bg-white space-y-2">
-                      <div className="flex items-center justify-between">
+                    <div key={r._id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                      <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-400 flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0">
                             {(r.user?.name ?? "U").charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-800">{r.user?.name ?? "Anonymous"}</p>
-                            <p className="text-xs text-gray-400">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}</p>
+                            <p className="text-sm font-bold text-gray-800">{r.user?.name ?? "Anonymous"}</p>
+                            <p className="text-xs text-gray-400">{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-BD", { year: "numeric", month: "short", day: "numeric" }) : ""}</p>
                           </div>
                         </div>
                         <StarRating value={r.rating} />
                       </div>
-                      {r.comment && <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>}
+                      {r.comment && <p className="text-sm text-gray-600 leading-relaxed mt-3">{r.comment}</p>}
                     </div>
                   ))}
                 </div>
@@ -979,13 +898,9 @@ export default function PhoneDetails() {
                     value={qForm}
                     onChange={(e) => setQForm(e.target.value)}
                     placeholder="Ask a question about this product…"
-                    className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary transition bg-white"
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition bg-white shadow-sm"
                   />
-                  <button
-                    type="submit"
-                    disabled={qLoading || !qForm.trim()}
-                    className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 disabled:opacity-60 transition"
-                  >
+                  <button type="submit" disabled={qLoading || !qForm.trim()} className="bg-primary text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-60 transition shadow-sm">
                     {qLoading ? "…" : "Ask"}
                   </button>
                 </form>
@@ -999,25 +914,23 @@ export default function PhoneDetails() {
               )}
 
               {questions.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">
-                  {user ? "No questions yet. Ask away!" : "No questions yet."}
-                </p>
+                <p className="text-sm text-gray-400 text-center py-12">{user ? "No questions yet. Ask away!" : "No questions yet."}</p>
               ) : (
                 <div className="space-y-4">
                   {questions.map((q) => (
-                    <div key={q._id} className="border border-gray-200 rounded-xl p-5 space-y-3 bg-white">
-                      <div className="flex gap-3">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold flex-shrink-0">Q</span>
-                        <p className="text-sm font-medium text-gray-800">{q.question}</p>
+                    <div key={q._id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-3">
+                      <div className="flex gap-3 items-start">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-white text-xs font-extrabold flex-shrink-0 mt-0.5">Q</span>
+                        <p className="text-sm font-semibold text-gray-800 pt-0.5">{q.question}</p>
                       </div>
                       {q.answer && (
-                        <div className="flex gap-3 pl-2 border-l-2 border-primary ml-3">
-                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-700 text-xs font-bold flex-shrink-0">A</span>
-                          <p className="text-sm text-gray-600">{q.answer}</p>
+                        <div className="flex gap-3 items-start ml-2 pl-3 border-l-2 border-green-300">
+                          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-green-100 text-green-700 text-xs font-extrabold flex-shrink-0 mt-0.5">A</span>
+                          <p className="text-sm text-gray-600 pt-0.5">{q.answer}</p>
                         </div>
                       )}
-                      <p className="text-xs text-gray-400 ml-9">
-                        {q.user?.name ?? "User"} · {q.createdAt ? new Date(q.createdAt).toLocaleDateString() : ""}
+                      <p className="text-xs text-gray-400 ml-10">
+                        {q.user?.name ?? "User"} · {q.createdAt ? new Date(q.createdAt).toLocaleDateString("en-BD", { year: "numeric", month: "short", day: "numeric" }) : ""}
                       </p>
                     </div>
                   ))}
@@ -1028,11 +941,12 @@ export default function PhoneDetails() {
         </div>
 
         {/* ── Similar Products ── */}
-        <div className="lg:col-span-1">
-          <h2 className="text-base font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+        <div className="lg:col-span-1 min-w-0">
+          <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="w-1 h-4 bg-primary rounded-full inline-block" />
             Related Products
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             {similar.length === 0 ? (
               <p className="text-xs text-gray-400">No related products</p>
             ) : (
@@ -1040,14 +954,10 @@ export default function PhoneDetails() {
                 <Link
                   key={p._id}
                   to={`/products/${p.slug}`}
-                  className="flex gap-3 items-start p-3 border border-gray-200 rounded-xl hover:border-primary hover:shadow-sm transition group"
+                  className="flex gap-2 items-center p-2.5 bg-white border border-gray-200 rounded-2xl hover:border-primary hover:shadow-md transition-all group overflow-hidden"
                 >
-                  <img
-                    src={p.thumbnail}
-                    alt={p.name}
-                    className="w-14 h-14 object-contain rounded-lg border border-gray-100 bg-white p-1 flex-shrink-0"
-                  />
-                  <div className="min-w-0">
+                  <img src={p.thumbnail} alt={p.name} className="w-12 h-12 object-contain rounded-xl border border-gray-100 bg-gray-50 p-1 flex-shrink-0" />
+                  <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-xs font-semibold text-gray-800 group-hover:text-primary transition line-clamp-2 leading-snug">
                       {p.name}
                     </p>
