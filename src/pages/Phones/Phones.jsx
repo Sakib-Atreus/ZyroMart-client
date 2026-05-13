@@ -424,7 +424,7 @@ const Phones = () => {
 
           {/* Products grid */}
           {loading ? (
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
               {Array.from({ length: 12 }).map((_, i) => <ProductSkeleton key={i} />)}
             </div>
           ) : products.length === 0 ? (
@@ -443,7 +443,7 @@ const Phones = () => {
               />
             </div>
           ) : (
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
               {products.map((p) => <ProductCard key={p._id} product={p} />)}
             </div>
           )}

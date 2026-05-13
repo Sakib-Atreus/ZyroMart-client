@@ -76,7 +76,7 @@ const Cart = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="space-y-6 col-span-2">
+          <div className="space-y-6 md:col-span-2">
             {cart.items.map((item) => {
               const product = item.product;
               const variant = item.variant;
@@ -87,15 +87,16 @@ const Cart = () => {
               return (
                 <div
                   key={variant?._id ?? item._id}
-                  className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                  className="p-4 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                 >
-                  <div className="flex items-center space-x-4">
+                  {/* Row 1: image + product info */}
+                  <div className="flex items-start gap-3">
                     <img
                       src={product?.thumbnail || variant?.images?.[0] || ""}
                       alt={product?.name}
-                      className="w-20 h-20 object-cover rounded-md shadow-sm"
+                      className="w-20 h-20 object-cover rounded-md shadow-sm flex-shrink-0"
                     />
-                    <div className="space-y-1">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <h3 className="text-base font-semibold text-gray-800 line-clamp-2">
                         {product?.name}
                       </h3>
@@ -113,35 +114,37 @@ const Cart = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleQuantityChange(variant._id, "decrease", item.quantity)}
-                      className="text-2xl hover:text-primary"
-                    >
-                      <FaCircleMinus />
-                    </button>
-                    <span className="w-8 text-center text-lg font-semibold">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => handleQuantityChange(variant._id, "increase", item.quantity)}
-                      className="text-2xl hover:text-primary"
-                      disabled={item.quantity >= item.availableStock}
-                    >
-                      <FaCirclePlus />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <p className="font-semibold text-gray-700 hidden md:block">
-                      ৳{item.lineTotal?.toLocaleString()}
-                    </p>
-                    <button
-                      onClick={() => handleRemove(variant._id)}
-                      className="text-red-500 text-xl hover:text-red-700"
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
+                  {/* Row 2: qty controls + line total + delete */}
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleQuantityChange(variant._id, "decrease", item.quantity)}
+                        className="text-2xl hover:text-primary"
+                      >
+                        <FaCircleMinus />
+                      </button>
+                      <span className="w-8 text-center text-lg font-semibold">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => handleQuantityChange(variant._id, "increase", item.quantity)}
+                        className="text-2xl hover:text-primary"
+                        disabled={item.quantity >= item.availableStock}
+                      >
+                        <FaCirclePlus />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <p className="font-semibold text-gray-700">
+                        ৳{item.lineTotal?.toLocaleString()}
+                      </p>
+                      <button
+                        onClick={() => handleRemove(variant._id)}
+                        className="text-red-500 text-xl hover:text-red-700"
+                      >
+                        <RiDeleteBin5Line />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

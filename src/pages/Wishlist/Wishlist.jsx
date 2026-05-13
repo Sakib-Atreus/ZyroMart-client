@@ -133,19 +133,20 @@ const Wishlist = () => {
               return (
                 <div
                   key={productId}
-                  className="flex items-center justify-between p-3 lg:p-4 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                  className="p-3 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                 >
-                  <div className="flex items-center space-x-4">
-                    <Link to={`/products/${slug}`}>
+                  {/* Row 1: image + info */}
+                  <div className="flex items-start gap-3">
+                    <Link to={`/products/${slug}`} className="flex-shrink-0">
                       <img
                         src={thumbnail}
                         alt={product.name}
-                        className="w-16 h-24 lg:w-32 md:w-28 lg:h-32 md:h-24 object-cover rounded-md shadow-sm"
+                        className="w-20 h-20 lg:w-28 lg:h-28 object-cover rounded-md shadow-sm"
                       />
                     </Link>
-                    <div className="space-y-2">
+                    <div className="flex-1 min-w-0 space-y-1">
                       <Link to={`/products/${slug}`}>
-                        <h3 className="text-lg font-semibold text-gray-800 hover:text-primary line-clamp-2">
+                        <h3 className="text-base font-semibold text-gray-800 hover:text-primary line-clamp-2">
                           {product.name || "Product"}
                         </h3>
                       </Link>
@@ -154,21 +155,22 @@ const Wishlist = () => {
                           {product.brand}
                         </Text>
                       )}
-                      <p className="text-xl font-semibold text-gray-900">
+                      <p className="text-lg font-semibold text-gray-900">
                         {money(price)}
                       </p>
-                      <Button
-                        size="small"
-                        icon={<ShoppingCartOutlined />}
-                        className="border border-primary text-primary hover:bg-primary hover:text-white"
-                        onClick={() => navigate(`/products/${slug}`)}
-                      >
-                        Add To Cart
-                      </Button>
                     </div>
                   </div>
 
-                  <div>
+                  {/* Row 2: Add to Cart + Delete */}
+                  <div className="flex items-center justify-between mt-3">
+                    <Button
+                      size="small"
+                      icon={<ShoppingCartOutlined />}
+                      className="border border-primary text-primary hover:bg-primary hover:text-white"
+                      onClick={() => navigate(`/products/${slug}`)}
+                    >
+                      Add To Cart
+                    </Button>
                     <Button
                       type="text"
                       danger

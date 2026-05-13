@@ -21,8 +21,8 @@ const sliderSettings = {
   arrows: false,
   responsive: [
     { breakpoint: 1024, settings: { slidesToShow: 3 } },
-    { breakpoint: 768, settings: { slidesToShow: 2, centerMode: true } },
-    { breakpoint: 480, settings: { slidesToShow: 1, centerMode: true } },
+    { breakpoint: 768, settings: { slidesToShow: 2 } },
+    { breakpoint: 480, settings: { slidesToShow: 1 } },
   ],
 };
 
@@ -33,7 +33,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="mx-2">
-      <div className="bg-white rounded-lg border hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+      <div className="bg-white rounded-lg border hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col">
         <Link to={`/products/${product.slug}`}>
           <div className="relative">
             <img
@@ -55,9 +55,9 @@ const ProductCard = ({ product }) => {
             )}
           </div>
         </Link>
-        <div className="p-3">
+        <div className="p-3 flex flex-col flex-1">
           <Link to={`/products/${product.slug}`}>
-            <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-primary transition-colors">
+            <h3 className="h-10 text-sm font-semibold text-gray-800 line-clamp-2 hover:text-primary transition-colors">
               {product.name}
             </h3>
           </Link>
@@ -70,7 +70,7 @@ const ProductCard = ({ product }) => {
               </span>
             )}
           </div>
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-auto pt-3">
             <Link
               to={`/products/${product.slug}`}
               className="flex-1 text-center bg-orange-100 text-primary px-3 py-1.5 rounded text-sm font-semibold hover:bg-primary hover:text-white transition"
@@ -115,7 +115,7 @@ const ExclusiveProducts = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse" />
           ))}

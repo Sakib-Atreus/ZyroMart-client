@@ -194,6 +194,7 @@ const Navbar = () => {
   const [cartItems, setCartItems] = useState([]);
   const [cartSubtotal, setCartSubtotal] = useState(0);
   const [cartLoading, setCartLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchCart = useCallback(async () => {
     if (!user) return;
@@ -289,14 +290,15 @@ const Navbar = () => {
       {/* ─── Top bar ─────────────────────────────────────────── */}
       <div className="navbar max-w-7xl mx-auto">
         <div className="navbar-start">
-          {/* Mobile hamburger placeholder */}
-          <div className="dropdown lg:hidden md:hidden">
-            <div tabIndex={0} role="button" className="btn btn-ghost">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-              </svg>
-            </div>
-          </div>
+          {/* Mobile hamburger */}
+          <button
+            className="btn btn-ghost lg:hidden md:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </button>
           <Link to="/" className="lg:text-3xl md:text-3xl text-2xl font-bold ps-2 text-white">
             Zyro<span className="text-orange-500">Mart</span>
           </Link>
@@ -387,6 +389,131 @@ const Navbar = () => {
               <Link to="/cart" onClick={() => setCartOpen(false)} className="btn btn-sm bg-white text-orange-600 border border-orange-600 hover:bg-orange-600 hover:text-white">
                 <ShoppingCartOutlined /> View Full Cart
               </Link>
+            </div>
+          </Drawer>
+
+          {/* Mobile menu Drawer */}
+          <Drawer
+            title="Menu"
+            placement="left"
+            onClose={() => setMobileMenuOpen(false)}
+            open={mobileMenuOpen}
+            width={280}
+          >
+            {/* User info */}
+            {user && (
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b">
+                <FontAwesomeIcon icon={faUser} className="bg-gray-100 px-3 py-2 rounded-lg h-5 text-gray-600" />
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Cart + Wishlist quick actions */}
+            <div className="flex gap-2 mb-5">
+              <Link
+                to="/wishlist"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-100 rounded-lg text-sm font-medium"
+              >
+                <FaHeart className="text-red-400" /> Wishlist
+                {wishlistCount > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1.5">{wishlistCount}</span>}
+              </Link>
+              <button
+                onClick={() => { setMobileMenuOpen(false); openCart(); }}
+                className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-100 rounded-lg text-sm font-medium"
+              >
+                <ShoppingCartOutlined /> Cart
+                {cartCount > 0 && <span className="bg-orange-500 text-white text-xs rounded-full px-1.5">{cartCount}</span>}
+              </button>
+            </div>
+
+            {/* Categories */}
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Categories</p>
+            <div className="space-y-0.5 mb-5">
+              {categories.map((cat) => (
+                <Link
+                  key={cat._id}
+                  to={`/phones?category=${cat._id}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-2 px-3 rounded-lg text-gray-700 font-medium hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+
+            {/* Other links */}
+            <div className="border-t pt-4 space-y-0.5 mb-4">
+              <Link
+                to="/storeLocations"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+              >
+                <FaLocationDot className="text-orange-500" /> Store Locator
+              </Link>
+              <a
+                href="tel:09727070118"
+                className="flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+              >
+                <FaPhoneAlt className="text-orange-500" /> 09727-070118
+              </a>
+            </div>
+
+            {/* Profile / Auth */}
+            <div className="border-t pt-4 space-y-0.5">
+              {user ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                  >
+                    <CgProfile /> My Profile
+                  </Link>
+                  <Link
+                    to="/profile?tab=orders"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                  >
+                    <ShoppingCartOutlined /> My Orders
+                  </Link>
+                  {user.role === "vendor" && (
+                    <Link
+                      to="/vendor"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 py-2 px-3 text-purple-600 hover:bg-purple-50 rounded-lg font-medium"
+                    >
+                      <SettingOutlined /> Seller Dashboard
+                    </Link>
+                  )}
+                  {user.role === "admin" && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 py-2 px-3 text-blue-600 hover:bg-blue-50 rounded-lg font-medium"
+                    >
+                      <SettingOutlined /> Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                    className="w-full flex items-center gap-2 py-2 px-3 text-orange-600 hover:bg-orange-50 rounded-lg font-medium"
+                  >
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 py-2 px-3 text-orange-600 font-semibold hover:bg-orange-50 rounded-lg"
+                >
+                  <FontAwesomeIcon icon={faUser} /> Login / Register
+                </Link>
+              )}
             </div>
           </Drawer>
 

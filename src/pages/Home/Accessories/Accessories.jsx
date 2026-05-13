@@ -39,7 +39,7 @@ const Accessories = () => {
       </div>
 
       {loading ? (
-        <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-1 gap-3">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="rounded-lg border bg-white overflow-hidden animate-pulse">
               <div className="h-48 bg-gray-200" />
@@ -54,7 +54,7 @@ const Accessories = () => {
       ) : products.length === 0 ? (
         <p className="text-center text-gray-400 py-12">No products yet.</p>
       ) : (
-        <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-2 gap-3 p-3 lg:p-0 md:p-0">
+        <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-1 gap-3 p-3 lg:p-0 md:p-0">
           {products.map((product) => {
             const discount = product.compareAtPrice && product.compareAtPrice > product.basePrice
               ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
