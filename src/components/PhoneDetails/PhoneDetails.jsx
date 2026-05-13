@@ -92,6 +92,7 @@ export default function PhoneDetails() {
   const [qty, setQty] = useState(1);
   const [emiMonths, setEmiMonths] = useState(null);
   const [inWishlist, setInWishlist] = useState(false);
+  const [cartVariantIds, setCartVariantIds] = useState(new Set());
   const [cartLoading, setCartLoading] = useState(false);
 
   // tabs
@@ -141,16 +142,21 @@ export default function PhoneDetails() {
           reviewApi.listByProduct(p._id).catch(() => ({ data: [] })),
           user ? reviewApi.myReviewForProduct(p._id).catch(() => ({ data: null })) : Promise.resolve({ data: null }),
           questionApi.listByProduct(p._id).catch(() => ({ data: [] })),
-          user ? wishlistApi.get().catch(() => ({ data: null })) : Promise.resolve({ data: null }),
+          user ? wishlistApi.get().catch(() => null) : Promise.resolve(null),
+          user ? cartApi.get().catch(() => null) : Promise.resolve(null),
+          Promise.resolve(p),
         ]);
       })
-      .then(([sim, rev, myRev, qs, wl]) => {
+      .then(([sim, rev, myRev, qs, wl, cartData, p]) => {
         setSimilar(sim.data ?? []);
         setReviews(rev.data?.reviews ?? rev.data ?? []);
         if (myRev?.data) { setMyReview(myRev.data); setReviewForm({ rating: myRev.data.rating, comment: myRev.data.comment }); }
         setQuestions(qs.data ?? []);
-        if (wl?.data?.items && product) {
-          setInWishlist((wl.data.items ?? []).some((i) => (i.product?._id ?? i.product) === product?._id));
+        if (wl?.data?.products) {
+          setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(p._id)));
+        }
+        if (cartData?.data?.items) {
+          setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
         }
       })
       .catch(() => toast.error("Product not found"))
@@ -176,6 +182,7 @@ export default function PhoneDetails() {
     ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
   const available = resolvedVariant
     ? Math.max(0, (resolvedVariant.stock ?? 0) - (resolvedVariant.reservedStock ?? 0)) : 0;
+  const inCart = resolvedVariant ? cartVariantIds.has(String(resolvedVariant._id)) : false;
   const emiOption = product?.emiOptions?.find((o) => o.months === emiMonths);
   const emiMonthly = emiOption
     ? Math.ceil((price * (1 + emiOption.monthlyRate * emiOption.months)) / emiOption.months) : null;
@@ -225,11 +232,13 @@ export default function PhoneDetails() {
 
   const handleAddToCart = async () => {
     if (!user) return navigate("/login");
+    if (inCart) return navigate("/cart");
     if (product?.hasVariants && !resolvedVariant) return toast.error("Please select all options");
     if (available < 1) return toast.error("Out of stock");
     setCartLoading(true);
     try {
       await cartApi.addItem({ product: product._id, variant: resolvedVariant._id, quantity: qty });
+      setCartVariantIds(prev => new Set([...prev, String(resolvedVariant._id)]));
       toast.success("Added to cart!");
       refreshCart();
     } catch (err) {
@@ -243,9 +252,11 @@ export default function PhoneDetails() {
     if (!user) return navigate("/login");
     if (product?.hasVariants && !resolvedVariant) return toast.error("Please select all options");
     if (available < 1) return toast.error("Out of stock");
+    if (inCart) return navigate("/checkout");
     setCartLoading(true);
     try {
       await cartApi.addItem({ product: product._id, variant: resolvedVariant._id, quantity: qty });
+      setCartVariantIds(prev => new Set([...prev, String(resolvedVariant._id)]));
       refreshCart();
       navigate("/checkout");
     } catch (err) {
@@ -610,11 +621,11 @@ export default function PhoneDetails() {
             <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
-                disabled={cartLoading || available < 1}
-                className="flex-1 flex items-center justify-center gap-2 bg-white text-primary border-2 border-primary font-bold py-3.5 rounded-xl hover:bg-orange-50 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                disabled={cartLoading || (!inCart && available < 1)}
+                className={`flex-1 flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm ${inCart ? "bg-green-500 text-white border-2 border-green-500 hover:bg-green-600 shadow-md shadow-green-500/25" : "bg-white text-primary border-2 border-primary hover:bg-orange-50"}`}
               >
                 <FiShoppingCart size={18} />
-                {cartLoading ? "Adding…" : "Add to Cart"}
+                {inCart ? "In Cart — View" : (cartLoading ? "Adding…" : "Add to Cart")}
               </button>
               <button
                 onClick={handleBuyNow}

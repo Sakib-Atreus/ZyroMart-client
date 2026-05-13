@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 import { userDashboardApi } from "../../api/endpoints";
+import { useCartWishlist } from "../../context/CartWishlistContext";
 
 const { Title } = Typography;
 
@@ -70,6 +71,7 @@ const StatCard = ({ icon, label, value, sub, color }) => (
 
 // ── main component ────────────────────────────────────────────────────────────
 const DashboardTab = () => {
+  const { cartCount, wishlistCount } = useCartWishlist();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -154,20 +156,22 @@ const DashboardTab = () => {
         <StatCard icon={<DollarOutlined />} label="Total Spend" color="#f97316"
           value={money(totalSpend)} sub="Paid orders" />
         <StatCard icon={<HeartOutlined />} label="Wishlist" color="#ec4899"
-          value={data?.wishlistCount ?? 0} sub="Saved items" />
+          value={wishlistCount} sub="Saved items" />
         <StatCard icon={<ShoppingCartOutlined />} label="Cart Items" color="#10b981"
-          value={data?.cartItemCount ?? 0} sub="Ready to buy" />
+          value={cartCount} sub="Ready to buy" />
       </div>
 
       {/* ── Charts ── */}
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
         {/* Orders by Status — pie */}
         <Col xs={24} sm={12} lg={8}>
-          <Card bordered={false} style={{ borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
+          <Card bordered={false} style={{ borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.06)", height: "100%" }}
             styles={{ body: { padding: 20 } }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 12 }}>Orders by Status</h3>
             {statusChartData.length === 0 ? (
-              <p style={{ color: "#9ca3af", textAlign: "center", padding: "28px 0", fontSize: 13 }}>No orders yet. <Link to="/phones">Shop now!</Link></p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 200 }}>
+                <p style={{ color: "#9ca3af", textAlign: "center", fontSize: 13 }}>No orders yet. <Link to="/phones">Shop now!</Link></p>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
