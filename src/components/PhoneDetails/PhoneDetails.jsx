@@ -118,9 +118,16 @@ export default function PhoneDetails() {
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
+    setProduct(null);
     setMainImage("");
     setSelectedOptions({});
     setResolvedVariant(null);
+    setSimilar([]);
+    setReviews([]);
+    setMyReview(null);
+    setQuestions([]);
+    setInWishlist(false);
+    setCartVariantIds(new Set());
 
     productApi.getBySlug(slug)
       .then((res) => {
@@ -137,30 +144,33 @@ export default function PhoneDetails() {
         });
         setSelectedOptions(defaults);
 
-        return Promise.all([
+        // ── Render the page immediately; load secondary data in background ──
+        setLoading(false);
+
+        Promise.all([
           productApi.similar(p._id, 6).catch(() => ({ data: [] })),
           reviewApi.listByProduct(p._id).catch(() => ({ data: [] })),
           user ? reviewApi.myReviewForProduct(p._id).catch(() => ({ data: null })) : Promise.resolve({ data: null }),
           questionApi.listByProduct(p._id).catch(() => ({ data: [] })),
           user ? wishlistApi.get().catch(() => null) : Promise.resolve(null),
           user ? cartApi.get().catch(() => null) : Promise.resolve(null),
-          Promise.resolve(p),
-        ]);
+        ]).then(([sim, rev, myRev, qs, wl, cartData]) => {
+          setSimilar(sim.data ?? []);
+          setReviews(rev.data?.reviews ?? rev.data ?? []);
+          if (myRev?.data) { setMyReview(myRev.data); setReviewForm({ rating: myRev.data.rating, comment: myRev.data.comment }); }
+          setQuestions(qs.data ?? []);
+          if (wl?.data?.products) {
+            setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(p._id)));
+          }
+          if (cartData?.data?.items) {
+            setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
+          }
+        });
       })
-      .then(([sim, rev, myRev, qs, wl, cartData, p]) => {
-        setSimilar(sim.data ?? []);
-        setReviews(rev.data?.reviews ?? rev.data ?? []);
-        if (myRev?.data) { setMyReview(myRev.data); setReviewForm({ rating: myRev.data.rating, comment: myRev.data.comment }); }
-        setQuestions(qs.data ?? []);
-        if (wl?.data?.products) {
-          setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(p._id)));
-        }
-        if (cartData?.data?.items) {
-          setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
-        }
-      })
-      .catch(() => toast.error("Product not found"))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        toast.error("Product not found");
+        setLoading(false);
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, user]);
 
