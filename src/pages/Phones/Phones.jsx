@@ -238,6 +238,7 @@ const Phones = () => {
   const isOnlineExclusive = searchParams.get("isOnlineExclusive") || "";
   const attrsStr = searchParams.get("attrs") || "";
   const attrFiltersStr = searchParams.get("attrFilters") || "";
+  const minRating = searchParams.get("minRating") || "";
   const page = Number(searchParams.get("page") || 1);
 
   const selectedAttrs = parseUrlAttrs(attrsStr);
@@ -262,11 +263,15 @@ const Phones = () => {
   const handleSearchInput = (value) => {
     setSearchInput(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    // Use functional updater so the debounce always operates on the latest params,
+    // not a stale closure captured when the timeout was created.
     debounceRef.current = setTimeout(() => {
-      const next = new URLSearchParams(searchParams);
-      if (value.trim()) { next.set("searchTerm", value.trim()); } else { next.delete("searchTerm"); }
-      next.delete("page");
-      setSearchParams(next, { replace: true });
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (value.trim()) { next.set("searchTerm", value.trim()); } else { next.delete("searchTerm"); }
+        next.delete("page");
+        return next;
+      }, { replace: true });
     }, 500);
   };
 
@@ -324,12 +329,15 @@ const Phones = () => {
   };
 
   // ── Data fetching ───────────────────────────────────────────────────────────
+  // Sync slider state whenever URL price params change (e.g. browser back/forward,
+  // or clear-all). Safe to run on every change — slider never updates the URL
+  // mid-drag, so there's no feedback loop.
   useEffect(() => {
     setPriceRange([
       minPrice ? Number(minPrice) : 0,
       maxPrice ? Number(maxPrice) : 300000,
     ]);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [minPrice, maxPrice]);
 
   useEffect(() => {
     categoryApi
@@ -349,6 +357,7 @@ const Phones = () => {
     if (isOnlineExclusive) params.isOnlineExclusive = true;
     if (attrsStr) params.attrs = attrsStr;
     if (attrFiltersStr) params.attrFilters = attrFiltersStr;
+    if (minRating) params.minRating = minRating;
 
     productApi
       .list(params)
@@ -358,14 +367,14 @@ const Phones = () => {
       })
       .catch(() => { setProducts([]); toast.error("Failed to load products"); })
       .finally(() => setLoading(false));
-  }, [category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, attrsStr, attrFiltersStr, page]);
+  }, [category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, attrsStr, attrFiltersStr, minRating, page]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   // ── Derived display values ──────────────────────────────────────────────────
   const activeCategoryName = selectedCategory?.name || "";
-  const hasFilters = !!(category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive || attrsStr || attrFiltersStr);
-  const activeFilterCount = [category, brand, minPrice, isOnlineExclusive, attrsStr, attrFiltersStr].filter(Boolean).length;
+  const hasFilters = !!(category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive || attrsStr || attrFiltersStr || minRating);
+  const activeFilterCount = [category, brand, minPrice, isOnlineExclusive, attrsStr, attrFiltersStr, minRating].filter(Boolean).length;
 
   const breadcrumbItems = [
     { title: <Link to="/" className="font-semibold">Home</Link> },
@@ -486,7 +495,31 @@ const Phones = () => {
 
       <div className="border-t border-gray-100" />
 
-      {/* 4. Brand — category-aware */}
+      {/* 4. Minimum Rating */}
+      <FilterSection title="Rating">
+        <div className="space-y-1.5">
+          {[4, 3, 2].map((star) => (
+            <label key={star} className="flex items-center gap-2 cursor-pointer group">
+              <Checkbox
+                checked={minRating === String(star)}
+                onChange={() => setParam("minRating", minRating === String(star) ? "" : String(star))}
+              />
+              <span className="flex items-center gap-1 text-sm text-gray-600 group-hover:text-orange-600 transition-colors">
+                {Array.from({ length: 5 }, (_, i) =>
+                  i < star
+                    ? <FaStar key={i} className="text-yellow-400 text-xs" />
+                    : <FaRegStar key={i} className="text-gray-300 text-xs" />,
+                )}
+                <span className="ml-0.5">& above</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </FilterSection>
+
+      <div className="border-t border-gray-100" />
+
+      {/* 6. Brand — category-aware */}
       <FilterSection title="Brand">
         <CheckboxList
           items={brandList}
@@ -497,7 +530,7 @@ const Phones = () => {
 
       <div className="border-t border-gray-100" />
 
-      {/* 5. Online Exclusive */}
+      {/* 7. Online Exclusive */}
       <div>
         <label className="flex items-center gap-2 cursor-pointer">
           <Checkbox
@@ -619,6 +652,11 @@ const Phones = () => {
               {isOnlineExclusive && (
                 <Tag closable onClose={() => setParam("isOnlineExclusive", "")} color="purple">
                   Online Exclusive
+                </Tag>
+              )}
+              {minRating && (
+                <Tag closable onClose={() => setParam("minRating", "")} color="gold">
+                  {minRating}★ & above
                 </Tag>
               )}
               {/* One tag per selected variant attribute value */}
