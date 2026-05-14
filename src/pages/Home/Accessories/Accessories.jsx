@@ -2,7 +2,26 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { productApi } from "../../../api/endpoints";
+
+const sliderSettings = {
+  dots: false,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 5,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 2000,
+  arrows: false,
+  responsive: [
+    { breakpoint: 1024, settings: { slidesToShow: 4 } },
+    { breakpoint: 768, settings: { slidesToShow: 2 } },
+    { breakpoint: 480, settings: { slidesToShow: 1 } },
+  ],
+};
 
 const Stars = ({ value }) => (
   <span className="flex gap-0.5 justify-center">
@@ -54,45 +73,47 @@ const Accessories = () => {
       ) : products.length === 0 ? (
         <p className="text-center text-gray-400 py-12">No products yet.</p>
       ) : (
-        <div className="grid lg:grid-cols-5 md:grid-cols-4 grid-cols-1 gap-3 p-3 lg:p-0 md:p-0">
+        <Slider {...sliderSettings}>
           {products.map((product) => {
             const discount = product.compareAtPrice && product.compareAtPrice > product.basePrice
               ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
               : 0;
             return (
-              <Link key={product._id} to={`/products/${product.slug}`}>
-                <div className="rounded-lg shadow border p-3 bg-white hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-                  <div className="relative">
-                    <img
-                      className="w-full h-44 object-contain"
-                      src={product.thumbnail}
-                      alt={product.name}
-                      onError={(e) => { e.target.src = "https://placehold.co/300x300?text=No+Image"; }}
-                    />
-                    {discount > 0 && (
-                      <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
-                        -{discount}%
-                      </span>
+              <div key={product._id} className="px-1.5">
+                <Link to={`/products/${product.slug}`}>
+                  <div className="rounded-lg shadow border p-3 bg-white hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                    <div className="relative">
+                      <img
+                        className="w-full h-44 object-contain"
+                        src={product.thumbnail}
+                        alt={product.name}
+                        onError={(e) => { e.target.src = "https://placehold.co/300x300?text=No+Image"; }}
+                      />
+                      {discount > 0 && (
+                        <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                          -{discount}%
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="h-10 text-sm font-semibold text-center mt-3 line-clamp-2">
+                      {product.name}
+                    </h2>
+                    <p className="text-center text-xs text-gray-400 mt-1">{product.brand}</p>
+                    <p className="text-center text-orange-600 text-sm font-bold mt-2">
+                      ৳{product.basePrice?.toLocaleString()}
+                    </p>
+                    {product.averageRating > 0 && (
+                      <div className="flex justify-center items-center gap-1 mt-1">
+                        <Stars value={product.averageRating} />
+                        <span className="text-gray-500 text-xs">({product.reviewCount})</span>
+                      </div>
                     )}
                   </div>
-                  <h2 className="text-sm font-semibold text-center mt-3 line-clamp-2 flex-1">
-                    {product.name}
-                  </h2>
-                  <p className="text-center text-xs text-gray-400 mt-1">{product.brand}</p>
-                  <p className="text-center text-orange-600 text-sm font-bold mt-2">
-                    ৳{product.basePrice?.toLocaleString()}
-                  </p>
-                  {product.averageRating > 0 && (
-                    <div className="flex justify-center items-center gap-1 mt-1">
-                      <Stars value={product.averageRating} />
-                      <span className="text-gray-500 text-xs">({product.reviewCount})</span>
-                    </div>
-                  )}
-                </div>
-              </Link>
+                </Link>
+              </div>
             );
           })}
-        </div>
+        </Slider>
       )}
     </div>
   );

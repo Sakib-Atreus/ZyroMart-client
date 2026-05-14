@@ -1,6 +1,12 @@
 import React from "react";
 import "./ImageHover.css";
 import { Link } from "react-router-dom";
+import img1 from "../../../assets/HomeImageHover/imgHovSec1.jpg";
+import img2 from "../../../assets/HomeImageHover/imgHovSec2.jpeg";
+import img3 from "../../../assets/HomeImageHover/imgHovSec3.jpg";
+import img4 from "../../../assets/HomeImageHover/imgHovSec4.jpg";
+import img5 from "../../../assets/HomeImageHover/imgHovSec5.jpg";
+import img6 from "../../../assets/HomeImageHover/imgHovSec6.webp";
 
 const ImageHover = () => {
   return (
@@ -8,32 +14,32 @@ const ImageHover = () => {
       <div className="grid lg:grid-cols-5 md:grid-cols-5 grid-cols-1 my-4">
         <img
           className="box lg:col-span-3 md:col-span-3 w-full h-full"
-          src="https://gadgetmonkeybd.com/public/uploads/all/1WjNGP6SsssOdaK4wGWY3o0jIiTn4fOMDIsWVUlg.jpg"
+          src={img4}
           alt="gadget"
         />
         <img
           className="box lg:col-span-2 md:col-span-2 w-full h-full"
-          src="https://images.unsplash.com/photo-1609081219090-a6d81d3085bf"
+          src={img2}
           alt="gadget"
         />
         <img
           className="box lg:col-span-2 md:col-span-2 w-full h-full"
-          src="https://matrixitworld.com/wp-content/uploads/2023/12/smart-watch-sits-smart-watch_843415-1959.jpg"
+          src={img3}
           alt="gadget"
         />
         <img
           className="box lg:col-span-3 md:col-span-3 w-full h-full"
-          src="https://gadgetmonkeybd.com/public/uploads/all/JMwviK7LCMV0aJ9DbRMpHFJU9GmFO3G8g7l53LMc.jpg"
+          src={img1}
           alt="gadget"
         />
         <img
           className="box lg:col-span-3 md:col-span-3 w-full h-full object-cover"
-          src="https://gadgetmonkeybd.com/public/uploads/all/WOh2tZ5sVdJpSCu39fxLa0FFIRCbkhmop9VewU9Y.jpg"
+          src={img5}
           alt="gadget"
         />
         <img
           className="box lg:col-span-2 md:col-span-2 w-full h-full object-cover"
-          src="https://images.unsplash.com/photo-1413708617479-50918bc877eb"
+          src={img6}
           alt="gadget"
         />
       </div>

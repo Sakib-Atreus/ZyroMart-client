@@ -9,6 +9,7 @@ import oep1 from "../../../assets/OnlineExclusiveProducts/oep1.png";
 import oep2 from "../../../assets/OnlineExclusiveProducts/oep2.png";
 import oep3 from "../../../assets/OnlineExclusiveProducts/oep3.png";
 import oep4 from "../../../assets/OnlineExclusiveProducts/oep4.png";
+import oe from "../../../assets/exclusive.png";
 
 const sliderSettings = {
   dots: false,
@@ -43,7 +44,7 @@ const ProductCard = ({ product }) => {
             />
             <div className="absolute top-2 right-2">
               <img
-                src="https://gadgetandgear.com/_next/static/media/online-only.6c507492.svg"
+                src={oe}
                 className="w-14 h-14"
                 alt="Online Only"
               />
