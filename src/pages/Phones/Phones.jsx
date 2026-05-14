@@ -9,16 +9,17 @@ import {
   Drawer,
   Button,
   Empty,
-  Spin,
   Badge,
   Tag,
   Input,
   InputNumber,
 } from "antd";
-import { FilterOutlined, SearchOutlined, CloseOutlined } from "@ant-design/icons";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaChevronDown } from "react-icons/fa";
 import { productApi, categoryApi } from "../../api/endpoints";
 import { toast } from "react-toastify";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const SORT_OPTIONS = [
   { value: "-createdAt", label: "New Arrivals" },
@@ -28,10 +29,55 @@ const SORT_OPTIONS = [
   { value: "-totalSold", label: "Best Selling" },
 ];
 
-const POPULAR_BRANDS = [
-  "Samsung", "Apple", "Google", "Dell", "Sony", "Xiaomi",
-  "OnePlus", "Oppo", "Huawei", "Realme", "Vivo", "Nokia",
-];
+// Brands shown in the sidebar filter and quick-pill row, keyed by category slug.
+// Falls back to `default` when no category is selected or slug not listed.
+const CATEGORY_BRANDS = {
+  default: ["Samsung", "Apple", "Google", "Dell", "Sony", "Xiaomi", "OnePlus", "Oppo", "Huawei", "Realme", "Vivo", "Nokia"],
+  phones: ["Samsung", "Apple", "Google", "Xiaomi", "OnePlus", "Oppo", "Realme", "Vivo", "Nokia", "Huawei", "Nothing", "Tecno"],
+  mac: ["Apple"],
+  macbook: ["Apple"],
+  tablets: ["Apple", "Samsung", "Xiaomi", "Huawei"],
+  ipad: ["Apple"],
+  watches: ["Apple", "Samsung", "Garmin", "Xiaomi", "Huawei"],
+  "headphone-speaker": ["Apple", "Sony", "JBL", "Bose", "Marshall", "Samsung", "Xiaomi"],
+  earbuds: ["Apple", "Samsung", "Sony", "JBL", "Bose", "Xiaomi"],
+  speaker: ["JBL", "Bose", "Marshall", "Sony", "Xiaomi"],
+  "pc-accessories": ["Apple", "Logitech", "Razer", "Microsoft"],
+  gaming: ["Logitech", "Razer", "Corsair", "SteelSeries", "Microsoft", "Sony"],
+  camera: ["DJI", "GoPro", "Insta360", "Sony", "Canon", "Nikon"],
+  drone: ["DJI"],
+  "cases-protectors": ["Spigen", "Pitaka", "UAG", "TORRAS", "Apple"],
+  networking: ["TP-Link", "Asus", "Netgear", "D-Link"],
+  router: ["TP-Link", "Asus", "Netgear"],
+  "power-bank": ["Belkin", "Skross", "Meko", "Anker"],
+  "phone-accessories": ["Apple", "Samsung", "Belkin", "Anker", "Spigen"],
+  gadget: ["DJI", "Xiaomi", "Amazon"],
+};
+
+// ─── URL attrs helpers ────────────────────────────────────────────────────────
+
+// "color:Black|Blue,ram:8GB" → { color: ['Black','Blue'], ram: ['8GB'] }
+const parseUrlAttrs = (str) => {
+  if (!str) return {};
+  const result = {};
+  for (const pair of str.split(",")) {
+    const idx = pair.indexOf(":");
+    if (idx < 0) continue;
+    const key = pair.slice(0, idx).trim();
+    const vals = pair.slice(idx + 1).trim().split("|").filter(Boolean);
+    if (key && vals.length) result[key] = vals;
+  }
+  return result;
+};
+
+// { color: ['Black','Blue'], ram: ['8GB'] } → "color:Black|Blue,ram:8GB"
+const serializeAttrs = (obj) =>
+  Object.entries(obj)
+    .filter(([, v]) => v && v.length > 0)
+    .map(([k, v]) => `${k}:${v.join("|")}`)
+    .join(",");
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 const Stars = ({ value }) => (
   <span className="flex gap-0.5">
@@ -44,9 +90,10 @@ const Stars = ({ value }) => (
 );
 
 const ProductCard = ({ product }) => {
-  const discount = product.compareAtPrice && product.compareAtPrice > product.basePrice
-    ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
-    : 0;
+  const discount =
+    product.compareAtPrice && product.compareAtPrice > product.basePrice
+      ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
+      : 0;
 
   return (
     <div className="bg-white rounded-lg border hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
@@ -117,6 +164,59 @@ const ProductSkeleton = () => (
   </div>
 );
 
+/** Collapsible filter section with animated chevron. */
+const FilterSection = ({ title, children, defaultOpen = true }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center justify-between w-full font-semibold text-gray-700 mb-2 text-xs uppercase tracking-widest hover:text-orange-600 transition-colors"
+      >
+        <span>{title}</span>
+        <FaChevronDown
+          className={`text-xs text-gray-400 transition-transform duration-200 ${open ? "rotate-0" : "-rotate-90"}`}
+        />
+      </button>
+      {open && <div className="mt-1">{children}</div>}
+    </div>
+  );
+};
+
+/** Checkbox list that collapses to MAX_VISIBLE items with a toggle. */
+const MAX_VISIBLE = 6;
+const CheckboxList = ({ items, isChecked, onChange, getLabel }) => {
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? items : items.slice(0, MAX_VISIBLE);
+  const hidden = items.length - MAX_VISIBLE;
+  return (
+    <>
+      <div className="space-y-1.5">
+        {visible.map((item) => (
+          <label key={item} className="flex items-center gap-2 cursor-pointer group">
+            <Checkbox checked={isChecked(item)} onChange={() => onChange(item)} />
+            <span className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">
+              {getLabel ? getLabel(item) : item}
+            </span>
+          </label>
+        ))}
+      </div>
+      {items.length > MAX_VISIBLE && (
+        <button
+          type="button"
+          onClick={() => setShowAll((s) => !s)}
+          className="mt-2 text-xs text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1"
+        >
+          {showAll ? "Show Less ↑" : `+ ${hidden} More`}
+        </button>
+      )}
+    </>
+  );
+};
+
+// ─── Main page component ──────────────────────────────────────────────────────
+
 const Phones = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
@@ -124,14 +224,41 @@ const Phones = () => {
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // local price state (only applied on slider change-complete)
   const [priceRange, setPriceRange] = useState([0, 300000]);
-
-  // local search input — debounced before being written to the URL
   const [searchInput, setSearchInput] = useState(searchParams.get("searchTerm") || "");
   const debounceRef = useRef(null);
 
+  // ── Read URL state ──────────────────────────────────────────────────────────
+  const category = searchParams.get("category") || "";
+  const brand = searchParams.get("brand") || "";
+  const sort = searchParams.get("sort") || "-createdAt";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
+  const searchTerm = searchParams.get("searchTerm") || "";
+  const isOnlineExclusive = searchParams.get("isOnlineExclusive") || "";
+  const attrsStr = searchParams.get("attrs") || "";
+  const attrFiltersStr = searchParams.get("attrFilters") || "";
+  const page = Number(searchParams.get("page") || 1);
+
+  const selectedAttrs = parseUrlAttrs(attrsStr);
+  const selectedAttrFilters = parseUrlAttrs(attrFiltersStr);
+
+  // ── Derived state ───────────────────────────────────────────────────────────
+  const selectedCategory = categories.find((c) => c._id === category);
+  const categorySlug = selectedCategory?.slug || "";
+
+  // Filterable attributes for the selected category (enum/multiselect/string with options + boolean)
+  const filterableAttrs = (selectedCategory?.attributeSchema ?? []).filter(
+    (attr) =>
+      attr.filterable &&
+      (attr.type === "boolean" ||
+        (["enum", "multiselect", "string"].includes(attr.type) && attr.options?.length > 0)),
+  );
+
+  // Category-aware brand list (sidebar + pills)
+  const brandList = CATEGORY_BRANDS[categorySlug] || CATEGORY_BRANDS.default;
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
   const handleSearchInput = (value) => {
     setSearchInput(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -143,25 +270,70 @@ const Phones = () => {
     }, 500);
   };
 
-  const category = searchParams.get("category") || "";
-  const brand = searchParams.get("brand") || "";
-  const sort = searchParams.get("sort") || "-createdAt";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const searchTerm = searchParams.get("searchTerm") || "";
-  const isOnlineExclusive = searchParams.get("isOnlineExclusive") || "";
-  const page = Number(searchParams.get("page") || 1);
+  const setParam = (key, value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) { next.set(key, value); } else { next.delete(key); }
+    next.delete("page");
+    setSearchParams(next);
+  };
 
-  // Sync slider from URL on mount
+  // Switching category clears all attribute filters (they're category-specific)
+  const setCategory = (catId) => {
+    const next = new URLSearchParams(searchParams);
+    if (catId) { next.set("category", catId); } else { next.delete("category"); }
+    next.delete("attrs");
+    next.delete("attrFilters");
+    next.delete("page");
+    setSearchParams(next);
+  };
+
+  // Multi-select attribute toggle.
+  // isVariantOption=true attrs (color, storage) → ?attrs (variant lookup).
+  // isVariantOption=false attrs (os, ram, nfc, network) → ?attrFilters (product.attributes match).
+  const toggleAttrValue = (attrKey, value, isVariantOption = true) => {
+    const paramKey = isVariantOption ? "attrs" : "attrFilters";
+    const currentMap = isVariantOption ? selectedAttrs : selectedAttrFilters;
+    const current = currentMap[attrKey] || [];
+    const next = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+
+    const nextMap = { ...currentMap };
+    if (next.length === 0) { delete nextMap[attrKey]; } else { nextMap[attrKey] = next; }
+
+    const nextStr = serializeAttrs(nextMap);
+    const nextParams = new URLSearchParams(searchParams);
+    if (nextStr) { nextParams.set(paramKey, nextStr); } else { nextParams.delete(paramKey); }
+    nextParams.delete("page");
+    setSearchParams(nextParams);
+  };
+
+  const applyPriceRange = ([min, max]) => {
+    const next = new URLSearchParams(searchParams);
+    if (min > 0) { next.set("minPrice", min); } else { next.delete("minPrice"); }
+    if (max < 300000) { next.set("maxPrice", max); } else { next.delete("maxPrice"); }
+    next.delete("page");
+    setSearchParams(next);
+  };
+
+  const clearAllFilters = () => {
+    setPriceRange([0, 300000]);
+    setSearchInput("");
+    setSearchParams({});
+    // setSearchParams({}) clears everything including attrs and attrFilters
+  };
+
+  // ── Data fetching ───────────────────────────────────────────────────────────
   useEffect(() => {
     setPriceRange([
       minPrice ? Number(minPrice) : 0,
       maxPrice ? Number(maxPrice) : 300000,
     ]);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    categoryApi.list()
+    categoryApi
+      .list()
       .then((res) => setCategories(res.data ?? res ?? []))
       .catch(() => {});
   }, []);
@@ -175,77 +347,68 @@ const Phones = () => {
     if (maxPrice) params.maxPrice = maxPrice;
     if (searchTerm) params.searchTerm = searchTerm;
     if (isOnlineExclusive) params.isOnlineExclusive = true;
+    if (attrsStr) params.attrs = attrsStr;
+    if (attrFiltersStr) params.attrFilters = attrFiltersStr;
 
-    productApi.list(params)
+    productApi
+      .list(params)
       .then((res) => {
         setProducts(res.data ?? []);
         setMeta(res.meta ?? { total: 0, page: 1, totalPages: 1 });
       })
       .catch(() => { setProducts([]); toast.error("Failed to load products"); })
       .finally(() => setLoading(false));
-  }, [category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, page]);
+  }, [category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, attrsStr, attrFiltersStr, page]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-  const setParam = (key, value) => {
-    const next = new URLSearchParams(searchParams);
-    if (value) { next.set(key, value); } else { next.delete(key); }
-    next.delete("page");
-    setSearchParams(next);
-  };
-
-  const clearAllFilters = () => {
-    setPriceRange([0, 300000]);
-    setSearchInput("");
-    setSearchParams({});
-  };
-
-  const activeCategoryName = categories.find((c) => c._id === category)?.name || "";
-  const hasFilters = category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive;
-
-  const applyPriceRange = ([min, max]) => {
-    const next = new URLSearchParams(searchParams);
-    if (min > 0) { next.set("minPrice", min); } else { next.delete("minPrice"); }
-    if (max < 300000) { next.set("maxPrice", max); } else { next.delete("maxPrice"); }
-    next.delete("page");
-    setSearchParams(next);
-  };
+  // ── Derived display values ──────────────────────────────────────────────────
+  const activeCategoryName = selectedCategory?.name || "";
+  const hasFilters = !!(category || brand || minPrice || maxPrice || searchTerm || isOnlineExclusive || attrsStr || attrFiltersStr);
+  const activeFilterCount = [category, brand, minPrice, isOnlineExclusive, attrsStr, attrFiltersStr].filter(Boolean).length;
 
   const breadcrumbItems = [
     { title: <Link to="/" className="font-semibold">Home</Link> },
-    ...(activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">{activeCategoryName}</span> }] : []),
-    ...(!activeCategoryName ? [{ title: <span className="text-orange-600 font-semibold">All Products</span> }] : []),
+    ...(activeCategoryName
+      ? [{ title: <span className="text-orange-600 font-semibold">{activeCategoryName}</span> }]
+      : [{ title: <span className="text-orange-600 font-semibold">All Products</span> }]),
   ];
 
+  // ── Filter panel (shared between sidebar & drawer) ──────────────────────────
   const filterContent = (
-    <div className="space-y-6">
-      {/* Categories */}
-      <div>
-        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Categories</h3>
-        <div className="space-y-1">
+    <div className="space-y-5">
+
+      {/* 1. Categories */}
+      <FilterSection title="Categories">
+        <div className="space-y-0.5">
           <button
-            onClick={() => setParam("category", "")}
-            className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${!category ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+            type="button"
+            onClick={() => setCategory("")}
+            className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${
+              !category ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"
+            }`}
           >
             All Products
           </button>
           {categories.map((cat) => (
             <button
               key={cat._id}
-              onClick={() => setParam("category", cat._id)}
-              className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${category === cat._id ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+              type="button"
+              onClick={() => setCategory(cat._id)}
+              className={`block w-full text-left px-2 py-1.5 rounded text-sm transition-colors ${
+                category === cat._id ? "bg-orange-50 text-orange-600 font-semibold" : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               {cat.name}
             </button>
           ))}
         </div>
-      </div>
+      </FilterSection>
 
-      {/* Price Range */}
-      <div>
-        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Price Range</h3>
+      <div className="border-t border-gray-100" />
+
+      {/* 2. Price Range */}
+      <FilterSection title="Price Range">
         <Slider
           range
           min={0}
@@ -264,7 +427,7 @@ const Phones = () => {
             onBlur={() => applyPriceRange(priceRange)}
             onPressEnter={() => applyPriceRange(priceRange)}
             formatter={(v) => `৳${v}`}
-            parser={(v) => v.replace(/৳/g, '')}
+            parser={(v) => v.replace(/৳/g, "")}
             size="small"
             className="w-full"
             placeholder="Min"
@@ -277,31 +440,64 @@ const Phones = () => {
             onBlur={() => applyPriceRange(priceRange)}
             onPressEnter={() => applyPriceRange(priceRange)}
             formatter={(v) => `৳${v}`}
-            parser={(v) => v.replace(/৳/g, '')}
+            parser={(v) => v.replace(/৳/g, "")}
             size="small"
             className="w-full"
             placeholder="Max"
           />
         </div>
-      </div>
+      </FilterSection>
 
-      {/* Brands */}
-      <div>
-        <h3 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">Brand</h3>
-        <div className="space-y-1.5">
-          {POPULAR_BRANDS.map((b) => (
-            <label key={b} className="flex items-center gap-2 cursor-pointer group">
-              <Checkbox
-                checked={brand === b}
-                onChange={(e) => setParam("brand", e.target.checked ? b : "")}
-              />
-              <span className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">{b}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+      {/* 3. Category-specific attribute filters — only when a category is selected */}
+      {filterableAttrs.length > 0 && (
+        <>
+          <div className="border-t border-gray-100" />
+          {filterableAttrs.map((attr) => {
+            const isVariant = !!attr.isVariantOption;
+            const activeMap = isVariant ? selectedAttrs : selectedAttrFilters;
+            return (
+              <FilterSection
+                key={attr.key}
+                title={attr.unit ? `${attr.label} (${attr.unit})` : attr.label}
+              >
+                {attr.type === "boolean" ? (
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <Checkbox
+                      checked={(activeMap[attr.key] || []).includes("true")}
+                      onChange={() => toggleAttrValue(attr.key, "true", isVariant)}
+                    />
+                    <span className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">
+                      {attr.label}
+                    </span>
+                  </label>
+                ) : (
+                  <CheckboxList
+                    items={attr.options || []}
+                    isChecked={(opt) => (activeMap[attr.key] || []).includes(opt)}
+                    onChange={(opt) => toggleAttrValue(attr.key, opt, isVariant)}
+                    getLabel={(opt) => (attr.unit ? `${opt} ${attr.unit}` : opt)}
+                  />
+                )}
+              </FilterSection>
+            );
+          })}
+        </>
+      )}
 
-      {/* Online Exclusive */}
+      <div className="border-t border-gray-100" />
+
+      {/* 4. Brand — category-aware */}
+      <FilterSection title="Brand">
+        <CheckboxList
+          items={brandList}
+          isChecked={(b) => brand === b}
+          onChange={(b) => setParam("brand", brand === b ? "" : b)}
+        />
+      </FilterSection>
+
+      <div className="border-t border-gray-100" />
+
+      {/* 5. Online Exclusive */}
       <div>
         <label className="flex items-center gap-2 cursor-pointer">
           <Checkbox
@@ -312,8 +508,10 @@ const Phones = () => {
         </label>
       </div>
 
+      {/* Clear all */}
       {hasFilters && (
         <button
+          type="button"
           onClick={clearAllFilters}
           className="w-full text-center text-sm text-red-500 hover:text-red-700 font-medium py-2 border border-red-200 rounded hover:bg-red-50 transition"
         >
@@ -323,15 +521,17 @@ const Phones = () => {
     </div>
   );
 
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-7xl mx-auto px-4 my-8">
       <Breadcrumb className="mb-6" separator=">" items={breadcrumbItems} />
 
-      {/* Brand quick-filter pills */}
+      {/* Brand quick-filter pills — category-aware */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {POPULAR_BRANDS.map((b) => (
+        {brandList.map((b) => (
           <button
             key={b}
+            type="button"
             onClick={() => setParam("brand", brand === b ? "" : b)}
             className={`px-3 py-1 rounded-full text-sm border transition-all ${
               brand === b
@@ -346,14 +546,15 @@ const Phones = () => {
 
       <div className="flex gap-6">
         {/* Sidebar — desktop */}
-        <div className="hidden md:block w-56 flex-shrink-0">
-          <div className="bg-white rounded-xl border p-4 sticky top-4">
+        <div className="hidden md:block w-60 flex-shrink-0">
+          <div className="bg-white rounded-xl border p-4 sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
             {filterContent}
           </div>
         </div>
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
+
           {/* Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-white rounded-xl border px-4 py-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -363,7 +564,7 @@ const Phones = () => {
                 onClick={() => setDrawerOpen(true)}
               >
                 Filters
-                {hasFilters && <Badge count={[category, brand, minPrice, isOnlineExclusive].filter(Boolean).length} className="ml-1" />}
+                {activeFilterCount > 0 && <Badge count={activeFilterCount} className="ml-1" />}
               </Button>
               <Input
                 prefix={<SearchOutlined className="text-gray-400" />}
@@ -387,12 +588,12 @@ const Phones = () => {
             </div>
           </div>
 
-          {/* Active filters */}
+          {/* Active filter tags */}
           {hasFilters && (
             <div className="flex flex-wrap gap-2 mb-4">
               {activeCategoryName && (
-                <Tag closable onClose={() => setParam("category", "")} color="orange">
-                  Category: {activeCategoryName}
+                <Tag closable onClose={() => setCategory("")} color="orange">
+                  {activeCategoryName}
                 </Tag>
               )}
               {brand && (
@@ -406,12 +607,13 @@ const Phones = () => {
                   onClose={() => {
                     setPriceRange([0, 300000]);
                     const next = new URLSearchParams(searchParams);
-                    next.delete("minPrice"); next.delete("maxPrice");
+                    next.delete("minPrice");
+                    next.delete("maxPrice");
                     setSearchParams(next);
                   }}
                   color="green"
                 >
-                  Price: ৳{(minPrice || 0).toLocaleString()} – ৳{(maxPrice || 300000).toLocaleString()}
+                  ৳{Number(minPrice || 0).toLocaleString()} – ৳{Number(maxPrice || 300000).toLocaleString()}
                 </Tag>
               )}
               {isOnlineExclusive && (
@@ -419,6 +621,36 @@ const Phones = () => {
                   Online Exclusive
                 </Tag>
               )}
+              {/* One tag per selected variant attribute value */}
+              {Object.entries(selectedAttrs).map(([key, values]) => {
+                const attrDef = filterableAttrs.find((a) => a.key === key);
+                const label = attrDef?.label || key;
+                return values.map((val) => (
+                  <Tag
+                    key={`attrs:${key}:${val}`}
+                    closable
+                    onClose={() => toggleAttrValue(key, val, true)}
+                    color="cyan"
+                  >
+                    {label}: {val}{attrDef?.unit ? ` ${attrDef.unit}` : ""}
+                  </Tag>
+                ));
+              })}
+              {/* One tag per selected product-level attribute value */}
+              {Object.entries(selectedAttrFilters).map(([key, values]) => {
+                const attrDef = filterableAttrs.find((a) => a.key === key);
+                const label = attrDef?.label || key;
+                return values.map((val) => (
+                  <Tag
+                    key={`attrFilters:${key}:${val}`}
+                    closable
+                    onClose={() => toggleAttrValue(key, val, false)}
+                    color="cyan"
+                  >
+                    {label}: {val}{attrDef?.unit ? ` ${attrDef.unit}` : ""}
+                  </Tag>
+                ));
+              })}
             </div>
           )}
 
@@ -434,7 +666,11 @@ const Phones = () => {
                   <div className="text-center">
                     <p className="text-gray-500 mb-3">No products found</p>
                     {hasFilters && (
-                      <button onClick={clearAllFilters} className="text-orange-600 hover:underline text-sm">
+                      <button
+                        type="button"
+                        onClick={clearAllFilters}
+                        className="text-orange-600 hover:underline text-sm"
+                      >
                         Clear filters
                       </button>
                     )}
@@ -475,10 +711,14 @@ const Phones = () => {
         placement="left"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
-        width={280}
+        width={300}
         extra={
           hasFilters && (
-            <button onClick={() => { clearAllFilters(); setDrawerOpen(false); }} className="text-red-500 text-sm">
+            <button
+              type="button"
+              onClick={() => { clearAllFilters(); setDrawerOpen(false); }}
+              className="text-red-500 text-sm"
+            >
               Clear All
             </button>
           )

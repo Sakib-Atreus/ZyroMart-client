@@ -33,6 +33,10 @@ const BRAND_SHORTCUTS = {
     { label: "Nothing", brand: "Nothing" },
     { label: "Tecno", brand: "Tecno" },
   ],
+  mac: [
+    { label: "MacBook Air", brand: "Apple" },
+    { label: "MacBook Pro", brand: "Apple" },
+  ],
   tablets: [
     { label: "iPad", brand: "Apple" },
     { label: "Samsung Tab", brand: "Samsung" },
@@ -40,19 +44,23 @@ const BRAND_SHORTCUTS = {
     { label: "Huawei MatePad", brand: "Huawei" },
   ],
   camera: [
-    { label: "Canon", brand: "Canon" },
-    { label: "Sony", brand: "Sony" },
-    { label: "Nikon", brand: "Nikon" },
-    { label: "Fujifilm", brand: "Fujifilm" },
-    { label: "GoPro", brand: "GoPro" },
     { label: "DJI", brand: "DJI" },
+    { label: "GoPro", brand: "GoPro" },
+    { label: "Insta360", brand: "Insta360" },
+    { label: "Sony", brand: "Sony" },
+    { label: "Canon", brand: "Canon" },
+    { label: "Nikon", brand: "Nikon" },
+  ],
+  drone: [
+    { label: "DJI Mini", brand: "DJI" },
+    { label: "DJI Neo", brand: "DJI" },
+    { label: "DJI Flip", brand: "DJI" },
   ],
   gaming: [
-    { label: "PlayStation", brand: "Sony" },
-    { label: "Xbox", brand: "Microsoft" },
-    { label: "Nintendo", brand: "Nintendo" },
-    { label: "Gaming Mouse", brand: "Razer" },
-    { label: "Gaming Keyboard", brand: "Corsair" },
+    { label: "Logitech", brand: "Logitech" },
+    { label: "Razer", brand: "Razer" },
+    { label: "Corsair", brand: "Corsair" },
+    { label: "SteelSeries", brand: "SteelSeries" },
   ],
   watches: [
     { label: "Apple Watch", brand: "Apple" },
@@ -67,7 +75,22 @@ const BRAND_SHORTCUTS = {
     { label: "Sony", brand: "Sony" },
     { label: "JBL", brand: "JBL" },
     { label: "Bose", brand: "Bose" },
-    { label: "Xiaomi", brand: "Xiaomi" },
+    { label: "Marshall", brand: "Marshall" },
+  ],
+  "pc-accessories": [
+    { label: "Apple", brand: "Apple" },
+    { label: "Logitech", brand: "Logitech" },
+    { label: "Razer", brand: "Razer" },
+  ],
+  networking: [
+    { label: "TP-Link", brand: "TP-Link" },
+    { label: "Asus", brand: "Asus" },
+    { label: "Netgear", brand: "Netgear" },
+  ],
+  "phone-accessories": [
+    { label: "Belkin", brand: "Belkin" },
+    { label: "Skross", brand: "Skross" },
+    { label: "Anker", brand: "Anker" },
   ],
 };
 
