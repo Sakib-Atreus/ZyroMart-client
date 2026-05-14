@@ -11,6 +11,8 @@ import Cart from "../pages/Cart/Cart";
 import Wishlist from "../pages/Wishlist/Wishlist";
 import StoreLocations from "../pages/StoreLocations/StoreLocations";
 import About from "../pages/About/About";
+import FAQ from "../pages/FAQ/FAQ";
+import Careers from "../pages/Careers/Careers";
 import Contact from "../pages/Contact/Contact";
 import PrivacyPolicy from "../pages/PrivacyPolicy/PrivacyPolicy";
 import TermsOfService from "../pages/TermsOfService/TermsOfService";
@@ -89,6 +91,8 @@ export const router = createBrowserRouter([
       },
       { path: "/storeLocations", element: <StoreLocations /> },
       { path: "/about", element: <About /> },
+      { path: "/faq", element: <FAQ /> },
+      { path: "/careers", element: <Careers /> },
       { path: "/contact", element: <Contact /> },
       { path: "/privacy-policy", element: <PrivacyPolicy /> },
       { path: "/terms", element: <TermsOfService /> },

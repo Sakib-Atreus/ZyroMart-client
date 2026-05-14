@@ -121,7 +121,7 @@ const Footer = () => {
             <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <Link to="/" className="link link-hover">Pricing</Link>
               <Link to="/" className="link link-hover">Documentation</Link>
-              <Link to="/" className="link link-hover">Guides</Link>
+              <Link to="/faq" className="link link-hover">Guides</Link>
               <Link to="/" className="link link-hover">API Status</Link>
             </div>
           </nav>
@@ -133,7 +133,7 @@ const Footer = () => {
             <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
               <Link to="/about" className="link link-hover">About</Link>
               <Link to="/contact" className="link link-hover">Contact</Link>
-              <Link to="/" className="link link-hover">Jobs</Link>
+              <Link to="/careers" className="link link-hover">Jobs</Link>
               <Link to="/" className="link link-hover">Press</Link>
               <Link to="/" className="link link-hover">Partners</Link>
             </div>
@@ -144,7 +144,7 @@ const Footer = () => {
               Legal
             </h6>
             <div className="flex flex-row lg:flex-col md:flex-col gap-4 lg:gap-2 md:gap-2 underline lg:no-underline md:no-underline">
-              <Link to="/" className="link link-hover">Claim</Link>
+              <Link to="/contact" className="link link-hover">Claim</Link>
               <Link to="/privacy-policy" className="link link-hover">Privacy</Link>
               <Link to="/terms" className="link link-hover">Terms</Link>
             </div>
