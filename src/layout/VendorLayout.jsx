@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ScrollToTop from "../utils/ScrollToTop";
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -144,6 +145,7 @@ const VendorLayout = () => {
           minHeight: 280,
           overflow: "auto",
         }}>
+          <ScrollToTop />
           <Outlet />
         </Content>
       </Layout>

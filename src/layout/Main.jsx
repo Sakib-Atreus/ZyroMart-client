@@ -4,10 +4,12 @@ import Footer from "../shared/Footer/Footer";
 import MobileNavbar from "../shared/Navbar/MobileNavbar";
 import DynamicBreadcrumb from "../utils/Breadcrumb";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
+import ScrollToTop from "../utils/ScrollToTop";
 
 const Main = () => {
     return (
         <div className="max-w-full mx-auto bg-[#F9F9F7] text-black">
+            <ScrollToTop />
             <Navbar />
             <DynamicBreadcrumb />
             <Outlet />

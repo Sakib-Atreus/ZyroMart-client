@@ -10,6 +10,10 @@ import Register from "../pages/Register/Register";
 import Cart from "../pages/Cart/Cart";
 import Wishlist from "../pages/Wishlist/Wishlist";
 import StoreLocations from "../pages/StoreLocations/StoreLocations";
+import About from "../pages/About/About";
+import Contact from "../pages/Contact/Contact";
+import PrivacyPolicy from "../pages/PrivacyPolicy/PrivacyPolicy";
+import TermsOfService from "../pages/TermsOfService/TermsOfService";
 import Profile from "../pages/Profile/Profile";
 import Checkout from "../pages/Checkout/Checkout";
 import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
@@ -84,6 +88,10 @@ export const router = createBrowserRouter([
         ),
       },
       { path: "/storeLocations", element: <StoreLocations /> },
+      { path: "/about", element: <About /> },
+      { path: "/contact", element: <Contact /> },
+      { path: "/privacy-policy", element: <PrivacyPolicy /> },
+      { path: "/terms", element: <TermsOfService /> },
     ],
   },
   {
