@@ -1,126 +1,67 @@
-import React from "react";
-import { Input, Space, Avatar, Badge, Dropdown } from "antd";
-// import type { GetProps } from 'antd';
+import React, { useState, useCallback } from "react";
+import { Space, Badge, Dropdown, Drawer } from "antd";
 import "./Navbar.css";
-import {
-  AudioOutlined,
-  MenuOutlined,
-  SettingOutlined,
-  ShoppingCartOutlined,
-} from "@ant-design/icons";
-import { Menu } from "antd";
+import { SettingOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { FaPhoneAlt, FaHeart } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { Button, Drawer } from "antd";
-import { useState } from "react";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
+import { useCartWishlist } from "../../context/CartWishlistContext";
+import { cartApi } from "../../api/endpoints";
 import { CgProfile } from "react-icons/cg";
 
 const MobileNavbar = () => {
   const { user, logout } = useAuth();
-    const navigate = useNavigate();
-  
-    const handleLogout = async () => {
-      await logout();
-      navigate("/login");
-      // LogOut();
-    };
-  
+  const { cartCount, wishlistCount, syncCartCount } = useCartWishlist();
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
-  
+  const [cartItems, setCartItems] = useState([]);
+  const [cartSubtotal, setCartSubtotal] = useState(0);
+  const [cartLoading, setCartLoading] = useState(false);
+
+  const fetchCart = useCallback(async () => {
+    if (!user) return;
+    setCartLoading(true);
+    try {
+      const res = await cartApi.get();
+      const data = res.data ?? {};
+      setCartItems(data.items ?? []);
+      setCartSubtotal(data.subtotal ?? 0);
+      syncCartCount(data.itemCount ?? data.items?.length ?? 0);
+    } catch {
+      setCartItems([]);
+    } finally {
+      setCartLoading(false);
+    }
+  }, [user, syncCartCount]);
+
   const showDrawer = () => {
     setOpen(true);
+    fetchCart();
   };
-  
-  const onClose = () => {
-    setOpen(false);
+
+  const onClose = () => setOpen(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   const onMenuClick = ({ key }) => {
-    if (key === "logout") {
-      handleLogout();
-    }
+    if (key === "logout") handleLogout();
   };
 
-  // navbar profile icon
   const profileItems = user
     ? [
-        // {
-        //   key: "1",
-        //   label: "My Account",
-        //   disabled: true,
-        // },
-        // {
-        //   type: "divider",
-        // },
-        {
-          key: "2",
-          label: "Profile",
-          icon: <CgProfile />,
-        },
-        {
-          key: "4",
-          label: "Settings",
-          icon: <SettingOutlined />,
-        },
-        {
-          type: "divider",
-        },
-        {
-          key: "logout",
-          label: <span className="text-primary font-medium">LogOut</span>,
-          // onClick: handleLogout,
-        },
+        { key: "profile", label: "Profile", icon: <CgProfile /> },
+        { key: "settings", label: "Settings", icon: <SettingOutlined /> },
+        { type: "divider" },
+        { key: "logout", label: <span className="text-primary font-medium">LogOut</span> },
       ]
-    : [
-        {
-          key: "login",
-          label: <Link to="/login">Login</Link>,
-        },
-      ];
-
-  const initialProducts = [
-    {
-      id: 1,
-      name: "Product Name",
-      category: "Category Name",
-      price: 19.99,
-      quantity: 1,
-      imageUrl:
-        "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
-    },
-    {
-      id: 2,
-      name: "Product Name",
-      category: "Category Name",
-      price: 29.99,
-      quantity: 1,
-      imageUrl:
-        "https://9to5google.com/wp-content/uploads/sites/4/2024/01/pixel-9-onl-3.jpg",
-    },
-    {
-      id: 3,
-      name: "Product Name",
-      category: "Category Name",
-      price: 19.99,
-      quantity: 1,
-      imageUrl:
-        "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
-    },
-  ];
-
-  const [products, setProducts] = useState(initialProducts);
-
-  const removeProduct = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
-  };
+    : [{ key: "login", label: <Link to="/login">Login</Link> }];
   
   return (
     <div className="sticky bottom-0 z-50">
@@ -132,75 +73,76 @@ const MobileNavbar = () => {
           to="/wishlist"
           className="btn bg-[#FFE6C71A] text-white text-2xl hover:bg-primary"
         >
-          <a href="/wishlist">
-            <Badge count={5} className="custom-badge">
-              {" "}
-              <FaHeart className="custom-icon" />{" "}
-            </Badge>
-          </a>
+          <Badge count={wishlistCount} style={{ fontSize: 13, height: 17, minWidth: 17, lineHeight: '17px' }}>
+            <FaHeart style={{ fontSize: '1.5rem' }} className="text-white" />
+          </Badge>
         </Link>
         {/* Cart Drawer */}
         <button
           onClick={showDrawer}
           className="btn bg-[#FFE6C71A] text-white text-2xl hover:bg-primary h-10"
         >
-          <ShoppingCartOutlined />
+          <Badge count={cartCount} style={{ fontSize: 13, height: 17, minWidth: 17, lineHeight: '17px' }}>
+            <ShoppingCartOutlined style={{ fontSize: '1.5rem' }} className="text-white" />
+          </Badge>
         </button>
         <Drawer title="My Cart" onClose={onClose} open={open}>
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1">
-              {/* Cart Items (Left Side) */}
-              <div className="space-y-6 col-span-2">
-                {products.slice(0, 3).map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between p-2 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-md shadow-sm"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {product.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {product.category}
-                        </p>
-                        <p className="text-xl font-semibold text-gray-900">
-                          ${product.price}
-                        </p>
-                      </div>
+          {cartLoading ? (
+            <div className="text-center py-12 text-gray-400">Loading…</div>
+          ) : cartItems.length > 0 ? (
+            <div className="space-y-4">
+              {cartItems.map((item) => {
+                const product = item.product ?? {};
+                const variant = item.variant ?? {};
+                const variantLabel = variant.options
+                  ? Object.values(variant.options).join(" / ")
+                  : "";
+                return (
+                  <div key={variant._id ?? item._id} className="flex items-center gap-3 p-2 bg-white border rounded-lg shadow-sm">
+                    <img
+                      src={product.thumbnail || variant.images?.[0] || "https://placehold.co/56x56?text=?"}
+                      alt={product.name}
+                      className="w-14 h-14 object-cover rounded flex-shrink-0"
+                      onError={(e) => { e.target.src = "https://placehold.co/56x56?text=?"; }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm line-clamp-2">{product.name}</p>
+                      {variantLabel && <p className="text-xs text-gray-500">{variantLabel}</p>}
+                      <p className="text-orange-600 font-bold text-sm">৳{variant.price?.toLocaleString()}</p>
+                      <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
                     </div>
-
-                    <button
-                      className="text-red-500 text-2xl"
-                      onClick={() => removeProduct(product.id)}
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
                   </div>
-                ))}
+                );
+              })}
+              <div className="border-t pt-3 flex justify-between font-semibold text-sm">
+                <span>Subtotal</span>
+                <span className="text-orange-600">৳{cartSubtotal?.toLocaleString()}</span>
               </div>
             </div>
           ) : (
-            <p className="text-center text-gray-500 mt-8 text-lg">
-              Your cart is empty.{" "}
-              <a href="/" className="text-blue-600 underline">
-                Start shopping
-              </a>
-              .
-            </p>
+            <div className="text-center py-12">
+              <p className="text-gray-500 mb-4">
+                {user ? "Your cart is empty." : "Please log in to view your cart."}
+              </p>
+              {!user && (
+                <Link to="/login" onClick={onClose} className="text-orange-600 underline">
+                  Log in
+                </Link>
+              )}
+              {user && (
+                <Link to="/phones" onClick={onClose} className="text-orange-600 underline">
+                  Start shopping
+                </Link>
+              )}
+            </div>
           )}
-          <div className="text-center my-6">
+          <div className="text-center mt-6">
             <Link
               to="/cart"
               onClick={onClose}
-              className="btn btn-sm bg-white text-primary text-md border-1 border-primary hover:bg-primary hover:text-white hover:border-none"
+              className="btn btn-sm bg-white text-orange-600 border border-orange-600 hover:bg-orange-600 hover:text-white"
             >
-              <ShoppingCartOutlined className="text-2xl" /> View All Cart
+              <ShoppingCartOutlined /> View Full Cart
             </Link>
           </div>
         </Drawer>

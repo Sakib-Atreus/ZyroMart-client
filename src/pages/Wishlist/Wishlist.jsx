@@ -1,100 +1,87 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button, Empty, Skeleton, Typography, message } from "antd";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { ShoppingCartOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import { wishlistApi } from "../../api/endpoints";
+import { useAuth } from "../../context/AuthContext";
+import { useCartWishlist } from "../../context/CartWishlistContext";
+
+const { Title, Text } = Typography;
+
+const money = (n, ccy = "BDT") =>
+  new Intl.NumberFormat("en-BD", { style: "currency", currency: ccy }).format(n ?? 0);
 
 const Wishlist = () => {
-  const initialProducts = [
-    {
-      id: 1,
-      name: "Product Name Na me NAme Hello ",
-      category: "Category Name",
-      price: 19.99,
-      quantity: 1,
-      imageUrl:
-        "https://d61s2hjse0ytn.cloudfront.net/category_cover/1/iPhone_14_Pro_Max.webp",
-    },
-    {
-      id: 2,
-      name: "Product Name",
-      category: "Category Name",
-      price: 29.99,
-      quantity: 1,
-      imageUrl:
-        "https://9to5google.com/wp-content/uploads/sites/4/2024/01/pixel-9-onl-3.jpg",
-    },
-    {
-      id: 3,
-      name: "Product Name",
-      category: "Category Name",
-      price: 19.99,
-      quantity: 1,
-      imageUrl:
-        "https://mobilerelation.sg/wp-content/uploads/2024/05/samsung-galaxy-s24-ultra-5g-grey.webp",
-    },
-  ];
+  const { user } = useAuth();
+  const { syncWishlistCount } = useCartWishlist();
+  const navigate = useNavigate();
 
-  const [products, setProducts] = useState(initialProducts);
-  const [showAlert, setShowAlert] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [removing, setRemoving] = useState(null);
 
-  // Check for empty products list on initial render
   useEffect(() => {
-    if (products.length === 0) {
-      setShowAlert(true);
-    }
-  }, [products]);
+    wishlistApi
+      .get()
+      .then((res) => {
+        const products = res.data?.products ?? res.products ?? [];
+        setItems(products);
+        syncWishlistCount(products.length);
+      })
+      .catch(() => message.error("Failed to load wishlist"))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const removeProduct = (id) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
-    setProducts(updatedProducts);
-
-    if (updatedProducts.length === 0) {
-      setShowAlert(true);
+  const handleRemove = async (productId) => {
+    setRemoving(productId);
+    try {
+      await wishlistApi.remove(productId);
+      setItems((prev) => {
+        const next = prev.filter((i) => i._id !== productId);
+        syncWishlistCount(next.length);
+        return next;
+      });
+      message.success("Removed from wishlist");
+    } catch (err) {
+      message.error(err.message || "Failed to remove item");
+    } finally {
+      setRemoving(null);
     }
   };
 
-  const closeAlert = () => {
-    setShowAlert(false);
-  };
+  if (!user) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <Title level={3}>Please log in to view your wishlist</Title>
+        <Button type="primary" onClick={() => navigate("/login")}>
+          Log In
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex gap-8">
       {/* Left Sidebar */}
-      <div className="w-1/4 max-h-max bg-white border rounded-lg shadow-md p-4 pb-8 hidden lg:block md:block">
+      <div className="w-56 lg:w-64 max-h-max bg-white border rounded-lg shadow-md p-4 pb-8 hidden md:block flex-shrink-0">
         <div className="flex items-center justify-center flex-col space-y-2 mb-8 text-center">
           <img
             className="w-16 h-16 rounded-full"
             src="https://png.pngtree.com/png-clipart/20230927/original/pngtree-man-avatar-image-for-profile-png-image_13001882.png"
-            alt="user photo"
+            alt="user"
           />
-          <h2 className="text-lg font-bold mb-4">Samiul Islam Sakib</h2>
+          <h2 className="text-lg font-bold mb-4">{user?.name || "My Account"}</h2>
         </div>
         <ul className="space-y-4 text-gray-700">
           <li>
-            <Link to="/account" className="hover:text-primary font-semibold">
+            <Link to="/profile" className="hover:text-primary font-semibold">
               My Account
             </Link>
           </li>
           <li>
-            <Link to="/orders" className="hover:text-primary font-semibold">
+            <Link to="/profile?tab=orders" className="hover:text-primary font-semibold">
               My Orders
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/ebook-library"
-              className="hover:text-primary font-semibold"
-            >
-              My eBook Library
-            </Link>
-          </li>
-          <li>
-            <Link to="/lists" className="hover:text-primary font-semibold">
-              My Lists
-            </Link>
-          </li>
-          <li>
-            <Link to="/bookshelf" className="hover:text-primary font-semibold">
-              My Bookshelf
             </Link>
           </li>
           <li>
@@ -102,84 +89,105 @@ const Wishlist = () => {
               My Wishlist
             </Link>
           </li>
-          <li>
-            <Link to="/interests" className="hover:text-primary font-semibold">
-              My Interests
-            </Link>
-          </li>
         </ul>
       </div>
 
       {/* Main Content */}
       <div className="flex-1">
-        {showAlert && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-6 flex items-center justify-between">
-            <p className="text-md font-semibold">
-              Your wishlist is empty.{" "}
-              <a href="/shop" className="text-blue-600">
-                Continue shopping
-              </a>
-              .
-            </p>
-            <button
-              onClick={() => setShowAlert(false)}
-              className="text-yellow-700 font-bold text-lg"
-            >
-              &times;
-            </button>
+        <Title level={2} style={{ marginBottom: 32 }}>
+          My Wishlist
+        </Title>
+
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((n) => (
+              <Skeleton key={n} active avatar paragraph={{ rows: 2 }} />
+            ))}
           </div>
-        )}
+        ) : items.length === 0 ? (
+          <Empty
+            description={
+              <span>
+                Your wishlist is empty.{" "}
+                <Link to="/phones" className="text-blue-600">
+                  Browse products
+                </Link>
+              </span>
+            }
+          >
+            <Link to="/phones">
+              <Button type="primary">Start Shopping</Button>
+            </Link>
+          </Empty>
+        ) : (
+          <div className="space-y-6">
+            {items.map((product) => {
+              const productId = product._id;
+              const price = product.basePrice ?? product.compareAtPrice ?? 0;
+              const thumbnail =
+                product.thumbnail ??
+                product.images?.[0] ??
+                "https://via.placeholder.com/128x128?text=?";
+              const slug = product.slug ?? "";
 
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">My Wishlist</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
-          {products.length > 0 ? (
-            <div className="space-y-6 col-span-3">
-              {products.map((product) => (
+              return (
                 <div
-                  key={product.id}
-                  className="flex items-center justify-between p-1 py-3 lg:p-4 md:p-4 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                  key={productId}
+                  className="p-3 bg-white border rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                 >
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="w-16 h-24 lg:w-32 md:w-28 lg:h-32 md:h-24 object-cover rounded-md shadow-sm"
-                    />
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {product.name}
-                      </h3>
-                      <p className="text-xl font-semibold text-gray-900">
-                        ${product.price}
+                  {/* Row 1: image + info */}
+                  <div className="flex items-start gap-3">
+                    <Link to={`/products/${slug}`} className="flex-shrink-0">
+                      <img
+                        src={thumbnail}
+                        alt={product.name}
+                        className="w-20 h-20 lg:w-28 lg:h-28 object-cover rounded-md shadow-sm"
+                      />
+                    </Link>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <Link to={`/products/${slug}`}>
+                        <h3 className="text-base font-semibold text-gray-800 hover:text-primary line-clamp-2">
+                          {product.name || "Product"}
+                        </h3>
+                      </Link>
+                      {product.brand && (
+                        <Text type="secondary" style={{ fontSize: 13 }}>
+                          {product.brand}
+                        </Text>
+                      )}
+                      <p className="text-lg font-semibold text-gray-900">
+                        {money(price)}
                       </p>
-                      <button className="btn btn-sm border-1 border-primary bg-white text-primary hover:bg-primary hover:text-white hover:border-none">
-                        Add To Cart
-                      </button>
                     </div>
                   </div>
 
-                  <div className="lg:pb-0 md:pb-0">
-                    <button
-                      className="text-red-500 text-2xl"
-                      onClick={() => removeProduct(product.id)}
+                  {/* Row 2: Add to Cart + Delete */}
+                  <div className="flex items-center justify-between mt-3">
+                    <Button
+                      size="small"
+                      icon={<ShoppingCartOutlined />}
+                      className="border border-primary text-primary hover:bg-primary hover:text-white"
+                      onClick={() => navigate(`/products/${slug}`)}
                     >
-                      <RiDeleteBin5Line />
-                    </button>
+                      Add To Cart
+                    </Button>
+                    <Button
+                      type="text"
+                      danger
+                      icon={<RiDeleteBin5Line style={{ fontSize: 22 }} />}
+                      loading={removing === productId}
+                      onClick={() => handleRemove(productId)}
+                      title="Remove from wishlist"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600 col-span-3 text-center">
-              No products in the wishlist.
-            </p>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default Wishlist;
-

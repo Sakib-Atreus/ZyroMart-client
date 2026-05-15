@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -7,6 +6,7 @@ import {
 } from "react-icons/fa";
 import "./Login.css";
 import { toast } from "react-toastify";
+import { authApi } from "../../api/endpoints";
 
 
 const Login = () => {
@@ -24,12 +24,25 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   useEffect(() => {
     if (location.pathname === "/login") setActiveTab("login");
     else if (location.pathname === "/register") setActiveTab("register");
   }, [location.pathname]);
+
+  const destinationForRole = (role) => {
+    if (role === "admin") return "/admin";
+    if (role === "vendor") return "/vendor";
+    return "/";
+  };
+
+  // If already authenticated, skip the form and send the user to the right place.
+  useEffect(() => {
+    if (user) {
+      navigate(destinationForRole(user.role), { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -43,38 +56,41 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/auth/login", {
+      const res = await authApi.login({
         email: formData.email,
         password: formData.password,
       });
-
-      login(res.data.data); // Store token or user info
+      login({ user: res.data, token: res.token });
       toast.success("Login successful!");
-      navigate("/");
+      navigate(destinationForRole(res.data?.role), { replace: true });
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      return alert("Passwords do not match");
+      return toast.error("Passwords do not match");
     }
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/auth/signup", {
+      await authApi.signup({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
         address: formData.address,
       });
-
-      login(res.data.data);
+      // Registration doesn't return a token — auto-login after signup.
+      const loginRes = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+      login({ user: loginRes.data, token: loginRes.token });
       toast.success("Registration successful!");
-      navigate("/");
+      navigate(destinationForRole(loginRes.data?.role), { replace: true });
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || err.message || "Registration failed");
     }
   };
 
@@ -82,7 +98,7 @@ const Login = () => {
     <div className="w-full mx-auto flex justify-center items-center bg-cover bg-center bg-no-repeat relative">
       <div className="bg-video bg-content flex justify-items-center items-center w-full h-full absolute inset-0 bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-        <div className="bg-white rounded-xl shadow-lg w-72 lg:w-[28%] md:w-[64%] mx-auto z-10 backdrop-blur-sm pt-8 pb-2 lg:p-12 flex flex-col col-span-1">
+        <div className="bg-white rounded-xl shadow-lg w-[92%] max-w-sm sm:max-w-md md:w-[64%] lg:w-[28%] mx-auto z-10 backdrop-blur-sm pt-8 pb-2 lg:p-12 flex flex-col col-span-1">
           <div className="tabs w-[70%] mx-auto grid grid-cols-2 justify-center bg-gray-100 rounded-full mb-4">
             <button
               className={`tab border-none text-lg font-medium rounded-full ${

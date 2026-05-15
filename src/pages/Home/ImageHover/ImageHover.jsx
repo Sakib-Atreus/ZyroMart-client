@@ -1,44 +1,50 @@
 import React from "react";
 import "./ImageHover.css";
 import { Link } from "react-router-dom";
+import img1 from "../../../assets/HomeImageHover/imgHovSec1.jpg";
+import img2 from "../../../assets/HomeImageHover/imgHovSec2.jpeg";
+import img3 from "../../../assets/HomeImageHover/imgHovSec3.jpg";
+import img4 from "../../../assets/HomeImageHover/imgHovSec4.jpg";
+import img5 from "../../../assets/HomeImageHover/imgHovSec5.jpg";
+import img6 from "../../../assets/HomeImageHover/imgHovSec6.webp";
 
 const ImageHover = () => {
   return (
     <div>
-      <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-1 my-4">
+      <div className="grid lg:grid-cols-5 md:grid-cols-5 grid-cols-1 my-4">
         <img
-          className="box col-span-3"
-          src="https://gadgetmonkeybd.com/public/uploads/all/1WjNGP6SsssOdaK4wGWY3o0jIiTn4fOMDIsWVUlg.jpg"
+          className="box lg:col-span-3 md:col-span-3 w-full h-full"
+          src={img4}
           alt="gadget"
         />
         <img
-          className="box col-span-2"
-          src="https://www.smartworldgadgets.pk/cdn/shop/files/SMART_WORLD_PRODUCT_BANNER.jpg?v=1711103716"
+          className="box lg:col-span-2 md:col-span-2 w-full h-full"
+          src={img2}
           alt="gadget"
         />
         <img
-          className="box col-span-2"
-          src="https://matrixitworld.com/wp-content/uploads/2023/12/smart-watch-sits-smart-watch_843415-1959.jpg"
+          className="box lg:col-span-2 md:col-span-2 w-full h-full"
+          src={img3}
           alt="gadget"
         />
         <img
-          className="box col-span-3"
-          src="https://gadgetmonkeybd.com/public/uploads/all/JMwviK7LCMV0aJ9DbRMpHFJU9GmFO3G8g7l53LMc.jpg"
+          className="box lg:col-span-3 md:col-span-3 w-full h-full"
+          src={img1}
           alt="gadget"
         />
         <img
-          className="box col-span-3"
-          src="https://gadgetmonkeybd.com/public/uploads/all/WOh2tZ5sVdJpSCu39fxLa0FFIRCbkhmop9VewU9Y.jpg"
+          className="box lg:col-span-3 md:col-span-3 w-full h-full object-cover"
+          src={img5}
           alt="gadget"
         />
         <img
-          className="box col-span-2"
-          src="https://gadgetmonkeybd.com/public/uploads/all/AT82vTRU91c5z4ftoLXSassyJQl07XDoBGtvC1Kz.jpg"
+          className="box lg:col-span-2 md:col-span-2 w-full h-full object-cover"
+          src={img6}
           alt="gadget"
         />
       </div>
       {/* text description about the website products */}
-      <div className="my-8 text-justify px-3 lg:px-0 md:px-0">
+      <div className="my-8 lg:mx-0 md:mx-4 mx-1/3 text-justify px-3 lg:px-0 md:px-0">
         <div className="my-6">
           <h2 className="text-xl font-bold my-2">
             The ZyroMart Experience - Official Apple Products, Premium Brands,

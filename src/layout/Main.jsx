@@ -3,15 +3,19 @@ import Navbar from "../shared/Navbar/Navbar";
 import Footer from "../shared/Footer/Footer";
 import MobileNavbar from "../shared/Navbar/MobileNavbar";
 import DynamicBreadcrumb from "../utils/Breadcrumb";
+import ChatWidget from "../components/ChatWidget/ChatWidget";
+import ScrollToTop from "../utils/ScrollToTop";
 
 const Main = () => {
     return (
         <div className="max-w-full mx-auto bg-[#F9F9F7] text-black">
-            <Navbar/>
+            <ScrollToTop />
+            <Navbar />
             <DynamicBreadcrumb />
-            <Outlet/>
-            <Footer/>
-            <MobileNavbar/>
+            <Outlet />
+            <Footer />
+            <MobileNavbar />
+            <ChatWidget />
         </div>
     );
 };

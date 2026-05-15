@@ -1,27 +1,44 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { authApi } from "../api/endpoints";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+const readStored = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
 
-  const login = (userData) => {
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(readStored);
+
+  const login = ({ user: userData, token }) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    if (token) localStorage.setItem("token", token);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // logout is best-effort; proceed with client cleanup regardless
+    }
     setUser(null);
-    toast.info("Logged out successfully!");
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    toast.info("Logged out successfully");
   };
+
+  const isAdmin = user?.role === "admin";
+  const isVendor = user?.role === "vendor";
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isVendor }}>
       {children}
     </AuthContext.Provider>
   );
