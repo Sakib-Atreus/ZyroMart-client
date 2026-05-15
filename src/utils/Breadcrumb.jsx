@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
 
@@ -6,11 +5,13 @@ const DynamicBreadcrumb = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
-  // Pages where the breadcrumb should not be shown
   const excludedPaths = ['/', '/login', '/register'];
+  const excludedPrefixes = ['/phones', '/products'];
 
-  // Return null if the current pathname matches any of the excluded paths
-  if (excludedPaths.includes(pathname)) {
+  if (
+    excludedPaths.includes(pathname) ||
+    excludedPrefixes.some((p) => pathname.startsWith(p))
+  ) {
     return null;
   }
 

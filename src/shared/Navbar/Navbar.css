@@ -41,3 +41,9 @@
 
 
 /* hover */
+
+/* Hide native scrollbar on category bar across all browsers */
+.cat-scroll::-webkit-scrollbar {
+  display: none;
+}
+
