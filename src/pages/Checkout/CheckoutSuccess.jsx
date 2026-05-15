@@ -108,7 +108,11 @@ const CheckoutSuccess = () => {
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Method">
-                {order.paymentMethod === "cod" ? "Cash on Delivery" : "Card / Stripe"}
+                {order.paymentMethod === "cod"
+                  ? "Cash on Delivery"
+                  : order.paymentMethod === "sslcommerz"
+                  ? "SSL Commerce (bKash / Nagad / Card)"
+                  : "Card / Stripe"}
               </Descriptions.Item>
               <Descriptions.Item label="Items">
                 {order.items?.length ?? 0} item(s)

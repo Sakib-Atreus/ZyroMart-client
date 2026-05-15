@@ -191,7 +191,10 @@ export default function PhoneDetails() {
   const discount = comparePrice && comparePrice > price
     ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
   const available = resolvedVariant
-    ? Math.max(0, (resolvedVariant.stock ?? 0) - (resolvedVariant.reservedStock ?? 0)) : 0;
+    ? (resolvedVariant.isActive === false
+        ? 0
+        : Math.max(0, (resolvedVariant.stock ?? 0) - (resolvedVariant.reservedStock ?? 0)))
+    : 0;
   const inCart = resolvedVariant ? cartVariantIds.has(String(resolvedVariant._id)) : false;
   const emiOption = product?.emiOptions?.find((o) => o.months === emiMonths);
   const emiMonthly = emiOption
@@ -577,7 +580,7 @@ export default function PhoneDetails() {
                       const vOpts = getOptions(v);
                       return Object.entries(testOptions).every(([k, value]) => vOpts[k] === value);
                     });
-                    const hasStock = matchingVariants.some((v) => (v.stock ?? 0) - (v.reservedStock ?? 0) > 0);
+                    const hasStock = matchingVariants.some((v) => v.isActive !== false && (v.stock ?? 0) - (v.reservedStock ?? 0) > 0);
                     const isSelected = selectedOptions[opt.key] === val;
                     if (isColor) {
                       const hex = getSwatchColor(val);
@@ -612,7 +615,11 @@ export default function PhoneDetails() {
           {/* Stock status */}
           {resolvedVariant ? (
             <div className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full ${available > 0 ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
-              {available > 0 ? <><FiCheck size={14} /> In Stock{available <= 10 && <span className="font-normal ml-1">— Only {available} left!</span>}</> : "Out of Stock"}
+              {available > 0
+                ? <><FiCheck size={14} /> In Stock{available <= 10 && <span className="font-normal ml-1">— Only {available} left!</span>}</>
+                : resolvedVariant.isActive === false
+                  ? "Not Available"
+                  : "Out of Stock"}
             </div>
           ) : product.hasVariants ? (
             <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full inline-block">Select options to check availability</p>

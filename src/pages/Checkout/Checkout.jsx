@@ -85,6 +85,14 @@ const Checkout = () => {
         } else {
           throw new Error("No Stripe session URL returned");
         }
+      } else if (paymentMethod === "sslcommerz") {
+        const session = await paymentApi.createSSLCSession({ orderId });
+        const url = session.data?.url ?? session.url;
+        if (url) {
+          window.location.href = url;
+        } else {
+          throw new Error("No SSL Commerce gateway URL returned");
+        }
       } else {
         navigate(`/checkout/success?orderId=${orderId}`);
       }
@@ -250,6 +258,18 @@ const Checkout = () => {
                       Secure payment via Stripe — you will be redirected
                     </Paragraph>
                   </Radio>
+                  <Radio value="sslcommerz">
+                    <Space>
+                      <span style={{ fontWeight: 500 }}>bKash / Nagad / Card (SSL Commerce)</span>
+                      <Tag color="orange">SSLCommerz</Tag>
+                    </Space>
+                    <Paragraph
+                      type="secondary"
+                      style={{ margin: "4px 0 0 24px", fontSize: 12 }}
+                    >
+                      Pay with bKash, Nagad, Rocket, or any card — powered by SSL Commerce
+                    </Paragraph>
+                  </Radio>
                 </Space>
               </Radio.Group>
 
@@ -261,6 +281,14 @@ const Checkout = () => {
                   message="After placing the order you will be redirected to Stripe's secure payment page."
                 />
               )}
+              {paymentMethod === "sslcommerz" && (
+                <Alert
+                  type="info"
+                  showIcon
+                  style={{ marginTop: 16 }}
+                  message="After placing the order you will be redirected to SSL Commerce's secure payment page. Supports bKash, Nagad, Rocket, and all major cards."
+                />
+              )}
             </Card>
 
             <Button
@@ -269,9 +297,17 @@ const Checkout = () => {
               htmlType="submit"
               block
               loading={placing}
-              icon={paymentMethod === "stripe" ? <CreditCardOutlined /> : <ShoppingCartOutlined />}
+              icon={
+                paymentMethod === "cod"
+                  ? <ShoppingCartOutlined />
+                  : <CreditCardOutlined />
+              }
             >
-              {paymentMethod === "stripe" ? "Continue to Payment" : "Place Order (COD)"}
+              {paymentMethod === "cod"
+                ? "Place Order (COD)"
+                : paymentMethod === "sslcommerz"
+                ? "Continue to SSL Commerce"
+                : "Continue to Payment"}
             </Button>
           </Form>
         </Col>

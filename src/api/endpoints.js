@@ -76,6 +76,7 @@ export const cartApi = {
 
 export const paymentApi = {
   createCheckoutSession: (body) => unwrap(api.post("/payments/checkout-session", body)),
+  createSSLCSession: (body) => unwrap(api.post("/payments/sslc/initiate", body)),
 };
 
 export const wishlistApi = {

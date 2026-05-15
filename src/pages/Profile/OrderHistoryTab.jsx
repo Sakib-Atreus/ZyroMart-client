@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  Button, Card, Descriptions, Empty, List, Modal, Popconfirm, Space, Table, Tag, message,
+  Alert, Button, Card, Descriptions, Empty, List, Modal, Popconfirm, Space, Table, Tag, message,
 } from "antd";
-import { EyeOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { orderApi } from "../../api/endpoints";
+import { CreditCardOutlined, EyeOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { orderApi, paymentApi } from "../../api/endpoints";
 
 const statusColor = {
   pending: "gold",
@@ -25,6 +25,7 @@ const OrderHistoryTab = () => {
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [loading, setLoading] = useState(false);
   const [viewing, setViewing] = useState(null);
+  const [payingId, setPayingId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,6 +59,34 @@ const OrderHistoryTab = () => {
   };
 
   const cancellable = (status) => ["pending", "paid", "processing"].includes(status);
+
+  const isRetryable = (row) =>
+    row.paymentStatus === "unpaid" &&
+    row.status === "pending" &&
+    (row.paymentMethod === "stripe" || row.paymentMethod === "sslcommerz");
+
+  const handlePayNow = async (row) => {
+    setPayingId(row._id);
+    try {
+      let url;
+      if (row.paymentMethod === "stripe") {
+        const session = await paymentApi.createCheckoutSession({ orderId: row._id });
+        url = session.data?.url ?? session.url;
+      } else {
+        const session = await paymentApi.createSSLCSession({ orderId: row._id });
+        url = session.data?.url ?? session.url;
+      }
+      if (url) {
+        window.location.href = url;
+      } else {
+        message.error("Could not get payment URL. Please try again.");
+      }
+    } catch (err) {
+      message.error(err.message || "Failed to initiate payment");
+    } finally {
+      setPayingId(null);
+    }
+  };
 
   const columns = [
     {
@@ -94,10 +123,21 @@ const OrderHistoryTab = () => {
       title: "Actions",
       key: "actions",
       render: (_, row) => (
-        <Space>
+        <Space wrap>
           <Button size="small" icon={<EyeOutlined />} onClick={() => setViewing(row)}>
             View
           </Button>
+          {isRetryable(row) && (
+            <Button
+              size="small"
+              type="primary"
+              icon={<CreditCardOutlined />}
+              loading={payingId === row._id}
+              onClick={() => handlePayNow(row)}
+            >
+              Pay Now
+            </Button>
+          )}
           {cancellable(row.status) && (
             <Popconfirm title="Cancel this order?" onConfirm={() => handleCancel(row._id)}>
               <Button size="small" danger icon={<CloseCircleOutlined />}>
@@ -139,11 +179,32 @@ const OrderHistoryTab = () => {
         open={!!viewing}
         title={`Order ${viewing?.orderNumber}`}
         onCancel={() => setViewing(null)}
-        footer={null}
+        footer={
+          viewing && isRetryable(viewing) ? (
+            <Button
+              type="primary"
+              icon={<CreditCardOutlined />}
+              loading={payingId === viewing._id}
+              onClick={() => handlePayNow(viewing)}
+              block
+            >
+              Complete Payment —{" "}
+              {viewing.paymentMethod === "stripe" ? "Stripe" : "SSL Commerce"}
+            </Button>
+          ) : null
+        }
         width="min(720px, 95vw)"
       >
         {viewing && (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
+            {isRetryable(viewing) && (
+              <Alert
+                type="warning"
+                showIcon
+                message="Payment Pending"
+                description="This order has not been paid yet. Click the button below to complete your payment. Your items are reserved until payment is completed or the order is cancelled."
+              />
+            )}
             <Descriptions column={2} bordered size="small">
               <Descriptions.Item label="Status">
                 <Tag color={statusColor[viewing.status]}>{viewing.status}</Tag>
@@ -155,7 +216,11 @@ const OrderHistoryTab = () => {
                 {new Date(viewing.placedAt).toLocaleString()}
               </Descriptions.Item>
               <Descriptions.Item label="Method">
-                {viewing.paymentMethod}
+                {viewing.paymentMethod === "cod"
+                  ? "Cash on Delivery"
+                  : viewing.paymentMethod === "sslcommerz"
+                  ? "SSL Commerce"
+                  : "Stripe"}
               </Descriptions.Item>
               <Descriptions.Item label="Subtotal">
                 {money(viewing.subtotal, viewing.currency)}
