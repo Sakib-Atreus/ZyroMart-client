@@ -35,10 +35,10 @@ const VALUES = [
 ];
 
 const TEAM = [
-  { name: "Rafiq Ahmed",    role: "Founder & CEO",         initial: "R" },
-  { name: "Nadia Islam",    role: "Head of Operations",    initial: "N" },
-  { name: "Tanvir Hossain", role: "Lead Product Manager",  initial: "T" },
-  { name: "Sadia Akter",    role: "Customer Experience",   initial: "S" },
+  { name: "Md. Sakib Mia",    role: "Founder & CEO",         initial: "M" },
+  { name: "Samiul Islam",    role: "Head of Operations",    initial: "S" },
+  { name: "Sakib", role: "Lead Product Manager",  initial: "S" },
+  { name: "Atreus",    role: "Customer Experience",   initial: "A" },
 ];
 
 const MILESTONES = [
