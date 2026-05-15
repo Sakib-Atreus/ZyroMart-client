@@ -6,7 +6,7 @@ import { ShoppingCartOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { FaPhoneAlt, FaHeart, FaChevronDown } from "react-icons/fa";
+import { FaPhoneAlt, FaHeart, FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { Button, Drawer } from "antd";
@@ -219,6 +219,22 @@ const Navbar = () => {
   const [cartLoading, setCartLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Category bar scroll state
+  const catScrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkCatScroll = useCallback(() => {
+    const el = catScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  }, []);
+
+  const scrollCat = (dir) => {
+    catScrollRef.current?.scrollBy({ left: dir * 240, behavior: "smooth" });
+  };
+
   const fetchCart = useCallback(async () => {
     if (!user) return;
     setCartLoading(true);
@@ -257,6 +273,13 @@ const Navbar = () => {
     if (key === "logout") { handleLogout(); return; }
     if (routes[key]) navigate(routes[key]);
   };
+
+  // Re-check scroll arrows after categories load and on resize
+  useEffect(() => {
+    checkCatScroll();
+    window.addEventListener("resize", checkCatScroll);
+    return () => window.removeEventListener("resize", checkCatScroll);
+  }, [categories, checkCatScroll]);
 
   // Fetch all categories and build parent → children map
   useEffect(() => {
@@ -573,10 +596,33 @@ const Navbar = () => {
       </div>
 
       {/* ─── Category bar ────────────────────────────────────── */}
-      <div className="bg-black">
-        <div className="max-w-7xl mx-auto hidden lg:flex items-center px-4">
-          <div className="flex items-center flex-1 overflow-x-auto scrollbar-hide">
-            <div className="flex items-center mx-auto">
+      <div className="bg-black border-t border-white/5">
+        <div className="max-w-7xl mx-auto hidden lg:flex items-center" style={{ height: 42 }}>
+
+          {/* Left scroll arrow */}
+          <button
+            onClick={() => scrollCat(-1)}
+            aria-label="Scroll left"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-full text-white/50 hover:text-orange-400 hover:bg-white/10 transition-all duration-200"
+            style={{ opacity: canScrollLeft ? 1 : 0, pointerEvents: canScrollLeft ? "auto" : "none" }}
+          >
+            <FaChevronLeft size={11} />
+          </button>
+
+          {/* Scrollable categories with fade edges */}
+          <div className="relative flex-1 flex items-center min-w-0 h-full">
+            {/* Left fade */}
+            <div
+              className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-black to-transparent pointer-events-none z-10 transition-opacity duration-200"
+              style={{ opacity: canScrollLeft ? 1 : 0 }}
+            />
+
+            <div
+              ref={catScrollRef}
+              onScroll={checkCatScroll}
+              className="flex items-center h-full w-full overflow-x-auto"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
               {categories.map((cat) => (
                 <CategoryItem
                   key={cat._id}
@@ -585,21 +631,44 @@ const Navbar = () => {
                 />
               ))}
             </div>
+
+            {/* Right fade */}
+            <div
+              className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black to-transparent pointer-events-none z-10 transition-opacity duration-200"
+              style={{ opacity: canScrollRight ? 1 : 0 }}
+            />
           </div>
 
-          {/* Online Exclusive badge — fixed right */}
-          <div className="flex-shrink-0 ml-4">
+          {/* Right scroll arrow */}
+          <button
+            onClick={() => scrollCat(1)}
+            aria-label="Scroll right"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-full text-white/50 hover:text-orange-400 hover:bg-white/10 transition-all duration-200"
+            style={{ opacity: canScrollRight ? 1 : 0, pointerEvents: canScrollRight ? "auto" : "none" }}
+          >
+            <FaChevronRight size={11} />
+          </button>
+
+          {/* Divider */}
+          <div className="flex-shrink-0 w-px h-5 bg-white/15 mx-1" />
+
+          {/* Online Exclusive */}
+          <div className="flex-shrink-0 px-3">
             <Link
               to="/phones?isOnlineExclusive=true"
-              className="text-sm font-semibold bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 bg-clip-text text-transparent whitespace-nowrap"
+              className="text-xs font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400 bg-clip-text text-transparent whitespace-nowrap hover:opacity-80 transition-opacity"
             >
               🔥 Online Exclusive
             </Link>
           </div>
 
-          <div className="flex-shrink-0 flex items-center gap-2 text-sm font-semibold text-white ml-6 whitespace-nowrap">
-            <FaPhoneAlt />
-            <a href="tel:09727070118" className="hover:text-orange-400">09727-070118</a>
+          {/* Divider */}
+          <div className="flex-shrink-0 w-px h-5 bg-white/15 mx-1" />
+
+          {/* Phone */}
+          <div className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-white/70 pr-4 pl-2 whitespace-nowrap">
+            <FaPhoneAlt size={10} className="text-orange-400" />
+            <a href="tel:09727070118" className="hover:text-orange-400 transition-colors">09727-070118</a>
           </div>
         </div>
       </div>
