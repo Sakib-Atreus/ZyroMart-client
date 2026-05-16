@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 export const LogOut = async () => {
   try {
-    await axios.post("http://localhost:5000/api/v1/auth/logout", {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/logout`, {
       //   withCredentials: true, // if using cookies
     });
     setUser(null);
