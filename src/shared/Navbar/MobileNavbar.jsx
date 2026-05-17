@@ -156,7 +156,7 @@ const MobileNavbar = () => {
                   <Space>
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                      className="bg-[#FFE6C71A] text-white px-[17px] py-[14px] rounded-lg h-5 hover:bg-primary"
                     />
                   </Space>
                 </a>
@@ -165,7 +165,7 @@ const MobileNavbar = () => {
               <Link to="/login">
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="bg-[#FFE6C71A] text-white mt-1 px-[14px] py-[10px] rounded-lg h-5 hover:bg-primary"
+                  className="bg-[#FFE6C71A] text-white px-[17px] py-[14px] rounded-lg h-5 hover:bg-primary"
                 />
               </Link>
             )}
