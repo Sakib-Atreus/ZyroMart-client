@@ -371,6 +371,57 @@ All API calls are organised into typed function groups:
 
 ---
 
+## Contributing
+
+Contributions are welcome from authorized collaborators. Please follow the process below to keep the codebase clean and consistent.
+
+### Branching Strategy
+
+```
+main          — production-ready code only
+develop       — integration branch for completed features
+feature/*     — new features (branched from develop)
+fix/*         — bug fixes (branched from develop)
+hotfix/*      — critical production fixes (branched from main)
+```
+
+### Workflow
+
+1. **Fork or branch** — create a branch from `develop` using the naming convention above.
+2. **Write your code** — place new pages under `src/pages/`, reusable components under `src/components/`, and new API call groups in `src/api/endpoints.js`.
+3. **Lint before committing** — run `npm run lint` and resolve all warnings.
+4. **Test in the browser** — verify the golden path and any edge cases (empty states, loading states, error states) before opening a pull request. Check both desktop and mobile screen sizes.
+5. **Commit clearly** — use short, imperative commit messages:
+   - `feat: add product comparison page`
+   - `fix: cart count not resetting on logout`
+   - `style: update checkout form spacing on mobile`
+6. **Open a pull request** — target the `develop` branch. Describe what changed, which pages or components are affected, and include screenshots for any UI changes.
+7. **Review** — at least one maintainer approval is required before merging.
+
+### Code Standards
+
+- Use functional components and React hooks — no class components.
+- Keep components small and focused; extract reusable UI into `src/components/` or `src/shared/`.
+- All API calls must go through the functions defined in `src/api/endpoints.js` — do not call Axios directly from pages.
+- Use Tailwind utility classes for styling; avoid inline `style` props unless animating with Framer Motion.
+- Do not commit `.env` files, API keys, or the `dist/` build output.
+
+---
+
+## Contact
+
+For questions about this project, integration support, or business enquiries, please reach out through the following channel.
+
+| Type | Details |
+|---|---|
+| **Email** | [your-email@example.com](mailto:your-email@example.com) |
+
+> For bug reports or feature requests related to the codebase, open an issue in the project repository with a clear description, steps to reproduce (if a bug), and any relevant screenshots or screen recordings.
+
+Response time is typically within 1–2 business days.
+
+---
+
 ## License
 
-This project is proprietary. All rights reserved.
+This project is proprietary. All rights reserved. Unauthorized copying, distribution, or modification of this software is strictly prohibited.
