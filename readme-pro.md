@@ -1,12 +1,21 @@
 # ZyroMart — Frontend Client
 
-A modern, responsive multi-vendor e-commerce storefront built with **React 18**, **Vite**, and **Tailwind CSS**. Ships separate role-based dashboards for admins and vendors alongside a full customer-facing shopping experience.
+![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat-square&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
+![Ant Design](https://img.shields.io/badge/Ant_Design-5.x-0170FE?style=flat-square&logo=antdesign&logoColor=white)
+![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)
+
+A modern, responsive multi-vendor e-commerce storefront built with **React 18**, **Vite**, and **Tailwind CSS**. Ships three separate role-based experiences — a full customer storefront, a vendor management dashboard, and an admin control panel — in a single application.
+
+> **Part of the ZyroMart full-stack project.** See the [Backend Repository](../ZyroMart-server/readme-pro.md) for the Node.js + Express API.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Key Highlights](#key-highlights)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Getting Started](#getting-started)
@@ -19,13 +28,46 @@ A modern, responsive multi-vendor e-commerce storefront built with **React 18**,
 
 ---
 
-## Overview
+## Screenshots
 
-ZyroMart's frontend delivers a complete shopping experience for three types of users:
+> Replace the placeholder paths below with your actual screenshots. Place images inside a `screenshots/` folder at the root of this project.
 
-- **Customers** — browse products, manage cart and wishlist, place orders, and pay via Stripe or SSLCommerz.
-- **Vendors** — manage their own product listings, variants, orders, and shop settings through a dedicated dashboard.
-- **Admins** — oversee the entire platform: approve vendors, moderate products, manage categories, and view platform-wide analytics.
+### Storefront
+
+| Home Page | Product Listing | Product Detail |
+|:---:|:---:|:---:|
+| ![Home Page](./screenshots/home.png) | ![Product Listing](./screenshots/product-listing.png) | ![Product Detail](./screenshots/product-detail.png) |
+
+### Shopping Experience
+
+| Cart | Checkout | Order Success |
+|:---:|:---:|:---:|
+| ![Cart](./screenshots/cart.png) | ![Checkout](./screenshots/checkout.png) | ![Order Success](./screenshots/order-success.png) |
+
+### Admin Dashboard
+
+| Analytics Overview | Vendor Management | Product Moderation |
+|:---:|:---:|:---:|
+| ![Admin Dashboard](./screenshots/admin-dashboard.png) | ![Vendor Management](./screenshots/admin-vendors.png) | ![Product Moderation](./screenshots/admin-products.png) |
+
+### Vendor Dashboard
+
+| Vendor Analytics | My Products | Order Tracking |
+|:---:|:---:|:---:|
+| ![Vendor Dashboard](./screenshots/vendor-dashboard.png) | ![My Products](./screenshots/vendor-products.png) | ![Vendor Orders](./screenshots/vendor-orders.png) |
+
+---
+
+## Key Highlights
+
+- **Three distinct dashboards in one app** — customer storefront, vendor panel, and admin control panel, each with its own layout, routing, and role guard.
+- **Dual payment gateway** — Stripe for international cards, SSLCommerz for Bangladeshi banks and mobile money. Payment selection at checkout with per-gateway success/cancel handling.
+- **Context-only state management** — no Redux or Zustand needed. `AuthContext` and `CartWishlistContext` cover all cross-component state while keeping the bundle lean.
+- **Axios interceptors** handle auth token injection, 401 auto-redirect to login, 403 toast feedback, and server error toasts centrally — components never deal with auth plumbing.
+- **Framer Motion** animations on page transitions, modals, and interactive components without layout jank.
+- **Recharts** powers all analytics charts (revenue, orders, top products) in both admin and vendor dashboards.
+- **Fully responsive** — Tailwind CSS mobile-first utilities with DaisyUI component layer and Ant Design for data-heavy UI (tables, forms, drawers).
+- **Role-based route protection** — `PrivateRoute`, `AdminRoute`, and `VendorRoute` guards with redirect to login on 401 and access-denied feedback on 403.
 
 ---
 
@@ -62,13 +104,13 @@ ZyroMart's frontend delivers a complete shopping experience for three types of u
 - Persistent server-side shopping cart
 - Wishlist management
 - Checkout with address entry
-- Payment via **Stripe** (international cards) or **SSLCommerz** (Bangladeshi banks/mobile money)
+- Payment via **Stripe** (international cards) or **SSLCommerz** (Bangladeshi banks / mobile money)
 - Order history with status tracking
 - Order cancellation
 - Profile management and password change
 
 ### Admin Dashboard
-- Platform analytics (revenue, users, orders, vendors)
+- Platform analytics: revenue, users, orders, vendors
 - Category management (create, edit, delete, nested categories)
 - Vendor application review and approval workflow
 - Product moderation (activate / deactivate listings)
@@ -76,7 +118,7 @@ ZyroMart's frontend delivers a complete shopping experience for three types of u
 - Admin-to-vendor messaging
 
 ### Vendor Dashboard
-- Vendor-specific analytics (own revenue, orders, top products)
+- Vendor-specific analytics: own revenue, orders, top products
 - Product listing management (CRUD + variant management)
 - Order tracking for own sales
 - Shop settings (name, logo, description)
@@ -84,9 +126,8 @@ ZyroMart's frontend delivers a complete shopping experience for three types of u
 - Answer customer Q&A on own products
 
 ### General
-- JWT-based authentication with automatic token refresh handling
+- JWT-based authentication with automatic 401 handling
 - Role-based protected routes (`user`, `vendor`, `admin`)
-- 401 auto-redirect to login; 403 access-denied feedback
 - Responsive design — mobile first via Tailwind CSS
 - Toast notifications for all async feedback
 - Smooth page and component animations via Framer Motion
@@ -98,7 +139,7 @@ ZyroMart's frontend delivers a complete shopping experience for three types of u
 ### Prerequisites
 
 - Node.js v18+
-- The ZyroMart backend running at `http://localhost:5000` (or configure `VITE_API_BASE_URL`)
+- The ZyroMart backend running at `http://localhost:5000` (or set `VITE_API_BASE_URL`)
 
 ### Installation
 
@@ -112,13 +153,13 @@ npm install
 
 # Copy environment file
 cp .env.example .env
-# Add your Google Maps API key if needed
+# Fill in your values (see Environment Variables below)
 ```
 
 ### Running the App
 
 ```bash
-# Development server (hot reload)
+# Development server with hot reload
 npm run dev
 ```
 
@@ -128,7 +169,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 # Production build
 npm run build
 
-# Preview production build locally
+# Preview the production build locally
 npm run preview
 ```
 
@@ -139,10 +180,10 @@ npm run preview
 Create a `.env` file at the project root:
 
 ```env
-# Backend API base URL (default: http://localhost:5000/api/v1)
+# Backend API base URL
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 
-# Google Maps (required for store locations page)
+# Google Maps (required for Store Locations page)
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
@@ -153,15 +194,14 @@ VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 ZyroMart-client/
 ├── public/
+├── screenshots/               # ← Place your screenshots here
 ├── src/
 │   ├── main.jsx               # App entry point — mounts providers
 │   ├── App.jsx                # Root component
-│   ├── App.css
-│   ├── index.css
 │   │
 │   ├── api/
 │   │   ├── axios.js           # Axios instance + request/response interceptors
-│   │   └── endpoints.js       # Typed API call wrappers for all modules
+│   │   └── endpoints.js       # API call wrappers for all modules
 │   │
 │   ├── context/
 │   │   ├── AuthContext.jsx    # User auth state + login/logout actions
@@ -181,46 +221,37 @@ ZyroMart-client/
 │   ├── pages/
 │   │   ├── Home/              # Landing page (banners, featured products)
 │   │   ├── Phones/            # Product listing with filters
-│   │   ├── Login/             # Login form
-│   │   ├── Register/          # Registration form
-│   │   ├── Profile/           # User profile & password change
-│   │   ├── Cart/              # Shopping cart
-│   │   ├── Wishlist/          # Saved products
-│   │   ├── Checkout/          # Checkout flow
+│   │   ├── Login/
+│   │   ├── Register/
+│   │   ├── Profile/
+│   │   ├── Cart/
+│   │   ├── Wishlist/
+│   │   ├── Checkout/
 │   │   │   ├── index.jsx      # Checkout form + payment method selection
 │   │   │   ├── Success.jsx    # Post-payment success page
 │   │   │   └── Cancel.jsx     # Payment cancelled page
-│   │   │
-│   │   ├── Admin/             # Admin dashboard pages
+│   │   ├── Admin/
 │   │   │   ├── Dashboard/
 │   │   │   ├── Categories/
 │   │   │   ├── Vendors/
 │   │   │   ├── Products/
 │   │   │   ├── Orders/
 │   │   │   └── Chat/
-│   │   │
-│   │   ├── Vendor/            # Vendor dashboard pages
-│   │   │   ├── Dashboard/
-│   │   │   ├── MyProducts/
-│   │   │   ├── Orders/
-│   │   │   ├── ShopSettings/
-│   │   │   └── Chat/
-│   │   │
-│   │   ├── About/
-│   │   ├── FAQ/
-│   │   ├── Careers/
-│   │   ├── Contact/
-│   │   ├── StoreLocations/
-│   │   ├── PrivacyPolicy/
-│   │   └── TermsOfService/
+│   │   └── Vendor/
+│   │       ├── Dashboard/
+│   │       ├── MyProducts/
+│   │       ├── Orders/
+│   │       ├── ShopSettings/
+│   │       └── Chat/
 │   │
 │   ├── components/
-│   │   ├── ChatWidget/        # Floating chat widget
+│   │   ├── ChatWidget/        # Floating AI-powered chat widget
+│   │   ├── WelcomeModal/      # Promotional welcome modal on home page
 │   │   └── PhoneDetails/      # Product detail view with variants, reviews, Q&A
 │   │
 │   ├── assets/                # Images, videos, static media
 │   ├── utils/                 # Helper functions
-│   ├── shared/                # Shared UI elements
+│   ├── shared/                # Shared UI (Navbar, Footer)
 │   └── providers/             # Context providers wrapper
 │
 ├── index.html
@@ -239,10 +270,10 @@ ZyroMart-client/
 
 | Path | Page | Description |
 |---|---|---|
-| `/` | Home | Landing page with featured products and promotions |
+| `/` | Home | Landing page with banners, featured products, and promotions |
 | `/phones` | Product Listing | Browse, search, and filter all products |
 | `/products/:slug` | Product Detail | Full product page with variants, reviews, and Q&A |
-| `/cart` | Cart | Shopping cart (view only if not logged in) |
+| `/cart` | Cart | Shopping cart |
 | `/login` | Login | Email + password login |
 | `/register` | Register | New account creation |
 | `/about` | About | Company information |
@@ -288,11 +319,9 @@ ZyroMart-client/
 
 ## State Management
 
-State is managed with React Context API — no external state library is required.
+State is managed with React Context API — no external state library required.
 
 ### AuthContext (`src/context/AuthContext.jsx`)
-
-Provides authentication state throughout the application.
 
 | Export | Type | Description |
 |---|---|---|
@@ -304,8 +333,6 @@ Provides authentication state throughout the application.
 | `logout()` | function | Calls backend logout, clears localStorage and context |
 
 ### CartWishlistContext (`src/context/CartWishlistContext.jsx`)
-
-Tracks cart and wishlist item counts for header badges.
 
 | Export | Type | Description |
 |---|---|---|
@@ -326,7 +353,7 @@ A pre-configured Axios instance handles all API communication.
 
 **Base URL:** `VITE_API_BASE_URL` (default: `http://localhost:5000/api/v1`)
 
-**Request interceptor:** Automatically attaches `Authorization: <token>` from localStorage to every request.
+**Request interceptor:** Automatically attaches `Authorization: <token>` from localStorage to every outgoing request.
 
 **Response interceptor:**
 
@@ -335,11 +362,9 @@ A pre-configured Axios instance handles all API communication.
 | 401 Unauthorized | Clears token and user, redirects to `/login` |
 | 403 Forbidden | Shows "No access" toast notification |
 | 500+ Server Error | Shows "Server error" toast notification |
-| Validation errors | Extracts first field error and shows descriptive toast |
+| Validation errors | Extracts first field error and shows a descriptive toast |
 
 ### API Endpoints (`src/api/endpoints.js`)
-
-All API calls are organised into typed function groups:
 
 | Group | Functions |
 |---|---|
@@ -347,7 +372,7 @@ All API calls are organised into typed function groups:
 | `userApi` | `getMe`, `updateMe`, `adminList`, `dashboard` |
 | `categoryApi` | `list`, `featured`, `get(slug)`, `create`, `update`, `remove` |
 | `vendorApi` | `list`, `apply`, `me`, `updateMe`, `changeStatus`, `adminList`, `adminCreate` |
-| `productApi` | `list(params)`, `getBySlug(slug)`, `create`, `update`, `remove`, `changeStatus`, `vendorMe`, `newArrivals`, `topSelling`, `onlineExclusive`, `similar(id)` |
+| `productApi` | `list(params)`, `getBySlug`, `create`, `update`, `remove`, `changeStatus`, `vendorMe`, `newArrivals`, `topSelling`, `onlineExclusive`, `similar(id)` |
 | `variantApi` | `byProduct(productId)`, `create`, `bulk`, `update`, `remove` |
 | `orderApi` | `listAll`, `listMine`, `vendorMine`, `get(id)`, `create`, `cancel`, `updateStatus` |
 | `cartApi` | `get`, `addItem`, `updateItem(variantId)`, `removeItem`, `clear` |
