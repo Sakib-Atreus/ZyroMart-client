@@ -91,14 +91,20 @@ const ProductCard = ({ product }) => {
   );
 };
 
+let _exclusiveCache = null;
+
 const ExclusiveProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(_exclusiveCache ?? []);
+  const [loading, setLoading] = useState(!_exclusiveCache);
 
   useEffect(() => {
+    if (_exclusiveCache) return;
     productApi
       .onlineExclusive(12)
-      .then((res) => setProducts(res.data ?? []))
+      .then((res) => {
+        _exclusiveCache = res.data ?? [];
+        setProducts(_exclusiveCache);
+      })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);

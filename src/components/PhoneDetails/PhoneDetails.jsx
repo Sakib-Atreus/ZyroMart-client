@@ -67,6 +67,11 @@ const getOptions = (v) => {
   return v.options;
 };
 
+// slug → { product, variants }
+const _productCache = new Map();
+// productId → { similar, reviews, questions }
+const _secondaryCache = new Map();
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PhoneDetails() {
   const { slug } = useParams();
@@ -117,35 +122,88 @@ export default function PhoneDetails() {
   // ─── Load product ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!slug) return;
+
+    // Always reset UI-only state when slug changes
+    setSelectedOptions({});
+    setResolvedVariant(null);
+    setThumbOffset(0);
+    setActiveTab("specification");
+    setShowShare(false);
+    setShowReviewForm(false);
+    setMyReview(null);
+    setReviewForm({ rating: 5, comment: "" });
+    setInWishlist(false);
+    setCartVariantIds(new Set());
+
+    const applyProduct = (p, v) => {
+      setProduct(p);
+      setVariants(v);
+      setMainImage(p.thumbnail);
+      const defaults = {};
+      (p.variantOptions ?? []).forEach((opt) => {
+        if (opt.values?.length) defaults[opt.key] = opt.values[0];
+      });
+      setSelectedOptions(defaults);
+      setLoading(false);
+    };
+
+    const cached = _productCache.get(slug);
+    if (cached) {
+      applyProduct(cached.product, cached.variants);
+
+      const sec = _secondaryCache.get(String(cached.product._id));
+      if (sec) {
+        setSimilar(sec.similar);
+        setReviews(sec.reviews);
+        setQuestions(sec.questions);
+      } else {
+        setSimilar([]);
+        setReviews([]);
+        setQuestions([]);
+        Promise.all([
+          productApi.similar(cached.product._id, 6).catch(() => ({ data: [] })),
+          reviewApi.listByProduct(cached.product._id).catch(() => ({ data: [] })),
+          questionApi.listByProduct(cached.product._id).catch(() => ({ data: [] })),
+        ]).then(([sim, rev, qs]) => {
+          const similar = sim.data ?? [];
+          const reviews = rev.data?.reviews ?? rev.data ?? [];
+          const questions = qs.data ?? [];
+          _secondaryCache.set(String(cached.product._id), { similar, reviews, questions });
+          setSimilar(similar);
+          setReviews(reviews);
+          setQuestions(questions);
+        });
+      }
+
+      // User-specific data is never cached — always fetch fresh
+      if (user) {
+        Promise.all([
+          reviewApi.myReviewForProduct(cached.product._id).catch(() => ({ data: null })),
+          wishlistApi.get().catch(() => null),
+          cartApi.get().catch(() => null),
+        ]).then(([myRev, wl, cartData]) => {
+          if (myRev?.data) { setMyReview(myRev.data); setReviewForm({ rating: myRev.data.rating, comment: myRev.data.comment }); }
+          if (wl?.data?.products) setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(cached.product._id)));
+          if (cartData?.data?.items) setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
+        });
+      }
+      return;
+    }
+
+    // No cache — full load
     setLoading(true);
     setProduct(null);
     setMainImage("");
-    setSelectedOptions({});
-    setResolvedVariant(null);
     setSimilar([]);
     setReviews([]);
-    setMyReview(null);
     setQuestions([]);
-    setInWishlist(false);
-    setCartVariantIds(new Set());
 
     productApi.getBySlug(slug)
       .then((res) => {
         const p = res.data ?? res;
-        setProduct(p);
         const v = p.variants ?? [];
-        setVariants(v);
-        setMainImage(p.thumbnail);
-
-        // pre-select first value per option
-        const defaults = {};
-        (p.variantOptions ?? []).forEach((opt) => {
-          if (opt.values?.length) defaults[opt.key] = opt.values[0];
-        });
-        setSelectedOptions(defaults);
-
-        // ── Render the page immediately; load secondary data in background ──
-        setLoading(false);
+        _productCache.set(slug, { product: p, variants: v });
+        applyProduct(p, v);
 
         Promise.all([
           productApi.similar(p._id, 6).catch(() => ({ data: [] })),
@@ -155,16 +213,16 @@ export default function PhoneDetails() {
           user ? wishlistApi.get().catch(() => null) : Promise.resolve(null),
           user ? cartApi.get().catch(() => null) : Promise.resolve(null),
         ]).then(([sim, rev, myRev, qs, wl, cartData]) => {
-          setSimilar(sim.data ?? []);
-          setReviews(rev.data?.reviews ?? rev.data ?? []);
+          const similar = sim.data ?? [];
+          const reviews = rev.data?.reviews ?? rev.data ?? [];
+          const questions = qs.data ?? [];
+          _secondaryCache.set(String(p._id), { similar, reviews, questions });
+          setSimilar(similar);
+          setReviews(reviews);
           if (myRev?.data) { setMyReview(myRev.data); setReviewForm({ rating: myRev.data.rating, comment: myRev.data.comment }); }
-          setQuestions(qs.data ?? []);
-          if (wl?.data?.products) {
-            setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(p._id)));
-          }
-          if (cartData?.data?.items) {
-            setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
-          }
+          setQuestions(questions);
+          if (wl?.data?.products) setInWishlist(wl.data.products.some((i) => String(i._id ?? i) === String(p._id)));
+          if (cartData?.data?.items) setCartVariantIds(new Set(cartData.data.items.map(i => String(i.variant?._id ?? i.variant))));
         });
       })
       .catch(() => {
@@ -317,6 +375,7 @@ export default function PhoneDetails() {
         setMyReview(res.data);
         setReviews((prev) => [res.data, ...prev]);
       }
+      _secondaryCache.delete(String(product._id));
       toast.success("Review saved!");
       setShowReviewForm(false);
     } catch (err) {
@@ -334,6 +393,7 @@ export default function PhoneDetails() {
     try {
       const res = await questionApi.create({ product: product._id, question: qForm });
       setQuestions((prev) => [res.data, ...prev]);
+      _secondaryCache.delete(String(product._id));
       setQForm("");
       toast.success("Question submitted!");
     } catch (err) {

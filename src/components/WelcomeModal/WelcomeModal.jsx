@@ -12,13 +12,21 @@ const perks = [
     { icon: <BiSupport size={16} />, label: '24/7 Customer Support' },
 ];
 
+const STORAGE_KEY = 'zyromart_welcome_shown';
+
 const WelcomeModal = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
+        if (localStorage.getItem(STORAGE_KEY)) return;
         const timer = setTimeout(() => setIsOpen(true), 500);
         return () => clearTimeout(timer);
     }, []);
+
+    const close = () => {
+        localStorage.setItem(STORAGE_KEY, '1');
+        setIsOpen(false);
+    };
 
     return (
         <AnimatePresence>
@@ -33,7 +41,7 @@ const WelcomeModal = () => {
                     {/* Backdrop */}
                     <motion.div
                         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                        onClick={() => setIsOpen(false)}
+                        onClick={close}
                     />
 
                     {/* Modal */}
@@ -46,7 +54,7 @@ const WelcomeModal = () => {
                     >
                         {/* Close Button */}
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={close}
                             className="absolute top-3 right-3 z-20 bg-white/90 hover:bg-white text-gray-700 hover:text-red-500 rounded-full p-1.5 shadow-md transition-all duration-200 hover:scale-110"
                             aria-label="Close modal"
                         >
@@ -134,7 +142,7 @@ const WelcomeModal = () => {
                             {/* CTA */}
                             <div>
                                 <button
-                                    onClick={() => setIsOpen(false)}
+                                    onClick={close}
                                     className="w-full bg-[#FF4500] hover:bg-[#e03d00] text-white font-semibold py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-orange-200 active:scale-95 text-sm"
                                 >
                                     Shop Now →
