@@ -7,6 +7,8 @@ export const authApi = {
   signup: (body) => unwrap(api.post("/auth/signup", body)),
   logout: () => unwrap(api.post("/auth/logout")),
   changePassword: (body) => unwrap(api.post("/auth/change-password", body)),
+  sendOtp: (body) => unwrap(api.post("/auth/send-otp", body)),
+  verifyOtp: (body) => unwrap(api.post("/auth/verify-otp", body)),
 };
 
 export const userApi = {

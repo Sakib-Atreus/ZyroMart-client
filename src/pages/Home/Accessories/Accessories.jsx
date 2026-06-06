@@ -33,14 +33,20 @@ const Stars = ({ value }) => (
   </span>
 );
 
+let _topSellingCache = null;
+
 const Accessories = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(_topSellingCache ?? []);
+  const [loading, setLoading] = useState(!_topSellingCache);
 
   useEffect(() => {
+    if (_topSellingCache) return;
     productApi
       .topSelling(8)
-      .then((res) => setProducts(res.data ?? []))
+      .then((res) => {
+        _topSellingCache = res.data ?? [];
+        setProducts(_topSellingCache);
+      })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);

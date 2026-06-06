@@ -215,12 +215,18 @@ const CheckboxList = ({ items, isChecked, onChange, getLabel }) => {
   );
 };
 
+// ─── Module-level caches ──────────────────────────────────────────────────────
+// query-key → { products, meta }
+const _phonesCache = new Map();
+// categories list (same for all users, rarely changes)
+let _categoriesCache = null;
+
 // ─── Main page component ──────────────────────────────────────────────────────
 
 const Phones = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(_categoriesCache ?? []);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -340,13 +346,27 @@ const Phones = () => {
   }, [minPrice, maxPrice]);
 
   useEffect(() => {
+    if (_categoriesCache) return;
     categoryApi
       .list()
-      .then((res) => setCategories(res.data ?? res ?? []))
+      .then((res) => {
+        _categoriesCache = res.data ?? res ?? [];
+        setCategories(_categoriesCache);
+      })
       .catch(() => {});
   }, []);
 
   const fetchProducts = useCallback(() => {
+    const cacheKey = JSON.stringify({ page, category, brand, sort, minPrice, maxPrice, searchTerm, isOnlineExclusive, attrsStr, attrFiltersStr, minRating });
+
+    const cached = _phonesCache.get(cacheKey);
+    if (cached) {
+      setProducts(cached.products);
+      setMeta(cached.meta);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     const params = { page, limit: 12, sort };
     if (category) params.category = category;
@@ -362,8 +382,11 @@ const Phones = () => {
     productApi
       .list(params)
       .then((res) => {
-        setProducts(res.data ?? []);
-        setMeta(res.meta ?? { total: 0, page: 1, totalPages: 1 });
+        const products = res.data ?? [];
+        const meta = res.meta ?? { total: 0, page: 1, totalPages: 1 };
+        _phonesCache.set(cacheKey, { products, meta });
+        setProducts(products);
+        setMeta(meta);
       })
       .catch(() => { setProducts([]); toast.error("Failed to load products"); })
       .finally(() => setLoading(false));

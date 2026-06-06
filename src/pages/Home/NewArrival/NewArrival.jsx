@@ -99,14 +99,20 @@ const ProductCard = ({ product }) => {
   );
 };
 
+let _newArrivalsCache = null;
+
 const NewArrival = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(_newArrivalsCache ?? []);
+  const [loading, setLoading] = useState(!_newArrivalsCache);
 
   useEffect(() => {
+    if (_newArrivalsCache) return;
     productApi
       .newArrivals(12)
-      .then((res) => setProducts(res.data ?? []))
+      .then((res) => {
+        _newArrivalsCache = res.data ?? [];
+        setProducts(_newArrivalsCache);
+      })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);

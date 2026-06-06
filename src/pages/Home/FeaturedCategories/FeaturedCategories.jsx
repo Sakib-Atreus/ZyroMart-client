@@ -43,14 +43,20 @@ const SLUG_ICON = {
 const imgClass =
   "w-24 h-24 lg:w-28 lg:h-28 border border-orange-600 rounded-full p-1 border-opacity-50 bg-white shadow-lg object-contain";
 
+let _categoriesCache = null;
+
 const FeaturedCategories = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(_categoriesCache ?? []);
+  const [loading, setLoading] = useState(!_categoriesCache);
 
   useEffect(() => {
+    if (_categoriesCache) return;
     categoryApi
       .featured()
-      .then((res) => setCategories(res.data ?? res ?? []))
+      .then((res) => {
+        _categoriesCache = res.data ?? res ?? [];
+        setCategories(_categoriesCache);
+      })
       .catch(() => setCategories([]))
       .finally(() => setLoading(false));
   }, []);
