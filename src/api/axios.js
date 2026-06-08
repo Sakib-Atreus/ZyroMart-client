@@ -48,7 +48,7 @@ api.interceptors.response.use(
           window.location.assign("/login");
         }
       }
-    } else if (status === 403) {
+    } else if (status === 403 && message !== "EMAIL_NOT_VERIFIED") {
       toast.error(message || "You don't have access to this resource");
     } else if (status && status >= 500) {
       toast.error("Server error. Please try again.");
