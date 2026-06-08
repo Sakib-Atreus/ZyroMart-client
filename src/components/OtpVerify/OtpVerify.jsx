@@ -52,6 +52,7 @@ const OtpVerify = ({ email, onVerified, onBack }) => {
   };
 
   const handleVerify = async () => {
+    if (loading) return;
     const otp = digits.join("");
     if (otp.length < OTP_LENGTH) return toast.error("Enter all 6 digits");
     setLoading(true);
