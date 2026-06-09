@@ -202,8 +202,8 @@ const Login = () => {
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:opacity-60">
-                      {loading ? <span className="loading loading-spinner loading-sm" /> : "Log In"}
+                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:bg-primary disabled:text-white disabled:opacity-70">
+                      {loading ? <span className="loading loading-spinner loading-sm text-white" /> : "Log In"}
                     </button>
                   </form>
                 ) : (
@@ -292,8 +292,8 @@ const Login = () => {
                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:opacity-60">
-                      {loading ? <span className="loading loading-spinner loading-sm" /> : "Sign Up"}
+                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:bg-primary disabled:text-white disabled:opacity-70">
+                      {loading ? <span className="loading loading-spinner loading-sm text-white" /> : "Sign Up"}
                     </button>
                   </form>
                 )}
