@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
 import { authApi } from "../../api/endpoints";
@@ -113,7 +113,7 @@ const OtpVerify = ({ email, onVerified, onBack }) => {
       <div
         className="flex justify-center gap-2 mb-6"
         onPaste={handlePaste}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyPress}
       >
         {digits.map((digit, index) => (
           <input
@@ -136,10 +136,10 @@ const OtpVerify = ({ email, onVerified, onBack }) => {
       <button
         onClick={handleVerify}
         disabled={loading || digits.join("").length < OTP_LENGTH}
-        className="btn bg-primary text-white w-full disabled:opacity-60"
+        className={`btn w-full ${loading ? "bg-white border border-primary" : "bg-primary text-white disabled:opacity-60"}`}
       >
         {loading ? (
-          <span className="loading loading-spinner loading-sm text-white" />
+          <span className="loading loading-spinner loading-sm text-primary" />
         ) : (
           "Verify Email"
         )}
