@@ -26,6 +26,7 @@ const Login = () => {
   const [otpStep, setOtpStep] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
   const [pendingPassword, setPendingPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,6 +61,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await authApi.login({
         email: formData.email,
@@ -83,6 +85,8 @@ const Login = () => {
         return;
       }
       toast.error(err.response?.data?.message || err.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +95,7 @@ const Login = () => {
     if (formData.password !== formData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
+    setLoading(true);
     try {
       await authApi.signup({
         name: formData.name,
@@ -106,6 +111,8 @@ const Login = () => {
       toast.info("A verification code has been sent to your email");
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -195,7 +202,9 @@ const Login = () => {
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button className="btn bg-primary text-white w-full">Log In</button>
+                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:opacity-60">
+                      {loading ? <span className="loading loading-spinner loading-sm" /> : "Log In"}
+                    </button>
                   </form>
                 ) : (
                   <form className="space-y-4" onSubmit={handleRegister}>
@@ -283,7 +292,9 @@ const Login = () => {
                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button className="btn bg-primary text-white w-full">Sign Up</button>
+                    <button disabled={loading} className="btn bg-primary text-white w-full disabled:opacity-60">
+                      {loading ? <span className="loading loading-spinner loading-sm" /> : "Sign Up"}
+                    </button>
                   </form>
                 )}
               </div>
