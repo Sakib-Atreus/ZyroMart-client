@@ -202,7 +202,7 @@ const Login = () => {
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button disabled={loading} className={`btn w-full ${loading ? "bg-white border-2 border-primary" : "bg-primary text-white"}`}>
+                    <button disabled={loading} className={`btn w-full ${loading ? "!bg-white border-2 !border-primary" : "bg-primary text-white"}`}>
                       {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Log In"}
                     </button>
                   </form>
@@ -292,7 +292,7 @@ const Login = () => {
                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
                     </div>
-                    <button disabled={loading} className={`btn w-full ${loading ? "bg-white border-2 border-primary" : "bg-primary text-white"}`}>
+                    <button disabled={loading} className={`btn w-full ${loading ? "!bg-white border-2 !border-primary" : "bg-primary text-white"}`}>
                       {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Sign Up"}
                     </button>
                   </form>
