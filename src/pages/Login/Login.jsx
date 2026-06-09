@@ -203,7 +203,7 @@ const Login = () => {
                       </span>
                     </div>
                     <button disabled={loading} className={`btn w-full bg-primary text-white`}>
-                      {loading ? <span className="loading loading-spinner loading-sm text-white" /> : "Log In"}
+                      {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Log In"}
                     </button>
                   </form>
                 ) : (
@@ -293,7 +293,7 @@ const Login = () => {
                       </span>
                     </div>
                     <button disabled={loading} className={`btn w-full bg-primary text-white`}>
-                      {loading ? <span className="loading loading-spinner loading-sm text-white" /> : "Sign Up"}
+                      {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Sign Up"}
                     </button>
                   </form>
                 )}

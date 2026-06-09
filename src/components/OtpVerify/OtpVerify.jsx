@@ -139,7 +139,7 @@ const OtpVerify = ({ email, onVerified, onBack }) => {
         className={`btn w-full bg-primary text-white disabled:opacity-60`}
       >
         {loading ? (
-          <span className="loading loading-spinner loading-sm text-white" />
+          <span className="loading loading-spinner loading-sm text-primary" />
         ) : (
           "Verify Email"
         )}
