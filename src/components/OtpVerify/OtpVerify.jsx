@@ -136,7 +136,7 @@ const OtpVerify = ({ email, onVerified, onBack }) => {
       <button
         onClick={handleVerify}
         disabled={loading || digits.join("").length < OTP_LENGTH}
-        className={`btn w-full ${loading ? "!bg-white border-2 !border-primary" : "bg-primary text-white disabled:opacity-60"}`}
+        className={`btn w-full ${loading ? "!bg-black border-0" : "bg-primary text-white disabled:opacity-60"}`}
       >
         {loading ? (
           <span className="loading loading-spinner loading-sm text-primary" />
