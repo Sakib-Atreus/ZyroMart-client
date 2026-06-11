@@ -4,7 +4,7 @@
 ![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Ant Design](https://img.shields.io/badge/Ant_Design-5.x-0170FE?style=flat-square&logo=antdesign&logoColor=white)
-![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 A modern, responsive multi-vendor e-commerce storefront built with **React 18**, **Vite**, and **Tailwind CSS**. Ships three separate role-based experiences — a full customer storefront, a vendor management dashboard, and an admin control panel — in a single application.
 
@@ -447,6 +447,8 @@ Response time is typically within 1–2 business days.
 
 ## License
 
-Copyright © 2025 MD. Sakib Mia. All Rights Reserved.
+This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
 
-You may not copy, clone, or redistribute this project without written permission. Contributions via pull request are welcome. See the [LICENSE](./LICENSE) file for full terms or contact [sakibmia0718@gmail.com](mailto:sakibmia0718@gmail.com) to request permission.
+Copyright © 2025 MD. Sakib Mia
+
+While this project is open source, direct copying or cloning to create a competing or identical product is discouraged. If you find it useful, please contribute back via pull request instead of forking and rebranding.
