@@ -30,12 +30,13 @@ A modern, responsive multi-vendor e-commerce storefront built with **React 18**,
 
 ## Screenshots
 
-### Storefront
+<!-- ### Storefront -->
 
 | Home Page | Product Listing | Product Detail |
 |:---:|:---:|:---:|
-| ![Home Page](./public/repo/zyromart_home.png) | ![Product Listing](./public/repo/zyromart_products.png) | ![Product Detail](./public/repo/zyromart_product_details.png) |
+| ![Home Page](./public/repo/zyromart_home.png) | ![Product Listing](./public/repo/zyromart_products.png) | ![Product Details](./public/repo/zyromart_product_details.png) |
 
+<!--
 ### Shopping Experience
 
 | Cart | Checkout | Order Success |
@@ -53,6 +54,7 @@ A modern, responsive multi-vendor e-commerce storefront built with **React 18**,
 | Vendor Analytics | My Products | Order Tracking |
 |:---:|:---:|:---:|
 | ![Vendor Dashboard](./screenshots/vendor-dashboard.png) | ![My Products](./screenshots/vendor-products.png) | ![Vendor Orders](./screenshots/vendor-orders.png) |
+-->
 
 ---
 
