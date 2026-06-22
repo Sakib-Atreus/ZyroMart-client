@@ -9,6 +9,8 @@ export const authApi = {
   changePassword: (body) => unwrap(api.post("/auth/change-password", body)),
   sendOtp: (body) => unwrap(api.post("/auth/send-otp", body)),
   verifyOtp: (body) => unwrap(api.post("/auth/verify-otp", body)),
+  forgotPassword: (body) => unwrap(api.post("/auth/forgot-password", body)),
+  resetPassword: (body) => unwrap(api.post("/auth/reset-password", body)),
 };
 
 export const userApi = {

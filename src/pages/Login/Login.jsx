@@ -205,6 +205,24 @@ const Login = () => {
                     <button disabled={loading} className={`btn w-full bg-primary text-white`}>
                       {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Log In"}
                     </button>
+                    <button
+                      type="button"
+                      className="text-sm text-primary hover:underline text-left"
+                      onClick={() => navigate("/forgot-password")}
+                    >
+                      Forgot password?
+                    </button>
+                    <div className="divider text-xs text-gray-400 my-0">or</div>
+                    <p className="text-center text-sm text-gray-500">
+                      Don't have an account?{" "}
+                      <button
+                        type="button"
+                        className="text-primary font-medium hover:underline"
+                        onClick={() => handleTabChange("register")}
+                      >
+                        Sign up
+                      </button>
+                    </p>
                   </form>
                 ) : (
                   <form className="space-y-4" onSubmit={handleRegister}>
@@ -295,6 +313,16 @@ const Login = () => {
                     <button disabled={loading} className={`btn w-full bg-primary text-white`}>
                       {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Sign Up"}
                     </button>
+                    <p className="text-center text-sm text-gray-500 mt-1">
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        className="text-primary hover:underline"
+                        onClick={() => handleTabChange("login")}
+                      >
+                        Login
+                      </button>
+                    </p>
                   </form>
                 )}
               </div>

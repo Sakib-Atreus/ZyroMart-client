@@ -20,6 +20,8 @@ import Profile from "../pages/Profile/Profile";
 import Checkout from "../pages/Checkout/Checkout";
 import CheckoutSuccess from "../pages/Checkout/CheckoutSuccess";
 import CheckoutCancel from "../pages/Checkout/CheckoutCancel";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import PrivateRoute from "./PrivateRoutes";
 import AdminRoute from "./AdminRoute";
 import VendorRoute from "./VendorRoute";
@@ -98,6 +100,8 @@ export const router = createBrowserRouter([
       { path: "/terms", element: <TermsOfService /> },
     ],
   },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/reset-password", element: <ResetPassword /> },
   {
     path: "/admin",
     element: (
