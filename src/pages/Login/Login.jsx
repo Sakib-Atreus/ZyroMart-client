@@ -104,11 +104,14 @@ const Login = () => {
         password: formData.password,
         address: formData.address,
       });
-      // OTP is sent by the server during signup — show the verify step
-      setPendingEmail(formData.email);
-      setPendingPassword(formData.password);
-      setOtpStep(true);
-      toast.info("A verification code has been sent to your email");
+      // Auto-login after signup — OTP verification temporarily disabled
+      const res = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+      login({ user: res.data, token: res.token });
+      toast.success("Account created successfully!");
+      navigate(destinationForRole(res.data?.role), { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Registration failed");
     } finally {
