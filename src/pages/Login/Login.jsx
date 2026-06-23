@@ -104,14 +104,10 @@ const Login = () => {
         password: formData.password,
         address: formData.address,
       });
-      // Auto-login after signup — OTP verification temporarily disabled
-      const res = await authApi.login({
-        email: formData.email,
-        password: formData.password,
-      });
-      login({ user: res.data, token: res.token });
-      toast.success("Account created successfully!");
-      navigate(destinationForRole(res.data?.role), { replace: true });
+      setPendingEmail(formData.email);
+      setPendingPassword(formData.password);
+      setOtpStep(true);
+      toast.info("Check your email for a verification code");
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Registration failed");
     } finally {
@@ -208,7 +204,11 @@ const Login = () => {
                     <button disabled={loading} className={`btn w-full bg-primary text-white`}>
                       {loading ? <span className="loading loading-spinner loading-sm text-primary" /> : "Log In"}
                     </button>
-                    {/* Forgot password — re-enable once email service is configured */}
+                    <div className="text-right -mt-1">
+                      <a href="/forgot-password" className="text-sm text-primary hover:underline">
+                        Forgot your password?
+                      </a>
+                    </div>
                     <div className="divider text-xs text-gray-400 my-0">or</div>
                     <p className="text-center text-sm text-gray-500">
                       Don't have an account?{" "}
